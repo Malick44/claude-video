@@ -1,0 +1,30 @@
+export interface FeedRow {
+  id: string;
+  platform: string;
+  video_url: string;
+  media_url: string | null;
+  thumbnail_url: string | null;
+  caption: string | null;
+  published_at: string | null;
+  duration_seconds: number | null;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  saves: number;
+  outlier_multiplier: number | null;
+  engagement_rate: number | null;
+  is_outlier: boolean;
+  processing_status: string;
+  competitor_id: string;
+  handle: string;
+  follower_count: number | null;
+  median_views_last_20: number | null;
+  niche_category: string | null;
+  hook_text: string | null;
+  hook_archetype: string | null;
+  cta_type: string | null;
+  primary_topic_cluster: string | null;
+  pacing_wpm: number | null;
+  similarity?: number;
+}
