@@ -1,0 +1,64 @@
+{
+  "id": "script_08_commute_time_machine",
+  "title": "The Commute & Gym Time Machine",
+  "angle": "Habit Stacking & Time Mastery",
+  "target_audience": "Daily commuters, drivers, fitness goers",
+  "target_duration_sec": 24.0,
+  "total_words": 69,
+  "cadence_wpm": 172.5,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "Stop wasting forty minutes every morning sitting in heavy rush hour traffic.",
+      "banner_headline": "WASTING 40 MIN IN TRAFFIC?",
+      "visual_action": "Creator sitting in car driver seat (parked), hands gesturing in frustration at windshield."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Identify lost time that yields zero return",
+      "text": "Most people listen to the exact same radio songs every commute and learn absolutely nothing new.",
+      "banner_headline": "SAME BORING RADIO SONGS...",
+      "visual_action": "Finger repeatedly hitting radio skip buttons on dashboard."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "Transforming dead time into massive compounding knowledge",
+      "text": "I queued all my work articles and personal reading into VoiceReader. Now my daily drive turns into a private masterclass, and I finish a full book every single week.",
+      "banner_headline": "FINISH A BOOK EVERY WEEK!",
+      "visual_action": "Phone mounted on dashboard connected via Bluetooth playing VoiceReader with clean CarPlay-friendly interface."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "What are you listening to during your commute right now? Comment below.",
+      "banner_headline": "WHAT DO YOU LISTEN TO?",
+      "visual_action": "Creator points down toward center console/comments."
+    }
+  ]
+}

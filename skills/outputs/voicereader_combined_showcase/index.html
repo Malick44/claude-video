@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>VoiceReader App - Character & Fullscreen Phone Showcase</title>
+    <!-- GSAP for HyperFrames Deterministic Animation Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #000000;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000000;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      }
+      .fullscreen-media {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+      }
+      .fullscreen-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-width="1080"
+      data-height="1920"
+      data-duration="24.5"
+    >
+      <!-- Master Synced Audio Track -->
+      <audio
+        id="master-audio"
+        class="clip"
+        data-start="0"
+        data-duration="24.5"
+        data-volume="1.0"
+        src="./assets/narration.mp3"
+      ></audio>
+
+      <!-- SCENE 1: Character Talking Hook [0.0s - 3.5s] (Higgsfield MiniMax H3 Max) -->
+      <video
+        id="hook-video"
+        class="clip fullscreen-video"
+        src="./assets/char_01_hook.mp4"
+        data-start="0"
+        data-duration="3.5"
+        data-media-start="0.2"
+        playsinline
+        muted
+      ></video>
+
+      <!-- SCENE 2: Fullscreen Phone - PDF Upload Screen [3.5s - 8.5s] -->
+      <img
+        id="phone-screen-1"
+        class="clip fullscreen-media"
+        data-start="3.5"
+        data-duration="5.0"
+        src="./assets/screen_01_upload.png"
+        alt="PDF Upload Screen"
+      />
+
+      <!-- SCENE 3: Fullscreen Phone - Voice Selection [8.5s - 13.5s] -->
+      <img
+        id="phone-screen-2"
+        class="clip fullscreen-media"
+        data-start="8.5"
+        data-duration="5.0"
+        src="./assets/screen_02_voices.png"
+        alt="Natural AI Voices Screen"
+      />
+
+      <!-- SCENE 4: Fullscreen Phone - Reader at 2X Speed [13.5s - 18.5s] -->
+      <img
+        id="phone-screen-3"
+        class="clip fullscreen-media"
+        data-start="13.5"
+        data-duration="5.0"
+        src="./assets/screen_03_reader_light.png"
+        alt="Reader Light Mode"
+      />
+      <img
+        id="phone-screen-4"
+        class="clip fullscreen-media"
+        data-start="16.0"
+        data-duration="2.5"
+        src="./assets/screen_04_reader_dark.png"
+        alt="Reader Dark Mode"
+        style="opacity: 0;"
+      />
+
+      <!-- SCENE 5: Character Outro Talking Smirk [18.5s - 24.5s] (Higgsfield MiniMax H3 Max) -->
+      <video
+        id="outro-video"
+        class="clip fullscreen-video"
+        src="./assets/char_04_outro.mp4"
+        data-start="18.5"
+        data-duration="6.0"
+        data-media-start="0.0"
+        playsinline
+        muted
+      ></video>
+    </div>
+
+    <!-- GSAP TIMELINE REGISTRATION -->
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 2: Fullscreen Phone Upload Animation (3.5s - 8.5s)
+      tl.fromTo(
+        "#phone-screen-1",
+        { scale: 1.0, y: 0 },
+        { scale: 1.05, y: -40, duration: 5.0, ease: "none" },
+        3.5
+      );
+
+      // Scene 3: Fullscreen Phone Voices Animation (8.5s - 13.5s)
+      tl.fromTo(
+        "#phone-screen-2",
+        { scale: 1.04, y: 10 },
+        { scale: 1.0, y: -30, duration: 5.0, ease: "none" },
+        8.5
+      );
+
+      // Scene 4: Fullscreen Phone Reader Animation (13.5s - 18.5s)
+      tl.fromTo(
+        "#phone-screen-3",
+        { scale: 1.0, y: 0 },
+        { scale: 1.04, y: -20, duration: 5.0, ease: "none" },
+        13.5
+      );
+      // Seamless cross-fade to dark mode reader
+      tl.to("#phone-screen-4", { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 16.0);
+      tl.fromTo(
+        "#phone-screen-4",
+        { scale: 1.02, y: -10 },
+        { scale: 1.06, y: -30, duration: 2.5, ease: "none" },
+        16.0
+      );
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

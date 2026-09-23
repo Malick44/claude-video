@@ -1,0 +1,64 @@
+{
+  "id": "script_06_robot_voice_is_dead",
+  "title": "The Robot Voice is Officially Dead",
+  "angle": "Tech Revolution / AI Voice Quality",
+  "target_audience": "Tech skeptics, audiobook listeners, casual scrollers",
+  "target_duration_sec": 24.0,
+  "total_words": 69,
+  "cadence_wpm": 172.5,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "Throw away everything you thought you ever knew about text-to-speech.",
+      "banner_headline": "ROBOT VOICES ARE DEAD!",
+      "visual_action": "Creator waves hand dismissively, intensely leaning towards camera."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Trigger nostalgia and shared frustration",
+      "text": "Remember those awful, stiff GPS voices from ten years ago that gave you an instant headache?",
+      "banner_headline": "THAT OLD STIFF GPS VOICE...",
+      "visual_action": "Imitates monotone robotic voice while clutching temples in mock pain."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "Auditory contrast & demonstration of realism",
+      "text": "VoiceReader just rolled out ultra-natural AI narrators that breathe, pause for dramatic effect, and emphasize key emotional words so realistically that audio producers literally cannot tell the difference.",
+      "banner_headline": "BREATHES & PAUSES NATURALLY!",
+      "visual_action": "VoiceReader voice picker UI showing expressive voice personas, audio waveform pulsing dynamically."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Listen closely for yourself and tell me down below: can you spot the AI voice?",
+      "banner_headline": "CAN YOU SPOT THE AI?",
+      "visual_action": "Creator cups hand to ear with a challenging smile."
+    }
+  ]
+}

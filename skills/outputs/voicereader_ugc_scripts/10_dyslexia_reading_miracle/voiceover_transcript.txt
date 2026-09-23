@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE DYSLEXIA & STRUGGLING READER MIRACLE (24.0s)
+Angle: Accessibility & Dual-Modality Learning | Target Audience: Dyslexic readers, ESL learners, slow reading adults
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (11 words)
+Banner Headline: MOST LIFE-CHANGING APP?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator looks sincerely and directly into camera with genuine awe.
+Spoken Voiceover: "This might actually be the most life-changing accessibility app ever created."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (16 words)
+Banner Headline: WORDS SCRAMBLING ON SCREEN...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Visual effect showing words blurring slightly on a page to illustrate dyslexia struggle.
+Spoken Voiceover: "If you struggle with dyslexia, words literally scramble across the screen and make reading agonizingly slow."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (27 words)
+Banner Headline: ELIMINATES READING FATIGUE!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Crisp close-up on VoiceReader's live karaoke-style word highlighter in action, paired with a warm, natural human voice.
+Spoken Voiceover: "VoiceReader uses dual modality sensory learning, highlighting every word in bright dynamic color while reading aloud with studio quality AI voices, completely eliminating reading fatigue for good."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (15 words)
+Banner Headline: SHARE WITH A FRIEND!
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator gestures with hands, warm inviting smile.
+Spoken Voiceover: "Share this with someone who struggles with reading, and tell me your personal thoughts below."
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+This might actually be the most life-changing accessibility app ever created. If you struggle with dyslexia, words literally scramble across the screen and make reading agonizingly slow. VoiceReader uses dual modality sensory learning, highlighting every word in bright dynamic color while reading aloud with studio quality AI voices, completely eliminating reading fatigue for good. Share this with someone who struggles with reading, and tell me your personal thoughts below.

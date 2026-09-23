@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>VoiceReader App - Fullscreen Phone UI Demo</title>
+    <!-- GSAP for HyperFrames Deterministic Animation Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #000000;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000000;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+      }
+      .fullscreen-media {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-width="1080"
+      data-height="1920"
+      data-duration="15.0"
+    >
+      <!-- Synced Phone Demo Narration Audio (15.0s) -->
+
+      <!-- SCENE 1: Fullscreen Phone - PDF Upload Screen [0.0s - 5.0s] -->
+      <img
+        id="phone-screen-1"
+        class="clip fullscreen-media"
+        data-start="0"
+        data-duration="5.0"
+        src="./assets/screen_01_upload.png"
+        alt="PDF Upload Screen"
+      />
+
+      <!-- SCENE 2: Fullscreen Phone - Voice Selection [5.0s - 10.0s] -->
+      <img
+        id="phone-screen-2"
+        class="clip fullscreen-media"
+        data-start="5.0"
+        data-duration="5.0"
+        src="./assets/screen_02_voices.png"
+        alt="Natural AI Voices Screen"
+      />
+
+      <!-- SCENE 3: Fullscreen Phone - Reader Light Mode [10.0s - 15.0s] -->
+      <img
+        id="phone-screen-3"
+        class="clip fullscreen-media"
+        data-start="10.0"
+        data-duration="5.0"
+        src="./assets/screen_03_reader_light.png"
+        alt="Reader Light Mode"
+      />
+
+      <!-- SCENE 4: Fullscreen Phone - Reader Dark Mode Cross-fade [12.5s - 15.0s] -->
+      <img
+        id="phone-screen-4"
+        class="clip fullscreen-media"
+        data-start="12.5"
+        data-duration="2.5"
+        src="./assets/screen_04_reader_dark.png"
+        alt="Reader Dark Mode"
+        style="opacity: 0;"
+      />
+    </div>
+
+    <!-- GSAP TIMELINE REGISTRATION -->
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Upload Screen Motion (0.0s - 5.0s)
+      tl.fromTo(
+        "#phone-screen-1",
+        { scale: 1.0, y: 0 },
+        { scale: 1.05, y: -40, duration: 5.0, ease: "none" },
+        0
+      );
+
+      // Scene 2: Voices Screen Motion (5.0s - 10.0s)
+      tl.fromTo(
+        "#phone-screen-2",
+        { scale: 1.04, y: 10 },
+        { scale: 1.0, y: -30, duration: 5.0, ease: "none" },
+        5.0
+      );
+
+      // Scene 3: Reader Light Mode Motion (10.0s - 15.0s)
+      tl.fromTo(
+        "#phone-screen-3",
+        { scale: 1.0, y: 0 },
+        { scale: 1.04, y: -20, duration: 5.0, ease: "none" },
+        10.0
+      );
+
+      // Scene 4: Reader Dark Mode Cross-fade (12.5s - 15.0s)
+      tl.to("#phone-screen-4", { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 12.5);
+      tl.fromTo(
+        "#phone-screen-4",
+        { scale: 1.02, y: -10 },
+        { scale: 1.06, y: -30, duration: 2.5, ease: "none" },
+        12.5
+      );
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

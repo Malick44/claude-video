@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE SEVERE SCREEN FATIGUE FIX (24.0s)
+Angle: Health, Wellness & Eye Relief | Target Audience: Office workers, developers, late-night readers, students
+Pacing: 175.0 WPM (Target: 172 WPM) | Total Spoken Words: 70
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (13 words)
+Banner Headline: FIX SEVERE SCREEN FATIGUE!
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator rubbing tired eyes under harsh fluorescent desk lamp.
+Spoken Voiceover: "If staring at screens all day gives you migraines, watch this right now."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (17 words)
+Banner Headline: BURNING EYES AT 5 PM...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   POV shot of glaring 4K monitor filled with tiny 10pt black-and-white text.
+Spoken Voiceover: "By five PM my eyes were burning, but I still had thirty pages of contracts to review."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (27 words)
+Banner Headline: CLOSE YOUR EYES & LISTEN!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Creator taps AirPod into ear, slumps comfortably into couch, eyes peacefully closed.
+Spoken Voiceover: "Instead of ruining my vision, I opened VoiceReader, plugged in my AirPods, closed my eyes, and effortlessly soaked up every single detail while reclining in the dark."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (13 words)
+Banner Headline: EYES OR AIRPODS?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator opens one eye, smiling relaxed at camera.
+Spoken Voiceover: "Would you rather read with your eyes, or listen like this every day?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+If staring at screens all day gives you migraines, watch this right now. By five PM my eyes were burning, but I still had thirty pages of contracts to review. Instead of ruining my vision, I opened VoiceReader, plugged in my AirPods, closed my eyes, and effortlessly soaked up every single detail while reclining in the dark. Would you rather read with your eyes, or listen like this every day?

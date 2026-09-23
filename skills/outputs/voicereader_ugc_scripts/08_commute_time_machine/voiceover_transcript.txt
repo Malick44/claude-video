@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE COMMUTE & GYM TIME MACHINE (24.0s)
+Angle: Habit Stacking & Time Mastery | Target Audience: Daily commuters, drivers, fitness goers
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (12 words)
+Banner Headline: WASTING 40 MIN IN TRAFFIC?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator sitting in car driver seat (parked), hands gesturing in frustration at windshield.
+Spoken Voiceover: "Stop wasting forty minutes every morning sitting in heavy rush hour traffic."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (16 words)
+Banner Headline: SAME BORING RADIO SONGS...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Finger repeatedly hitting radio skip buttons on dashboard.
+Spoken Voiceover: "Most people listen to the exact same radio songs every commute and learn absolutely nothing new."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (29 words)
+Banner Headline: FINISH A BOOK EVERY WEEK!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Phone mounted on dashboard connected via Bluetooth playing VoiceReader with clean CarPlay-friendly interface.
+Spoken Voiceover: "I queued all my work articles and personal reading into VoiceReader. Now my daily drive turns into a private masterclass, and I finish a full book every single week."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (12 words)
+Banner Headline: WHAT DO YOU LISTEN TO?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator points down toward center console/comments.
+Spoken Voiceover: "What are you listening to during your commute right now? Comment below."
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+Stop wasting forty minutes every morning sitting in heavy rush hour traffic. Most people listen to the exact same radio songs every commute and learn absolutely nothing new. I queued all my work articles and personal reading into VoiceReader. Now my daily drive turns into a private masterclass, and I finish a full book every single week. What are you listening to during your commute right now? Comment below.

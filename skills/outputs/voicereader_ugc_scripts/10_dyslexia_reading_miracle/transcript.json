@@ -1,0 +1,64 @@
+{
+  "id": "script_10_dyslexia_reading_miracle",
+  "title": "The Dyslexia & Struggling Reader Miracle",
+  "angle": "Accessibility & Dual-Modality Learning",
+  "target_audience": "Dyslexic readers, ESL learners, slow reading adults",
+  "target_duration_sec": 24.0,
+  "total_words": 69,
+  "cadence_wpm": 172.5,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "This might actually be the most life-changing accessibility app ever created.",
+      "banner_headline": "MOST LIFE-CHANGING APP?",
+      "visual_action": "Creator looks sincerely and directly into camera with genuine awe."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Address real, painful struggles with text processing",
+      "text": "If you struggle with dyslexia, words literally scramble across the screen and make reading agonizingly slow.",
+      "banner_headline": "WORDS SCRAMBLING ON SCREEN...",
+      "visual_action": "Visual effect showing words blurring slightly on a page to illustrate dyslexia struggle."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "Dual-sensory solution that unlocks fluid reading",
+      "text": "VoiceReader uses dual modality sensory learning, highlighting every word in bright dynamic color while reading aloud with studio quality AI voices, completely eliminating reading fatigue for good.",
+      "banner_headline": "ELIMINATES READING FATIGUE!",
+      "visual_action": "Crisp close-up on VoiceReader's live karaoke-style word highlighter in action, paired with a warm, natural human voice."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Share this with someone who struggles with reading, and tell me your personal thoughts below.",
+      "banner_headline": "SHARE WITH A FRIEND!",
+      "visual_action": "Creator gestures with hands, warm inviting smile."
+    }
+  ]
+}

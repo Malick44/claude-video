@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE PHYSICAL BOOK CAMERA SCANNER (24.0s)
+Angle: Hardware Camera Magic / Instant Gratification | Target Audience: Physical book buyers, students with paper handouts
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (11 words)
+Banner Headline: SCAN ANY PHYSICAL BOOK!
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Over-the-shoulder shot: Phone camera hovering over open paperback novel.
+Spoken Voiceover: "You can literally point your phone camera at physical books now."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (17 words)
+Banner Headline: HANDS FULL IN THE KITCHEN...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Creator chopping vegetables on cutting board with book propped up awkwardly.
+Spoken Voiceover: "I had this heavy paperback I wanted to read, but my hands were completely busy prepping dinner."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (28 words)
+Banner Headline: PHOTO TO SPEECH IN 2 SECONDS!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Phone snaps photo in app; instant OCR processing banner turns immediately into smooth audio playback.
+Spoken Voiceover: "I snapped one quick photo using VoiceReader App, and in under two seconds, it turned the printed page into crystal-clear speech with zero robotic pauses or awkward mispronunciations."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (13 words)
+Banner Headline: ARE PHYSICAL BOOKS OBSOLETE?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator holds paperback in one hand, phone in the other, smiling.
+Spoken Voiceover: "Are physical books becoming obsolete, or do you still prefer holding paper pages?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+You can literally point your phone camera at physical books now. I had this heavy paperback I wanted to read, but my hands were completely busy prepping dinner. I snapped one quick photo using VoiceReader App, and in under two seconds, it turned the printed page into crystal-clear speech with zero robotic pauses or awkward mispronunciations. Are physical books becoming obsolete, or do you still prefer holding paper pages?

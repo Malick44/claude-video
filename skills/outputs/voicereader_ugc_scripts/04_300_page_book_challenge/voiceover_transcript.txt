@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE 300-PAGE BOOK IN 3 HOURS CHALLENGE (24.0s)
+Angle: Speed Reading / Quantifiable Benchmark | Target Audience: Avid book readers, self-improvement enthusiasts
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (11 words)
+Banner Headline: 300 PAGES IN ONE AFTERNOON?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator slaps a thick 300-page book onto table, staring into camera in disbelief.
+Spoken Voiceover: "I just finished an entire three-hundred page book in one afternoon."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (16 words)
+Banner Headline: UNFINISHED NIGHTSTAND BOOKS...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Creator pans across a nightstand with 5 half-finished books.
+Spoken Voiceover: "Most people read at two hundred words per minute, meaning books sit unread on their nightstand."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (30 words)
+Banner Headline: 2.5X SPEED WITH FULL RETENTION!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Close up on phone screen: speed slider hitting 2.5x, words glowing yellow as voice flies smoothly.
+Spoken Voiceover: "I loaded the whole book into VoiceReader, bumped the speed up to two-point-five, and because the synchronized text highlights every spoken word, my retention was actually higher than reading normally."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (12 words)
+Banner Headline: TOO FAST OR GENIUS?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator points down toward comment section with slight smirk.
+Spoken Voiceover: "Would you try this speed-reading method, or is it way too fast?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+I just finished an entire three-hundred page book in one afternoon. Most people read at two hundred words per minute, meaning books sit unread on their nightstand. I loaded the whole book into VoiceReader, bumped the speed up to two-point-five, and because the synchronized text highlights every spoken word, my retention was actually higher than reading normally. Would you try this speed-reading method, or is it way too fast?

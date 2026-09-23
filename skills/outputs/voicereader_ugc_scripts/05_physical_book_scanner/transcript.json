@@ -1,0 +1,64 @@
+{
+  "id": "script_05_physical_book_scanner",
+  "title": "The Physical Book Camera Scanner",
+  "angle": "Hardware Camera Magic / Instant Gratification",
+  "target_audience": "Physical book buyers, students with paper handouts",
+  "target_duration_sec": 24.0,
+  "total_words": 69,
+  "cadence_wpm": 172.5,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "You can literally point your phone camera at physical books now.",
+      "banner_headline": "SCAN ANY PHYSICAL BOOK!",
+      "visual_action": "Over-the-shoulder shot: Phone camera hovering over open paperback novel."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Everyday scenario where hands are tied",
+      "text": "I had this heavy paperback I wanted to read, but my hands were completely busy prepping dinner.",
+      "banner_headline": "HANDS FULL IN THE KITCHEN...",
+      "visual_action": "Creator chopping vegetables on cutting board with book propped up awkwardly."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "Demonstrating the OCR-to-Audio magic",
+      "text": "I snapped one quick photo using VoiceReader App, and in under two seconds, it turned the printed page into crystal-clear speech with zero robotic pauses or awkward mispronunciations.",
+      "banner_headline": "PHOTO TO SPEECH IN 2 SECONDS!",
+      "visual_action": "Phone snaps photo in app; instant OCR processing banner turns immediately into smooth audio playback."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Are physical books becoming obsolete, or do you still prefer holding paper pages?",
+      "banner_headline": "ARE PHYSICAL BOOKS OBSOLETE?",
+      "visual_action": "Creator holds paperback in one hand, phone in the other, smiling."
+    }
+  ]
+}

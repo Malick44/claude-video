@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE BORDERLINE ILLEGAL PRODUCTIVITY HACK (24.0s)
+Angle: Tech Secrets & Forbidden Shortcuts | Target Audience: Tech enthusiasts, entrepreneurs, productivity geeks
+Pacing: 175.0 WPM (Target: 172 WPM) | Total Spoken Words: 70
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (12 words)
+Banner Headline: BORDERLINE ILLEGAL APP?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator glances left and right as if sharing top secret classified info.
+Spoken Voiceover: "This app feels borderline illegal, but absolutely nobody is talking about it."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (17 words)
+Banner Headline: NO TIME TO READ?
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Quick montage: stack of unread books collecting dust on coffee table.
+Spoken Voiceover: "Everyone complains they don't have enough time to read books or stay on top of industry news."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (29 words)
+Banner Headline: SOUNDS LIKE A HUMAN NARRATOR!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Live phone demonstration: pasting an article link, voice kicks in with stunningly realistic human cadence.
+Spoken Voiceover: "With VoiceReader, you paste any webpage, document, or e-book, and its AI voices sound so incredibly human that you genuinely forget you're not listening to a professionally produced audiobook."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (12 words)
+Banner Headline: REPLACE READING FOREVER?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator holds hands up in a weighing scale motion.
+Spoken Voiceover: "Tell me down below: could you replace traditional reading with this completely?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+This app feels borderline illegal, but absolutely nobody is talking about it. Everyone complains they don't have enough time to read books or stay on top of industry news. With VoiceReader, you paste any webpage, document, or e-book, and its AI voices sound so incredibly human that you genuinely forget you're not listening to a professionally produced audiobook. Tell me down below: could you replace traditional reading with this completely?

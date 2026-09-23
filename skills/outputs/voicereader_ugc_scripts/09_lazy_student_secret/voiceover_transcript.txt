@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE LAZY STUDENT'S 4.0 GPA SECRET (24.0s)
+Angle: Unfair Advantage / High Grades | Target Audience: High school & university students wanting top marks with minimal effort
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (12 words)
+Banner Headline: LAZY GUY GOT STRAIGHT A'S?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator leans in conspiratorially, talking low and fast.
+Spoken Voiceover: "How the laziest guy in our entire class got straight A's effortlessly."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (15 words)
+Banner Headline: NEVER TOUCHED A TEXTBOOK...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Pans past fellow students hunched over books with 6 different highlighters.
+Spoken Voiceover: "He never touched a physical highlighter or opened a single dense textbook during study hall."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (30 words)
+Banner Headline: GAMING WHILE STUDYING!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Split screen: gaming on console while VoiceReader plays synchronized study notes in background.
+Spoken Voiceover: "His secret was scanning lecture slides and syllabi into VoiceReader, putting it on double speed while playing video games, and letting his auditory memory absorb all the exam material automatically."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (12 words)
+Banner Headline: GENIUS OR UNFAIR?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator shrugs with a smirk: 'you decide'.
+Spoken Voiceover: "Is this pure academic genius, or is it completely unfair to everyone?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+How the laziest guy in our entire class got straight A's effortlessly. He never touched a physical highlighter or opened a single dense textbook during study hall. His secret was scanning lecture slides and syllabi into VoiceReader, putting it on double speed while playing video games, and letting his auditory memory absorb all the exam material automatically. Is this pure academic genius, or is it completely unfair to everyone?

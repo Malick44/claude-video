@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE ADHD READING CHEAT CODE (24.0s)
+Angle: ADHD & Focus Hack | Target Audience: Students, neurodivergent readers, people struggling with attention spans
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (10 words)
+Banner Headline: ADHD READING SECRET?
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator leans in close to lens, wide eyes, whispering intensely into microphone.
+Spoken Voiceover: "If you have ADHD and can't finish books, stop scrolling."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (17 words)
+Banner Headline: REREADING THE SAME LINE...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   B-roll cut: Frustrated creator staring blankly at a dense book, facepalming.
+Spoken Voiceover: "I used to reread the exact same paragraph ten times in a row before giving up completely."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (29 words)
+Banner Headline: FINISHED 3 CHAPTERS IN 20 MIN!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Phone screen recording showing VoiceReader app: animated karaoke highlight running at 2x speed while creator folds clothes with AirPods in.
+Spoken Voiceover: "Then I imported my entire textbook into VoiceReader, turned on the hyper-realistic narrator at two-times speed, and finished three full chapters while doing my laundry without losing focus once."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (13 words)
+Banner Headline: IS LISTENING CHEATING?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator cuts back to front camera, raising an eyebrow with an amused, questioning grin.
+Spoken Voiceover: "Is this a genius productivity hack, or does listening count as actual cheating?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+If you have ADHD and can't finish books, stop scrolling. I used to reread the exact same paragraph ten times in a row before giving up completely. Then I imported my entire textbook into VoiceReader, turned on the hyper-realistic narrator at two-times speed, and finished three full chapters while doing my laundry without losing focus once. Is this a genius productivity hack, or does listening count as actual cheating?

@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:03,200
+Throw away everything you thought you ever knew about text-to-speech.
+
+2
+00:00:03,200 --> 00:00:08,800
+Remember those awful, stiff GPS voices from ten years ago that gave you an instant headache?
+
+3
+00:00:08,800 --> 00:00:19,500
+VoiceReader just rolled out ultra-natural AI narrators that breathe, pause for dramatic effect, and emphasize key emotional words so realistically that audio producers literally cannot tell the difference.
+
+4
+00:00:19,500 --> 00:00:24,000
+Listen closely for yourself and tell me down below: can you spot the AI voice?

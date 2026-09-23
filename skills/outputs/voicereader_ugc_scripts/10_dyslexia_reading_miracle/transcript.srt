@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:03,200
+This might actually be the most life-changing accessibility app ever created.
+
+2
+00:00:03,200 --> 00:00:08,800
+If you struggle with dyslexia, words literally scramble across the screen and make reading agonizingly slow.
+
+3
+00:00:08,800 --> 00:00:19,500
+VoiceReader uses dual modality sensory learning, highlighting every word in bright dynamic color while reading aloud with studio quality AI voices, completely eliminating reading fatigue for good.
+
+4
+00:00:19,500 --> 00:00:24,000
+Share this with someone who struggles with reading, and tell me your personal thoughts below.

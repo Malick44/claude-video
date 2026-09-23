@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE PROFESSOR'S EXAM CRAM HACK (24.0s)
+Angle: College & Academic Panic | Target Audience: College students, high schoolers facing finals
+Pacing: 175.0 WPM (Target: 172 WPM) | Total Spoken Words: 70
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (11 words)
+Banner Headline: PROFESSORS WILL HATE THIS!
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator shakes head at camera, finger pointing at viewer in cautionary stance.
+Spoken Voiceover: "Your professors will genuinely hate me for showing you this secret."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (17 words)
+Banner Headline: 400 PAGES BEFORE EXAMS...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Cut to laptop screen showing massive 70-page syllabus and dense PDF stack.
+Spoken Voiceover: "Finals are next week and you still have four hundred pages of mandatory reading left to finish."
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (29 words)
+Banner Headline: PDF TO PODCAST IN SECONDS!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   Screen capture dragging PDF into VoiceReader: instantly converts into waveforms and crisp, smooth narration.
+Spoken Voiceover: "Drop that nightmare PDF right into VoiceReader App. It literally converts dense academic jargon into a natural podcast voice you can absorb at double speed while driving to campus."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (13 words)
+Banner Headline: CRAM OR LISTEN?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator looks straight down lens, tapping chin thoughtfully.
+Spoken Voiceover: "Would you use this to pass your exams, or stick to all-night cramming?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+Your professors will genuinely hate me for showing you this secret. Finals are next week and you still have four hundred pages of mandatory reading left to finish. Drop that nightmare PDF right into VoiceReader App. It literally converts dense academic jargon into a natural podcast voice you can absorb at double speed while driving to campus. Would you use this to pass your exams, or stick to all-night cramming?

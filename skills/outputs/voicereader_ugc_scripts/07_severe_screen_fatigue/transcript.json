@@ -1,0 +1,64 @@
+{
+  "id": "script_07_severe_screen_fatigue",
+  "title": "The Severe Screen Fatigue Fix",
+  "angle": "Health, Wellness & Eye Relief",
+  "target_audience": "Office workers, developers, late-night readers, students",
+  "target_duration_sec": 24.0,
+  "total_words": 70,
+  "cadence_wpm": 175.0,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "If staring at screens all day gives you migraines, watch this right now.",
+      "banner_headline": "FIX SEVERE SCREEN FATIGUE!",
+      "visual_action": "Creator rubbing tired eyes under harsh fluorescent desk lamp."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Relatable end-of-workday fatigue scenario",
+      "text": "By five PM my eyes were burning, but I still had thirty pages of contracts to review.",
+      "banner_headline": "BURNING EYES AT 5 PM...",
+      "visual_action": "POV shot of glaring 4K monitor filled with tiny 10pt black-and-white text."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "The restorative relief mechanism",
+      "text": "Instead of ruining my vision, I opened VoiceReader, plugged in my AirPods, closed my eyes, and effortlessly soaked up every single detail while reclining in the dark.",
+      "banner_headline": "CLOSE YOUR EYES & LISTEN!",
+      "visual_action": "Creator taps AirPod into ear, slumps comfortably into couch, eyes peacefully closed."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Would you rather read with your eyes, or listen like this every day?",
+      "banner_headline": "EYES OR AIRPODS?",
+      "visual_action": "Creator opens one eye, smiling relaxed at camera."
+    }
+  ]
+}

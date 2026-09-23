@@ -1,0 +1,38 @@
+===========================================================================
+VOICEREADER UGC SCRIPT: THE ROBOT VOICE IS OFFICIALLY DEAD (24.0s)
+Angle: Tech Revolution / AI Voice Quality | Target Audience: Tech skeptics, audiobook listeners, casual scrollers
+Pacing: 172.5 WPM (Target: 172 WPM) | Total Spoken Words: 69
+===========================================================================
+
+[00.0s - 03.2s] THE SCROLL-STOP HOOK (10 words)
+Banner Headline: ROBOT VOICES ARE DEAD!
+Vocal Tone:      intense whisper with shocked emphasis
+Inflection Cue:  [Intense Whisper / Shocked Eye Contact / Sudden Peak]
+Visual Action:   Creator waves hand dismissively, intensely leaning towards camera.
+Spoken Voiceover: "Throw away everything you thought you ever knew about text-to-speech."
+
+[03.2s - 08.8s] THE SETUP & ENTITIES (16 words)
+Banner Headline: THAT OLD STIFF GPS VOICE...
+Vocal Tone:      rapid-fire matter-of-fact delivery and fast tempo
+Inflection Cue:  [Rapid-fire Matter-of-Fact Delivery / Fast Tempo]
+Visual Action:   Imitates monotone robotic voice while clutching temples in mock pain.
+Spoken Voiceover: "Remember those awful, stiff GPS voices from ten years ago that gave you an instant headache?"
+
+[08.8s - 19.5s] THE DRAMATIC TWIST (28 words)
+Banner Headline: BREATHES & PAUSES NATURALLY!
+Vocal Tone:      incredulous and shocked with building excitement
+Inflection Cue:  [Incredulous Pause / Pitch Shift / Shocked Delivery]
+Visual Action:   VoiceReader voice picker UI showing expressive voice personas, audio waveform pulsing dynamically.
+Spoken Voiceover: "VoiceReader just rolled out ultra-natural AI narrators that breathe, pause for dramatic effect, and emphasize key emotional words so realistically that audio producers literally cannot tell the difference."
+
+[19.5s - 24.0s] THE MORAL DILEMMA & QUESTION (15 words)
+Banner Headline: CAN YOU SPOT THE AI?
+Vocal Tone:      amused deadpan and engaging rising intonation
+Inflection Cue:  [Deadpan Delivery / Eyebrow Raise / Direct Gaze]
+Visual Action:   Creator cups hand to ear with a challenging smile.
+Spoken Voiceover: "Listen closely for yourself and tell me down below: can you spot the AI voice?"
+
+===========================================================================
+CLEAN SPOKEN TEXT ONLY (For TTS / AuK-Voice / ElevenLabs):
+===========================================================================
+Throw away everything you thought you ever knew about text-to-speech. Remember those awful, stiff GPS voices from ten years ago that gave you an instant headache? VoiceReader just rolled out ultra-natural AI narrators that breathe, pause for dramatic effect, and emphasize key emotional words so realistically that audio producers literally cannot tell the difference. Listen closely for yourself and tell me down below: can you spot the AI voice?

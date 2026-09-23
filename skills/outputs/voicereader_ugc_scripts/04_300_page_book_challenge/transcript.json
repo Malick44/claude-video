@@ -1,0 +1,64 @@
+{
+  "id": "script_04_300_page_book_challenge",
+  "title": "The 300-Page Book in 3 Hours Challenge",
+  "angle": "Speed Reading / Quantifiable Benchmark",
+  "target_audience": "Avid book readers, self-improvement enthusiasts",
+  "target_duration_sec": 24.0,
+  "total_words": 69,
+  "cadence_wpm": 172.5,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "I just finished an entire three-hundred page book in one afternoon.",
+      "banner_headline": "300 PAGES IN ONE AFTERNOON?",
+      "visual_action": "Creator slaps a thick 300-page book onto table, staring into camera in disbelief."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Highlight normal limitations vs benchmark",
+      "text": "Most people read at two hundred words per minute, meaning books sit unread on their nightstand.",
+      "banner_headline": "UNFINISHED NIGHTSTAND BOOKS...",
+      "visual_action": "Creator pans across a nightstand with 5 half-finished books."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "The secret method and dual-sensory retention",
+      "text": "I loaded the whole book into VoiceReader, bumped the speed up to two-point-five, and because the synchronized text highlights every spoken word, my retention was actually higher than reading normally.",
+      "banner_headline": "2.5X SPEED WITH FULL RETENTION!",
+      "visual_action": "Close up on phone screen: speed slider hitting 2.5x, words glowing yellow as voice flies smoothly."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Would you try this speed-reading method, or is it way too fast?",
+      "banner_headline": "TOO FAST OR GENIUS?",
+      "visual_action": "Creator points down toward comment section with slight smirk."
+    }
+  ]
+}

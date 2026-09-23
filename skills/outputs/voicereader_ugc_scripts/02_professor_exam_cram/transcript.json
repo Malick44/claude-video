@@ -1,0 +1,64 @@
+{
+  "id": "script_02_professor_exam_cram",
+  "title": "The Professor's Exam Cram Hack",
+  "angle": "College & Academic Panic",
+  "target_audience": "College students, high schoolers facing finals",
+  "target_duration_sec": 24.0,
+  "total_words": 70,
+  "cadence_wpm": 175.0,
+  "target_wpm_baseline": 172.0,
+  "beats": [
+    {
+      "beat_id": "01_hook",
+      "name": "The Scroll-Stop Hook",
+      "start_time": 0.0,
+      "end_time": 3.2,
+      "duration": 3.2,
+      "inflection": "[Intense Whisper / Shocked Eye Contact / Sudden Peak]",
+      "tone": "intense whisper with shocked emphasis",
+      "role": "Pattern Interrupt - Stop Mindless Scrolling",
+      "text": "Your professors will genuinely hate me for showing you this secret.",
+      "banner_headline": "PROFESSORS WILL HATE THIS!",
+      "visual_action": "Creator shakes head at camera, finger pointing at viewer in cautionary stance."
+    },
+    {
+      "beat_id": "02_setup",
+      "name": "The Setup & Entities",
+      "start_time": 3.2,
+      "end_time": 8.8,
+      "duration": 5.6,
+      "inflection": "[Rapid-fire Matter-of-Fact Delivery / Fast Tempo]",
+      "tone": "rapid-fire matter-of-fact delivery and fast tempo",
+      "role": "Establish immediate high-stakes crisis",
+      "text": "Finals are next week and you still have four hundred pages of mandatory reading left to finish.",
+      "banner_headline": "400 PAGES BEFORE EXAMS...",
+      "visual_action": "Cut to laptop screen showing massive 70-page syllabus and dense PDF stack."
+    },
+    {
+      "beat_id": "03_escalation_twist",
+      "name": "The Dramatic Twist",
+      "start_time": 8.8,
+      "end_time": 19.5,
+      "duration": 10.7,
+      "inflection": "[Incredulous Pause / Pitch Shift / Shocked Delivery]",
+      "tone": "incredulous and shocked with building excitement",
+      "role": "The turning point and effortless solution",
+      "text": "Drop that nightmare PDF right into VoiceReader App. It literally converts dense academic jargon into a natural podcast voice you can absorb at double speed while driving to campus.",
+      "banner_headline": "PDF TO PODCAST IN SECONDS!",
+      "visual_action": "Screen capture dragging PDF into VoiceReader: instantly converts into waveforms and crisp, smooth narration."
+    },
+    {
+      "beat_id": "04_outro_question",
+      "name": "The Moral Dilemma & Question",
+      "start_time": 19.5,
+      "end_time": 24.0,
+      "duration": 4.5,
+      "inflection": "[Deadpan Delivery / Eyebrow Raise / Direct Gaze]",
+      "tone": "amused deadpan and engaging rising intonation",
+      "role": "Viral Engagement Engine: prompt debate in comments",
+      "text": "Would you use this to pass your exams, or stick to all-night cramming?",
+      "banner_headline": "CRAM OR LISTEN?",
+      "visual_action": "Creator looks straight down lens, tapping chin thoughtfully."
+    }
+  ]
+}
