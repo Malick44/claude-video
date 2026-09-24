@@ -3,9 +3,9 @@
 Every sound is synthesized by default (pipeline/sounds.py). Point a name at a stock asset
 here to replace it in every episode; an episode can override names with its own SOUNDS dict.
 
-Names: theme, sting, sting_end, sting_soft, shutter, typewriter (one key, played per letter),
-ding, wind, chimes, crickets, glitch, jump. theme/wind/chimes/crickets are looped or trimmed
-to fit; the rest play once.
+Names: theme, sting, sting_end, sting_soft, riser, impact, braam, whoosh, shutter, typewriter
+(one key, played per letter), ding, wind, chimes, crickets, glitch, jump. theme/wind/chimes/
+crickets are looped or trimmed to fit; the rest play once. Stereo files keep their stereo.
 
 Sources (all also take "gain_db" to trim the level):
   {"file": "stock/audio/my_sting.wav"}          a local file, any format (relative to the episode

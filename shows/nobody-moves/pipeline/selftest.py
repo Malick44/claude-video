@@ -153,7 +153,7 @@ def main():
         ep = os.path.join(tmp, "ep99_selftest")
         os.makedirs(os.path.join(ep, "stills"))
         os.makedirs(os.path.join(ep, "recordings"))
-        shutil.copy(os.path.join(SHOW, "episodes/ep01_three_feet/stills/garrison.webp"), os.path.join(ep, "stills"))
+        shutil.copy(os.path.join(SHOW, "stills", "garrison.webp"), os.path.join(ep, "stills"))
         with open(os.path.join(ep, "episode.py"), "w") as f:
             f.write(EPISODE.format(base=base))
         with open(os.path.join(ep, "local_sting.wav"), "wb") as f:
