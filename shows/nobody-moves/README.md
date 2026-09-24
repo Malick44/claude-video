@@ -1,0 +1,67 @@
+# NOBODY MOVES
+
+A true-crime docuseries for TikTok where every witness is a lawn ornament. The episodes are built from AI stills with slow camera moves, captions and scratch voices. The ornaments never move; only the camera does. The series bible (cast, visual style, planted clues, episode roadmap) is in [`SERIES.md`](SERIES.md).
+
+This folder is independent of the `watch` skill in the rest of the repo.
+
+## Quick start
+
+```bash
+./setup.sh                                   # once: venv, Kokoro TTS model, fonts (PyPI + GitHub only)
+./make_episode.sh episodes/ep01_three_feet   # ~10 min on a laptop CPU
+```
+
+Outputs, in `episodes/<episode>/build/` (not committed):
+
+| File | What |
+|---|---|
+| `<episode>.mp4` | Master render, 1080×1920, 30 fps, about 9 Mbps |
+| `<episode>_tiktok.mp4` | Upload copy under 29 MB |
+| `soundtrack.wav`, `timeline.json` | The mixed audio and the shot/caption timings |
+
+`make_episode.sh` also rewrites `episodes/<episode>/SCRIPT.md`, the timecoded script.
+
+## Making a new episode
+
+1. Copy `episodes/ep01_three_feet` to `episodes/ep02_<name>`. Empty its `stills/` and delete `SCRIPT.md`.
+2. Generate the stills you need with the style prompt in `SERIES.md`. Put them in `stills/` as `<key>.webp` (or `.png` / `.jpg`).
+3. Edit `episode.py`: the title, `NEXT_UP`, `ANSWER` and the `SHOTS` list.
+4. Check framing without a full render:
+   ```bash
+   .venv/bin/python pipeline/build_audio.py episodes/ep02_x
+   .venv/bin/python pipeline/render.py episodes/ep02_x --contact            # one frame per shot -> build/contact.png
+   .venv/bin/python pipeline/render.py episodes/ep02_x --preview 1,12.5,30  # frames at those seconds
+   ```
+5. Run `./make_episode.sh episodes/ep02_x`.
+
+The voice clips are cached by line text, so rebuilding after an edit only re-voices the lines you changed.
+
+## `episode.py` reference
+
+Positions are **fractions of the source image**: `(0.5, 0.5)` is the center. Zoom `1.0` shows the whole image and `2.0` is a 2× push-in.
+
+```python
+V("still_key", (cx, cy, zoom_start), (cx, cy, zoom_end), look)   # one camera move on one still
+L("WHO", "caption text", "optional spoken text")                 # a line; spoken text fixes pronunciation ("1994" -> "nineteen ninety-four")
+P(0.5)                                                           # a pause, in seconds
+```
+
+`views` is a list of camera moves. The shot uses the first one whose still exists, so list the ideal image first and a crop of one you already have as the fallback. The optional `look` is `"anon"` (blurred and cold, for anonymous sources) or `"longlens"` (a soft stakeout crop).
+
+| `kind` | What it draws | Fields |
+|---|---|---|
+| `still` | A camera move on a still, captions, and an optional name card | `views`, `items`, `post`, `lower_third=(name, line2, line3)`, `lower_third_at="last"` |
+| `evidence` | A still plus a camera flash, an EXHIBIT tag and timestamp, and drawn annotations | as `still`, plus `label`, `stamp`, `annot_arrow={"from","to","label"}`, `annot_circles=[(x, y, r)]` |
+| `title` | Series title and episode name | `views`, `min` |
+| `qcard` | A black card where the interviewer's question types out | `text`, `min` |
+| `board` | Cork board with polaroids, red string and a "WHO MOVED DEB?" card | `kb`, `polaroids=[(still, (x0, y0, x1), label, fx, fy, size, rotation, look)]`; uses `stills/cork` if present, otherwise a drawn board |
+| `doorbell` | Night-vision cam that jump-cuts A to B when the clock reaches :00, then flickers and shows a call to action | `frame_a`, `frame_b`, `clock_start`, `kb`, `alter_box` (region mirrored in frame B: the hidden clue) |
+| `end` | End card with `NEXT_UP` and the AI disclaimer | `min` |
+
+Every shot also takes `note` (the stage direction for `SCRIPT.md`) and `sfx`. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score and typewriter clicks are added automatically.
+
+`CAST` maps each speaker to a [Kokoro voice](https://github.com/thewh1teagle/kokoro-onnx) (`bm_george`, `am_fenrir`, `af_bella`, `af_nicole`, …) with `speed`, `pitch` and `altered` (a disguised voice). The voices are scratch tracks: recording your own takes is the biggest quality upgrade.
+
+## Posting
+
+Turn on TikTok's **AI-generated** label, and pin a comment that points at the hidden clue without giving it away. Main episodes run over 60 seconds, which TikTok's Creator Rewards program requires.

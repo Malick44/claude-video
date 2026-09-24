@@ -35,6 +35,9 @@ skills/watch/.skillignore           export-ignore
 # CI workflows — repo-only, not needed at skill runtime
 .github/         export-ignore
 
+# TikTok series pipeline + episode stills — unrelated to the skill, keep out of installs
+shows/          export-ignore
+
 # Build config itself
 .gitignore      export-ignore
 .gitattributes  export-ignore
