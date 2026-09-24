@@ -10,6 +10,16 @@ Kokoro is deterministic: the same line + the same settings + the same model file
 same audio. Keep these entries stable; changing one re-voices that character in every
 episode. An episode can add one-off speakers by defining its own CAST, which is merged
 over this one.
+
+Other voice sources:
+  ElevenLabs   {"provider": "elevenlabs", "voice_id": "<id from your ElevenLabs voice library>",
+                "model": "eleven_multilingual_v2", "seed": 7,
+                "voice_settings": {"stability": 0.5, "similarity_boost": 0.75}}
+               Needs ELEVENLABS_API_KEY. "seed" keeps retakes close; pitch/altered still apply.
+  Your voice   drop <shot>_<n>.m4a (or .wav/.mp3) into an episode's recordings/ folder; SCRIPT.md
+               lists the name for every line. A recording replaces that line's TTS. Add
+               "fx_on_recordings": True to a character to also run its pitch/altered chain on
+               your takes (e.g. to disguise your own voice as the anonymous source).
 """
 
 CAST = {

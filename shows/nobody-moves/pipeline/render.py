@@ -661,7 +661,7 @@ def main(argv):
     argv = argv[1:]
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
-    missing = [k for k in ep.STILLS if not still_path(k)]
+    missing = [k for k in getattr(ep, "STILLS", {}) if not still_path(k)]
     if missing:
         print("not provided (using fallbacks):", ", ".join(missing))
     if "--preview" in argv:

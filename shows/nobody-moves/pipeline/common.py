@@ -26,9 +26,16 @@ def load_episode(ep_dir):
     # series voices from cast.py; an episode's own CAST only adds or overrides speakers
     series_cast = _import("cast", os.path.join(SHOW_DIR, "cast.py")).CAST
     ep.CAST = {**series_cast, **getattr(ep, "CAST", {})}
+    # music/sfx sources from soundtrack.py; an episode's own SOUNDS overrides names
+    ep.SOUNDS = {**load_sound_sources(), **getattr(ep, "SOUNDS", {})}
     ep.DIR = ep_dir
     ep.SLUG = os.path.basename(ep_dir.rstrip("/"))
     ep.BUILD = os.path.join(ep_dir, "build")
     ep.STILLS_DIR = os.path.join(ep_dir, "stills")
     os.makedirs(ep.BUILD, exist_ok=True)
     return ep
+
+
+def load_sound_sources():
+    """The show-wide SOUNDS mapping from soundtrack.py (name -> stock source)."""
+    return _import("soundtrack", os.path.join(SHOW_DIR, "soundtrack.py")).SOUNDS

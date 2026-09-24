@@ -108,6 +108,41 @@ There are no samples or stock audio: every sound is synthesized in code in [`pip
 
 **Sound kit.** `.venv/bin/python pipeline/sound_kit.py` exports every sound to `sound_kit/*.wav`: the theme (60 s), three stings, shutter, typewriter key, bell and a full typed question, 20 s beds of wind, chimes and crickets, and the glitch. Use them for Confessionals or trailers in CapCut; they match the episodes exactly.
 
+## Stock assets: local files and third-party APIs
+
+Anything the show uses can come from your own files or from an API instead of being generated.
+
+**Sounds and music.** Point a name in [`soundtrack.py`](soundtrack.py) at a source, and every episode uses it. An episode can override a name with its own `SOUNDS = {...}`. The names are `theme`, `sting`, `sting_end`, `sting_soft`, `shutter`, `typewriter`, `ding`, `wind`, `chimes`, `crickets`, `glitch` and `jump`.
+
+```python
+SOUNDS = {
+    "sting":    {"file": "stock/audio/my_sting.wav"},                          # your own file, any format
+    "ding":     {"url": "https://example.com/bell.mp3", "credit": "Bell by X, CC-BY"},
+    "shutter":  {"freesound": 123456},                                        # a Freesound sound id
+    "crickets": {"freesound_search": "crickets night ambience", "max_seconds": 60},
+    "theme":    {"elevenlabs_sfx": "ominous solo piano ostinato, true crime", "seconds": 22},
+}
+```
+
+The looped names (`theme`, `wind`, `chimes`, `crickets`) are looped with a crossfade, or trimmed, to fit the shot. Every source also takes `gain_db` to adjust its level.
+
+**Voices.** Any character in [`cast.py`](cast.py) can use an ElevenLabs voice instead of Kokoro. Your own takes beat both: save a line as `recordings/<name>.m4a` in the episode folder. `SCRIPT.md` shows the name for every line, for example `hook_1` or `chime_3`. A recording replaces that line's text-to-speech; the other lines keep their generated voice.
+
+**Images.** Stills are already local files: put any image in `episodes/<ep>/stills/`. To pull one from a stock library:
+
+```bash
+.venv/bin/python pipeline/stock.py image episodes/ep02_x aerial --pexels "suburban cul-de-sac at night"
+.venv/bin/python pipeline/stock.py image episodes/ep02_x aerial --url https://.../photo.jpg --credit "Name, license"
+```
+
+**Keys.** Copy `.env.example` to `.env` (it's gitignored) and fill in only the services you use: `FREESOUND_API_KEY`, `ELEVENLABS_API_KEY`, `PEXELS_API_KEY`. The keys are never written anywhere else.
+
+**Pinned and credited.** Anything fetched over the network is saved once in `stock/` and recorded in `stock/sources.lock.json` with its license and author. Every later build and every episode reuses that exact file with no API call; a Freesound search, for example, keeps the sound it found the first time. Commit `stock/` so the pins travel with the show. To fetch something again, delete its lock entry. `stock/CREDITS.md` lists everything, and each episode's `SCRIPT.md` ends with the credits for the sounds it used.
+
+**Licensing.** Freesound searches only return CC0 and Attribution sounds, never NonCommercial ones, because a monetized TikTok counts as commercial use. Paste Attribution credits into the video description. For files you add yourself, record the license with `"credit"`.
+
+**Self-test.** `.venv/bin/python pipeline/selftest.py` checks every source type against a local mock of Freesound, ElevenLabs and Pexels. It needs no keys or network and doesn't touch `stock/` or your episodes.
+
 ## Posting
 
 Turn on TikTok's **AI-generated** label, and pin a comment that points at the hidden clue without giving it away. Main episodes run over 60 seconds, which TikTok's Creator Rewards program requires.

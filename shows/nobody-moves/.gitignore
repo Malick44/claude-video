@@ -2,3 +2,4 @@
 assets/
 episodes/*/build/
 sound_kit/
+.env

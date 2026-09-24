@@ -26,15 +26,22 @@ def main():
     ]
     if getattr(ep, "ANSWER", None):
         out.append(f"**Cliffhanger answer (don't post this):** {ep.ANSWER}\n")
-    out += ["## Voices\n", "| Character | Scratch voice (Kokoro TTS) |", "|---|---|"]
+    out += ["## Voices\n", "| Character | Voice |", "|---|---|"]
+    speakers = {c["who"] for c in tl["captions"]}
     for who, c in ep.CAST.items():
+        if who not in speakers:
+            continue
         extra = []
         if c.get("pitch", 1.0) != 1.0:
             extra.append(f"pitch ×{c['pitch']}")
         if c.get("altered"):
             extra.append("disguised")
-        out.append(f"| {who} | {c['voice']}" + (f" ({', '.join(extra)})" if extra else "") + " |")
-    out += ["", "## Script\n"]
+        voice = f"ElevenLabs {c['voice_id']}" if c.get("provider") == "elevenlabs" else f"Kokoro {c['voice']}"
+        out.append(f"| {who} | {voice}" + (f" ({', '.join(extra)})" if extra else "") + " |")
+    recorded = sum(c.get("recorded", False) for c in tl["captions"])
+    out += ["", "To use your own take for a line, save it as `recordings/<name>.m4a` (or .wav/.mp3) in this "
+            f"episode folder, using the name shown next to the line. {recorded} of {len(tl['captions'])} lines are recorded.",
+            "", "## Script\n"]
     for s in tl["shots"]:
         out.append(f"### {tc(s['start'])}–{tc(s['end'])} · {s['id'].upper()}")
         if s.get("note"):
@@ -46,7 +53,14 @@ def main():
             out.append(f"\n> **Q:** {s['text']}")
         for c in tl["captions"]:
             if c["shot"] == s["id"]:
-                out.append(f"\n**{c['who']}** ({tc(c['start'])}): {c['text']}")
+                mark = "recorded" if c.get("recorded") else "record as"
+                out.append(f"\n**{c['who']}** ({tc(c['start'])}) · {mark} `{c.get('rec', '')}`: {c['text']}")
+        out.append("")
+    if tl.get("credits"):
+        out += ["## Credits\n", "Stock sounds used in this episode. Paste the Attribution (CC-BY) ones into the TikTok description.\n"]
+        for c in tl["credits"]:
+            parts = [c.get("title", ""), f"by {c['author']}" if c.get("author") else "", c.get("license", ""), c.get("source", "")]
+            out.append("- " + " · ".join(p for p in parts if p))
         out.append("")
     path = os.path.join(ep.DIR, "SCRIPT.md")
     with open(path, "w") as f:

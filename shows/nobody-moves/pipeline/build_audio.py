@@ -1,10 +1,14 @@
-"""Voice the script with Kokoro TTS, lay it on a timeline, and mix the soundtrack.
+"""Voice the script, lay it on a timeline, and mix the soundtrack.
 
   python pipeline/build_audio.py episodes/<episode>
 
+Each line comes from the first of: a recording in <episode>/recordings/<shot>_<n>.* (any
+audio format), the character's TTS provider in cast.py (Kokoro by default, or ElevenLabs).
+Music and sound effects come from soundtrack.py (synthesized unless pointed at stock assets).
+
 Outputs (in <episode>/build/):
-  timeline.json  - shot/caption/sfx timings consumed by render.py
-  soundtrack.wav - final mix (voice + synthesized score + sfx)
+  timeline.json  - shot/caption/sfx timings (+ stock credits) consumed by render.py / script_md.py
+  soundtrack.wav - final mix (voice + score + sfx)
 """
 import hashlib
 import json
@@ -15,9 +19,12 @@ import sys
 import numpy as np
 import soundfile as sf
 
-from common import MODELS, load_episode
-from sounds import (LEVELS, SR, carriage_ding, chimes, crickets, glitch, motif_bed, shutter, sting,
-                    typewriter_click, typewriter_gain, wind)
+import stock
+from common import MODELS, SHOW_DIR, load_episode
+from soundbank import Bank
+from sounds import LEVELS, SR, typewriter_gain
+
+AUDIO_EXTS = ("wav", "m4a", "mp3", "aiff", "aif", "flac", "ogg", "caf")
 
 ep = None  # set in main()
 BUILD = CACHE = None
@@ -71,16 +78,42 @@ def fx(path_in, path_out, cast):
     return path_out
 
 
-def voice_line(who, say):
+def recording(rec):
+    """Your own take for a line, if you dropped one in <episode>/recordings/ (e.g. hook_1.m4a)."""
+    for ext in AUDIO_EXTS:
+        path = os.path.join(ep.DIR, "recordings", f"{rec}.{ext}")
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def voice_line(who, say, rec):
+    if who not in ep.CAST:
+        sys.exit(f"{who} is not in the cast - add them to cast.py (or this episode's CAST)")
     cast = ep.CAST[who]
-    key = hashlib.sha1(json.dumps([cast, say]).encode()).hexdigest()[:12]
+    take = recording(rec)
+    if take:
+        st = os.stat(take)
+        key = hashlib.sha1(json.dumps([cast, take, st.st_size, st.st_mtime]).encode()).hexdigest()[:12]
+    else:
+        key = hashlib.sha1(json.dumps([cast, say]).encode()).hexdigest()[:12]
     raw = os.path.join(CACHE, f"{who}_{key}_raw.wav")
     out = os.path.join(CACHE, f"{who}_{key}.wav")
     if not os.path.exists(out):
-        samples, sr = kokoro().create(say, voice=cast["voice"], speed=cast["speed"], lang="en-us" if cast["voice"][0] == "a" else "en-gb")
-        assert sr == SR, sr
+        provider = cast.get("provider", "kokoro")
+        apply_fx = True
+        if take:
+            samples = stock.decode_audio(take, SR)
+            apply_fx = cast.get("fx_on_recordings", False)
+        elif provider == "elevenlabs":
+            samples = stock.decode_audio_bytes(stock.elevenlabs_tts(say, cast), SR)
+        elif provider == "kokoro":
+            samples, sr = kokoro().create(say, voice=cast["voice"], speed=cast["speed"], lang="en-us" if cast["voice"][0] == "a" else "en-gb")
+            assert sr == SR, sr
+        else:
+            sys.exit(f"{who}: unknown voice provider {provider!r} (kokoro or elevenlabs)")
         sf.write(raw, samples, SR)
-        processed = fx(raw, out + ".fx.wav", cast)
+        processed = fx(raw, out + ".fx.wav", cast) if apply_fx else raw
         y, _ = sf.read(processed)
         y = trim(y)
         # loudness-match every line: RMS target, peak-capped
@@ -116,10 +149,12 @@ def main():
                 t += item[1]
                 continue
             _, who, text, say = item
-            y = voice_line(who, say)
+            rec = f"{shot['id']}_{len(lines) + 1}"
+            y = voice_line(who, say, rec)
             dur = len(y) / SR
             voice.append((t, y))
-            captions.append({"start": round(t, 3), "end": round(t + dur, 3), "who": who, "text": text, "shot": shot["id"]})
+            captions.append({"start": round(t, 3), "end": round(t + dur, 3), "who": who, "text": text, "shot": shot["id"],
+                             "rec": rec, "recorded": bool(recording(rec))})
             lines.append({"start": round(t, 3), "end": round(t + dur, 3), "text": text})
             t += dur
         t += shot.get("post", 0.0)
@@ -145,10 +180,11 @@ def main():
         seg = y[: n - i]
         buf[i: i + len(seg)] += seg * db(gain_db)
 
-    # score: ostinato bed from the title card (first "sting") to the end card, ducked under dialogue
+    bank = Bank(ep.SOUNDS, [ep.DIR, SHOW_DIR])
+    # score: theme bed from the title card (first "sting") to the end card, ducked under dialogue
     bed_start = next((s["start"] for s in shots if "sting" in s.get("sfx", [])), 0.0)
     bed_end = next((s["start"] for s in shots if s["kind"] == "end"), total) + 0.4
-    bed = motif_bed(bed_end - bed_start + 2)
+    bed = bank.get("theme", bed_end - bed_start + 2)
     fade = np.ones(int((bed_end - bed_start) * SR))
     k = int(1.5 * SR)
     fade[-k:] = np.linspace(1, 0, k)
@@ -156,21 +192,15 @@ def main():
 
     for s in shots:
         for name in s.get("sfx", []):
-            if name == "sting":
-                put(music, s["start"], sting(), LEVELS["sting"])
-            elif name == "sting_end":
-                put(music, s["start"], sting(6.0), LEVELS["sting_end"])
+            if name in ("sting", "sting_end"):
+                put(music, s["start"], bank.get(name), LEVELS[name])
             elif name == "sting_soft":
                 # a soft sting under the shot's last line (the question the episode asks)
-                put(music, s["lines"][-1]["start"] - 0.1, sting(4.0), LEVELS["sting_soft"])
+                put(music, s["lines"][-1]["start"] - 0.1, bank.get(name), LEVELS[name])
             elif name == "shutter":
-                put(sfx, s["start"], shutter(), LEVELS["shutter"])
-            elif name == "wind":
-                put(sfx, s["start"], wind(s["end"] - s["start"]), LEVELS["wind"])
-            elif name == "chimes":
-                put(sfx, s["start"], chimes(s["end"] - s["start"]), LEVELS["chimes"])
-            elif name == "crickets":
-                put(sfx, s["start"], crickets(s["end"] - s["start"]), LEVELS["crickets"])
+                put(sfx, s["start"], bank.get(name), LEVELS[name])
+            elif name in ("wind", "chimes", "crickets"):
+                put(sfx, s["start"], bank.get(name, s["end"] - s["start"]), LEVELS[name])
             else:
                 sys.exit(f"shot {s['id']}: unknown sfx {name!r}")
         if s["kind"] == "qcard":
@@ -179,15 +209,15 @@ def main():
             span = (s["end"] - s["start"]) * 0.6
             for j, ch in enumerate(txt):
                 if ch != " ":
-                    put(sfx, s["start"] + 0.15 + span * j / len(txt), typewriter_click(j), LEVELS["typewriter"] + typewriter_gain(j))
-            put(sfx, s["start"] + 0.15 + span + 0.05, carriage_ding(), LEVELS["ding"])
+                    put(sfx, s["start"] + 0.15 + span * j / len(txt), bank.get("typewriter", i=j), LEVELS["typewriter"] + typewriter_gain(j))
+            put(sfx, s["start"] + 0.15 + span + 0.05, bank.get("ding"), LEVELS["ding"])
         if s["kind"] == "doorbell":
             flick = s["lines"][-1]["end"] + 0.15
             for j in range(6):
-                put(sfx, flick + j * 0.3, glitch(), LEVELS["glitch"])
+                put(sfx, flick + j * 0.3, bank.get("glitch"), LEVELS["glitch"])
             s["flicker_at"] = round(flick, 3)
             # the jump cut when the clock rolls over to the next minute
-            put(sfx, s["start"] + (60 - s["clock_start"]), glitch(), LEVELS["jump"])
+            put(sfx, s["start"] + (60 - s["clock_start"]), bank.get("jump"), LEVELS["jump"])
 
     # duck the score under dialogue (smoothed voice envelope)
     env = np.abs(vox)
@@ -201,7 +231,8 @@ def main():
     sf.write(out, mix, SR)
 
     with open(os.path.join(BUILD, "timeline.json"), "w") as f:
-        json.dump({"total": round(total, 3), "shots": shots, "captions": captions}, f, indent=1)
+        json.dump({"total": round(total, 3), "shots": shots, "captions": captions,
+                   "credits": list(bank.credits.values())}, f, indent=1)
     print("wrote", out)
 
 
