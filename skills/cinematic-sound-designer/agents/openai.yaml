@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cinematic Sound Designer"
+  short_description: "Find story turns and time cinematic sound cues"
+  default_prompt: "Use $cinematic-sound-designer to analyze my timed narration and create a precise, restrained SFX cue sheet and audio stem."
