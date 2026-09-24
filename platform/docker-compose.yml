@@ -1,0 +1,68 @@
+# One-command local stack:  docker compose up --build   →  http://localhost:3000
+#
+# Postgres + pgvector (schema + demo data), PostgREST behind a Supabase-style
+# gateway, the Inngest dev server (http://localhost:8288) and the app.
+# Everything here is for local use only; the JWT secret and key below are
+# throwaway dev values. Put real API keys in platform/.env to enable scraping
+# and analysis (see .env.example).
+
+x-dev-jwt: &dev-jwt local-dev-jwt-secret-not-for-production-use
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./local/00-roles.sql:/docker-entrypoint-initdb.d/00-roles.sql:ro
+      - ./supabase/migrations/0001_init.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+      - ./supabase/seed.sql:/docker-entrypoint-initdb.d/20-seed.sql:ro
+      - ./local/30-grants.sql:/docker-entrypoint-initdb.d/30-grants.sql:ro
+      - db-data:/var/lib/postgresql/data
+    ports: ["54322:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres && psql -U postgres -tAc 'select 1 from competitors limit 1'"]
+      interval: 2s
+      retries: 60
+
+  rest:
+    image: postgrest/postgrest:v12.2.3
+    environment:
+      PGRST_DB_URI: postgres://authenticator:authenticator@db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: *dev-jwt
+    depends_on:
+      db: { condition: service_healthy }
+
+  gateway:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./local/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [rest]
+
+  inngest:
+    image: inngest/inngest:latest
+    command: inngest dev -u http://app:3000/api/inngest --no-discovery
+    ports: ["8288:8288"]
+
+  app:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SUPABASE_URL: http://gateway:8080
+      SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoiY29tcGV0aXRvci1pbnRlbC1sb2NhbCIsImV4cCI6MjAwMDAwMDAwMH0.ijE9iP8-VGCRBsc966-4JGF7UTEDZsiFDNhJQlFQkms
+      INNGEST_DEV: "1"
+      INNGEST_BASE_URL: http://inngest:8288
+      APIFY_WEBHOOK_SECRET: ${APIFY_WEBHOOK_SECRET:-local-webhook-secret}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+    ports: ["3000:3000"]
+    depends_on:
+      db: { condition: service_healthy }
+      gateway: { condition: service_started }
+      inngest: { condition: service_started }
+
+volumes:
+  db-data:

@@ -95,7 +95,11 @@ async function uploadFrames(videoId: string, frames: Keyframe[]) {
   for (const f of frames) {
     const key = `${videoId}/${f.path.split("/").pop()}`;
     const { error } = await bucket.upload(key, await readFile(f.path), { contentType: "image/jpeg", upsert: true });
-    if (error) throw new Error(`frame upload: ${error.message}`);
+    if (error) {
+      // Frames are only for display; analysis reads them from local disk, so don't fail the video.
+      console.warn(`keyframe upload skipped (${error.message})`);
+      return [];
+    }
     out.push({ t: f.t, kind: f.kind, url: bucket.getPublicUrl(key).data.publicUrl });
   }
   return out;

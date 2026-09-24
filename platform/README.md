@@ -44,7 +44,22 @@ The baseline is recomputed in Postgres after each ingest batch, and every video 
 - Claude calls use structured outputs (`messages.parse` + Zod), adaptive thinking, and server-side refusal fallbacks (`fallbacks: "default"`). The default model is `claude-opus-5`; set `ANALYSIS_MODEL` to change it.
 - Embeddings use OpenAI `text-embedding-3-small` (1536-d, matching the spec's `vector(1536)`), because Anthropic has no embeddings endpoint.
 
-## Setup
+## Quick start (Docker, one command)
+
+Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), then:
+
+```bash
+cd platform
+docker compose up --build
+```
+
+Open http://localhost:3000 for the dashboard (with demo data) and http://localhost:8288 for the Inngest dashboard, where you can watch background jobs. The first build takes a few minutes. Stop with `Ctrl+C`. `docker compose down -v` wipes the database.
+
+This runs everything locally: Postgres + pgvector, loaded with the schema and demo data; PostgREST behind a Supabase-style gateway; the Inngest dev server; and the app, which bundles ffmpeg and yt-dlp. You don't need a Supabase account. Keyframe images aren't stored locally because there's no storage service, but the analysis still uses them.
+
+To scrape and analyze real competitors, copy `.env.example` to `.env` and fill in `APIFY_TOKEN`, `DEEPGRAM_API_KEY`, `ANTHROPIC_API_KEY` and `OPENAI_API_KEY`, then rerun the command. Apify's webhook needs a public URL, so set `APP_URL` to a tunnel (e.g. `ngrok http 3000`), or POST scraped items straight to the webhook as shown below. The local webhook secret is `local-webhook-secret` unless you set `APIFY_WEBHOOK_SECRET`.
+
+## Setup (Supabase)
 
 ```bash
 cd platform
