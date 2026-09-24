@@ -7,6 +7,8 @@ Agent Skills package that gives an agent a video input. Installable across Claud
 - `skills/watch/SKILL.md` — canonical skill contract the model reads when `/watch` fires. Source of truth for behavior across every host.
 - `skills/watch/scripts/watch.py` — entry point; orchestrates download → frames → transcript.
 - `skills/watch/scripts/{download,frames,transcribe,whisper,setup,config}.py` — yt-dlp wrapper, ffmpeg frame extraction + auto-fps, caption/Whisper transcription, preflight/installer, shared config.
+- `skills/cinematic-sound-designer/` — companion skill for transcript tension analysis, timestamped SFX plans, and deterministic cue rendering. Its `scripts/` use the final narration timeline.
+- `agents/cinematic-sound-designer.md` — plugin subagent that preloads the companion skill; `.claude/agents/` has a project-scoped copy and `.claude/skills/` links to the skill.
 - `skills/watch/scripts/build-skill.sh` — builds `dist/watch.skill` for claude.ai upload (dev-only).
 - `hooks/` — Claude Code SessionStart setup-status hook (Claude Code only).
 - `.claude-plugin/` — `plugin.json` + `marketplace.json` (Claude Code plugin + local marketplace).
