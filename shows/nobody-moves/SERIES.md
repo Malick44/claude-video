@@ -23,6 +23,8 @@ It's a grey-sided house with a white porch, a black front door, a brass lantern 
 
 ## Cast
 
+The voices are defined in [`cast.py`](cast.py) and shared by every episode.
+
 | Character | Personality | Scratch voice |
 |---|---|---|
 | Narrator | A serious true-crime narrator | `bm_george` |

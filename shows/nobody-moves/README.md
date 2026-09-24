@@ -60,7 +60,17 @@ P(0.5)                                                           # a pause, in s
 
 Every shot also takes `note` (the stage direction for `SCRIPT.md`) and `sfx`. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score and typewriter clicks are added automatically.
 
-`CAST` maps each speaker to a [Kokoro voice](https://github.com/thewh1teagle/kokoro-onnx) (`bm_george`, `am_fenrir`, `af_bella`, `af_nicole`, …) with `speed`, `pitch` and `altered` (a disguised voice). The voices are scratch tracks: recording your own takes is the biggest quality upgrade.
+## Voices
+
+Every line is spoken by [Kokoro](https://github.com/thewh1teagle/kokoro-onnx), an open-weight text-to-speech model that runs locally on the CPU with no API key. Each character is a Kokoro preset voice plus a little post-processing: a speaking rate, a pitch shift, and for the anonymous source a "voice altered" filter.
+
+The voices are defined once, in [`cast.py`](cast.py), and every episode uses them. Kokoro is deterministic, so the same line with the same settings and model files always produces the same audio. `setup.sh` checks the model files against pinned checksums, and `requirements.txt` pins the TTS packages. That keeps Garrison sounding like Garrison in Episode 12.
+
+- **A new character:** add an entry to `cast.py`. Any of the 54 Kokoro presets works; `cast.py` has commented-out suggestions for Ray and Mr. Basin.
+- **A one-off speaker in a single episode:** define `CAST = {...}` in that episode's `episode.py`. It's merged over the series cast.
+- **Changing an existing voice:** edit its `cast.py` entry. That character changes in every episode the next time each one is built.
+
+The voices are scratch tracks. Recording your own takes is the biggest quality upgrade.
 
 ## Posting
 

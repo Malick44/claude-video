@@ -14,14 +14,8 @@ ANSWER = ("In frame 418 Lorraine the porch goose has turned to face the other wa
           "the obvious change; the goose is the hidden one - the same goose who said "
           "\"Where would I go? I'm concrete.\"")
 
-# Voice casting (Kokoro voices) and post-processing.
-# pitch < 1 lowers pitch while keeping speed (ffmpeg asetrate/atempo).
-CAST = {
-    "NARRATOR": {"voice": "bm_george", "speed": 1.02, "pitch": 1.0},
-    "GARRISON": {"voice": "am_fenrir", "speed": 1.0, "pitch": 0.86},
-    "LORRAINE": {"voice": "af_bella", "speed": 1.05, "pitch": 1.0},
-    "CHIME": {"voice": "af_nicole", "speed": 1.05, "pitch": 0.72, "altered": True},
-}
+# Voices come from the shared series cast (../../cast.py). Define CAST here only to add
+# a one-off speaker for this episode.
 
 # Stills (stills/<key>.webp|png|jpg). The first five are the user's images;
 # the rest are optional upgrades - a shot uses the first view whose still exists.
