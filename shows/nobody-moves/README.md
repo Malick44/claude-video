@@ -67,7 +67,7 @@ P(0.5)                                                           # a pause, in s
 | `doorbell` | Night-vision cam: jump-cuts from A to B, flickers after the last line, pauses on B and shows a call to action | `frame_a`, `frame_b`, `kb`, `clock_start` (seconds past 03:11:00, or `"HH:MM:SS"` with `jump_after`), `frames=(a, b)`, `cta=(line1, line2)`, `cta_sub`. For the hidden clue in frame B: `alter_box=(x0, y0, x1, y1)` mirrors a region (it turned around); `alter_glow=(x, y, r)` lights a point (it switched on) |
 | `end` | End card with `NEXT_UP` and the AI disclaimer | `min` |
 
-Every shot also takes `note` (the stage direction for `SCRIPT.md`) and `sfx`. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score and typewriter clicks are added automatically.
+Every shot also takes `note` (the stage direction for `SCRIPT.md`), `sfx`, and `"music": "out"` to cut the score for that shot. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score, the typewriter clicks, and the risers, whooshes and hits are added automatically.
 
 ## Voices
 
@@ -97,29 +97,52 @@ If voicing fails with `Error processing file ... phontab`, the folder's path is 
 
 ## Score and sound effects
 
-There are no samples or stock audio: every sound is synthesized in code in [`pipeline/sounds.py`](pipeline/sounds.py), the show's sound library.
+There are no samples or stock audio by default: every sound is synthesized in code in [`pipeline/sounds.py`](pipeline/sounds.py), the show's sound library. The palette is the movie-trailer toolkit, at 48 kHz stereo.
 
 | Sound | How it's made |
 |---|---|
-| Theme | A sparse A-minor piano ostinato (A C E C A C D# C, 0.62 s per note, with a D on every other bar) over a low 55 Hz drone. It plays under the whole episode and dips automatically under dialogue. |
-| Stings (title, end, soft) | A low A-minor piano cluster plus a sub-bass boom that sweeps from 48 to 30 Hz |
-| Piano | Additive synthesis: nine slightly stretched harmonics, each decaying at its own rate, plus a hammer thump |
-| Room | One shared reverb, made by convolving with a decaying-noise impulse response, so everything sounds like it's in the same space |
-| Camera shutter | Two filtered noise clicks and a flash-charge whine |
+| Theme | The show's signature: a sparse A-minor piano ostinato (A C E C A C D# C, 0.62 s per note, with a D on every other bar). It sits on a detuned string pad that moves i–VI–iv–V, with cellos an octave down and violins an octave up. A heartbeat pulse and a high string shimmer come in as the tension builds (see **Dynamics**). |
+| Braam | A low brass-like blast: a detuned sawtooth power chord whose filter opens on the attack, saturated so phones can hear it |
+| Impact | A sub drop, a punchy mid body, a noise boom and a transient crack. The saturated harmonics carry it on phone speakers. |
+| Riser, whoosh | A riser is a noise sweep, rising tones and an accelerating tremolo that peak exactly on the next hit. A whoosh is a noise swell that passes from left to right. |
+| Stings | Title and end: braam, impact and a low A-minor piano cluster. Soft: the string chord swelling out of nothing, with a sub underneath. |
+| Piano | Additive synthesis: 12 slightly stretched harmonics, each decaying at its own rate, plus a hammer thump |
+| Room | One shared stereo hall (decorrelated left and right tails), so everything sounds like it's in the same space |
+| Camera shutter | Two filtered noise clicks and a flash-charge whine, landing on an impact |
 | Typewriter | Filtered noise keys with a body thump, and a three-tone carriage bell |
-| Wind chimes, wind | Random strikes of five pitches with inharmonic overtones; low band-passed noise with slow gusts |
-| Night crickets | Three crickets at 4.4, 4.75 and 5.1 kHz, plus a faint 60 Hz porch-light hum |
-| Doorbell glitch | A square-wave buzz in noise |
+| Wind chimes, wind | Random strikes of five pitches with inharmonic overtones, spread across the stereo field; low band-passed noise with slow gusts |
+| Night crickets | Three crickets at 4.4, 4.75 and 5.1 kHz in different positions, plus a faint 60 Hz porch-light hum |
+| Doorbell glitch, jump | A square-wave buzz in noise; the jump cut adds a short sub hit |
 
-**Reuse.** Every episode uses this same library, so the next episode gets the same theme, stings and effects automatically; choose them per shot with `sfx`. Each sound seeds its own random stream, so it's identical in every episode no matter what else the episode contains. The mix levels are shared too (`LEVELS` in `sounds.py`). To change the show's sound, edit `sounds.py`: the theme notes are `THEME_NOTES`.
+**Automatic hits.** The mix places most effects from the shot kinds, so an episode gets the cinematic treatment without any extra fields:
 
-**Sound kit.** `.venv/bin/python pipeline/sound_kit.py` exports every sound to `sound_kit/*.wav`: the theme (60 s), three stings, shutter, typewriter key, bell and a full typed question, 20 s beds of wind, chimes and crickets, and the glitch. Use them for Confessionals or trailers in CapCut; they match the episodes exactly.
+- a riser sweeps into the title card and lands on the title sting;
+- every question card is preceded by a whoosh, then its question types out;
+- every `shutter` lands on an impact;
+- the doorbell jump cut gets a sub hit;
+- a riser runs across the flicker, and a braam and impact land on the call to action.
+
+**Dynamics.** The score starts quietly on the title card and builds toward the last doorbell shot: the pad swells, the heartbeat fades in around the middle, and the shimmer enters in the last stretch. It hushes under the doorbell flicker so the reveal hit lands. Give a shot `"music": "out"` to cut the score for that shot: silence before a punchline or a reveal is the most dramatic sound there is. The score and risers duck automatically under dialogue.
+
+**Mastering.** The mix is highpassed at 30 Hz, lightly compressed and limited, then normalized in two passes to −14 LUFS with true peaks at −1.5 dBTP, which is TikTok's loudness target. Build with `pipeline/build_audio.py <episode> --stems` to also write `build/stems/{dialogue,score,effects}.wav` for remixing in an editor.
+
+**Reuse.** Every episode uses this same library, so the next episode gets the same theme, hits and effects automatically; choose the extra ones per shot with `sfx`. Each sound seeds its own random stream, so it's identical in every episode no matter what else the episode contains. The mix levels are shared too (`LEVELS` in `sounds.py`). To change the show's sound, edit `sounds.py`: the theme notes are `THEME_NOTES` and the chords are `PAD_CHORDS`.
+
+**Sound kit.** `.venv/bin/python pipeline/sound_kit.py` exports every sound to `sound_kit/*.wav` in 48 kHz stereo. That covers:
+
+- the theme (60 s);
+- three stings, and the braam, impact, a 2 s riser and the whoosh;
+- the shutter, a typewriter key, the bell and a full typed question;
+- 20 s beds of wind, chimes and crickets;
+- the glitch and the jump.
+
+Use them for Confessionals or trailers in CapCut; they match the episodes exactly.
 
 ## Stock assets: local files and third-party APIs
 
 Anything the show uses can come from your own files or from an API instead of being generated.
 
-**Sounds and music.** Point a name in [`soundtrack.py`](soundtrack.py) at a source, and every episode uses it. An episode can override a name with its own `SOUNDS = {...}`. The names are `theme`, `sting`, `sting_end`, `sting_soft`, `shutter`, `typewriter`, `ding`, `wind`, `chimes`, `crickets`, `glitch` and `jump`.
+**Sounds and music.** Point a name in [`soundtrack.py`](soundtrack.py) at a source, and every episode uses it. An episode can override a name with its own `SOUNDS = {...}`. The names are `theme`, `sting`, `sting_end`, `sting_soft`, `riser`, `impact`, `braam`, `whoosh`, `shutter`, `typewriter`, `ding`, `wind`, `chimes`, `crickets`, `glitch` and `jump`. Stereo files stay stereo.
 
 ```python
 SOUNDS = {

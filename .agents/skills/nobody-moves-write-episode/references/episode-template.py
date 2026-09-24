@@ -35,7 +35,7 @@ SHOTS = [
         "lower_third": ("GARRISON", "Garden gnome · Flower bed, No. 7", "Gag line"),
         # "lower_third_at": "last",   # show the name card on the last line instead of at 0.35 s
     },
-    # --- TITLE card over a sting (the score starts here)
+    # --- TITLE card over a sting (a riser sweeps in; the score starts here and builds to the doorbell)
     {
         "id": "title", "kind": "title", "note": "Title card over a piano sting.",
         "views": [V("aerial", (0.5, 0.45, 1.25), (0.5, 0.5, 1.12)), V("porch", (0.42, 0.32, 1.3), (0.42, 0.36, 1.12))],
@@ -62,6 +62,7 @@ SHOTS = [
         "lower_third": ("LORRAINE", "Porch goose · Front steps, No. 7", "Gag line"),
     },
     # --- ANONYMOUS SOURCE: sfx wind + chimes; drop them in the next shot for "the wind stopped"
+    #     (and give that shot "music": "out", so the whole soundtrack goes silent for the beat)
     {
         "id": "chime", "kind": "still", "note": "...",
         "views": [V("chime", (0.5, 0.45, 1.1), (0.5, 0.42, 1.3), "anon"),
@@ -82,6 +83,7 @@ SHOTS = [
             ("porch", (0.696, 0.015, 1.0), "ANON.", 0.78, 0.58, 420, 5, "anon"),
         ],
         "items": [L("NARRATOR", "The question...")], "post": 0.6, "sfx": ["sting_soft"],
+        # "music": "out",   # any shot: cut the score for this shot (silence before a punchline/reveal)
     },
     # --- DOORBELL CAM cliffhanger: jump cut A -> B at jump_after, flicker after the last line,
     #     pause on B, then the call to action. Frame B carries the hidden clue.

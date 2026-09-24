@@ -35,6 +35,11 @@ cd shows/nobody-moves
   2. the character's provider in `cast.py`, which is Kokoro unless set to ElevenLabs.
 - **Caching:** voice clips are cached by line text and settings, so only changed lines are re-voiced.
 - **Sounds:** they come from `soundtrack.py`, with the episode's `SOUNDS` overriding it. They're synthesized unless pointed at stock files or APIs; see the README section "Stock assets". Anything fetched is pinned in `stock/sources.lock.json`. Commit `stock/`.
+- **The mix:** 48 kHz stereo, mastered to −14 LUFS (TikTok's target). The risers, whooshes and hits come from the shot kinds, and the score builds toward the last doorbell shot. Add `--stems` to write `build/stems/{dialogue,score,effects}.wav`.
+- **Check the mix by measurement, not only by ear:**
+  - Loudness: `$FF -i build/soundtrack.wav -af ebur128=peak=true -f null -` should give about −14 LUFS and a peak of −1.5 dBFS or lower. `$FF` is the `imageio_ffmpeg` binary.
+  - Dialogue: in each line's window from `timeline.json`, the dialogue stem should be about 15 dB or more above score plus effects. Lines under deliberate ambience, like the chime, can sit around 10 dB.
+  - A line that gets buried usually means an ambience or a hit is too close to it. Move the hit or trim `LEVELS`; don't turn the voices up.
 
 ## 4. Look before rendering
 
@@ -64,7 +69,7 @@ It runs the audio, `SCRIPT.md`, the master render and the TikTok copy. It writes
 - `build/<ep>.mp4`, the master at about 9 Mbps, too big to send in chat;
 - `build/<ep>_tiktok.mp4`, under 29 MB. **Send this one.**
 
-Verify with ffprobe, via the `imageio_ffmpeg` binary: 1080×1920, 30 fps, AAC audio, and the duration matching the timing table.
+Verify with `$FF -i <file>` (the `imageio_ffmpeg` binary; there's no ffprobe): 1080×1920, 30 fps, AAC stereo at 48 kHz, and the duration matching the timing table.
 
 ## 6. Hand-off
 

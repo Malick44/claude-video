@@ -17,7 +17,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from common import FONTS, SHOW_DIR, doorbell_clock, fmt_clock, load_episode
+from common import CTA_DELAY, FONTS, SHOW_DIR, doorbell_clock, fmt_clock, load_episode
 
 W, H, FPS = 1080, 1920, 30
 YELLOW = (242, 194, 48)
@@ -610,7 +610,7 @@ def render_doorbell(shot, lt, fi, dur):
     d.text((70, 252), f"{shot.get('date', '06/14/2026')}  {clock} AM", font=mono, fill=(255, 255, 255))
     if phase >= 0:
         d.text((W - 70, 252), f"FRAME {frame_b if use_b else frame_a}", font=mono, fill=YELLOW, anchor="ra")
-    cta_t = fl + 1.9
+    cta_t = fl + CTA_DELAY
     a = smooth((lt - cta_t) / 0.3)
     if a > 0:
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))

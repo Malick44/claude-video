@@ -30,6 +30,7 @@ These rules come from how the pilot was designed and what TikTok rewards. Each o
 - **Nobody moves.** Every witness is one still with a slow camera move. Never write action that needs animation. The comedy comes from the gap between prestige true-crime form and stakes no bigger than a flamingo three feet to the left.
 - **Captions carry the comedy.** Most people watch muted, so every joke has to read as text. Keep lines short, one idea each, and put the punchline last. Use a `P(...)` pause before a punchline; the silence is the joke's timing.
 - **Each character has one mechanism; escalate it, don't swap it.** Lorraine is warm and evasive ("hon"; turning around isn't "going anywhere"). Garrison is defensive and "was facing the other way." The chime only talks when it's windy. Mr. Basin is his own lawyer. Ray only talks after a full day of sun. New jokes should come out of these rules.
+- **Silence is a sound cue.** The score builds toward the doorbell by itself, and the risers, whooshes and hits are automatic. Your one lever is `"music": "out"` on a shot, which cuts the score for it. Use it once or twice an episode, right before a punchline or a reveal (Episode 2: "The wind stopped."). The drop is what makes the next beat land; used everywhere, it stops meaning anything.
 - **End card.** Set `NEXT_UP` to the next roadmap title, so the audience knows there's more.
 
 ## Stills

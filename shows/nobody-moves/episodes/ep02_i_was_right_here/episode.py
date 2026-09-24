@@ -176,7 +176,7 @@ SHOTS = [
         "views": [V("chime", (0.5, 0.42, 1.3), (0.5, 0.42, 1.32), "anon"),
                   V("porch", (0.86, 0.12, 3.35), (0.86, 0.12, 3.4), "anon")],
         "items": [P(1.2), L("NARRATOR", "The wind stopped.")],
-        "post": 0.9,
+        "post": 0.9, "music": "out",
     },
     {
         "id": "board", "kind": "board", "card": "WHAT ELSE CAN MOVE?",

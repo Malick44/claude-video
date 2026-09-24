@@ -213,14 +213,15 @@ def fetch(spec, kind, base_dirs):
     return path, credit
 
 
-def decode_audio(path, sr=SR):
-    """Any audio file ffmpeg can read -> mono float array at `sr`."""
+def decode_audio(path, sr=SR, channels=1):
+    """Any audio file ffmpeg can read -> float array at `sr`: mono (n,) or, with channels=2, (n, 2)."""
     import imageio_ffmpeg
-    out = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", path, "-ac", "1", "-ar", str(sr),
-                          "-f", "f32le", "-"], capture_output=True)
+    out = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", path, "-ac", str(channels),
+                          "-ar", str(sr), "-f", "f32le", "-"], capture_output=True)
     if out.returncode or not out.stdout:
         sys.exit(f"could not decode audio {path}: {out.stderr.decode(errors='replace')[:300]}")
-    return np.frombuffer(out.stdout, np.float32).astype(np.float64)
+    y = np.frombuffer(out.stdout, np.float32).astype(np.float64)
+    return y.reshape(-1, channels) if channels > 1 else y
 
 
 def decode_audio_bytes(data, sr=SR):

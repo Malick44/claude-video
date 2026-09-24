@@ -41,6 +41,11 @@ def load_sound_sources():
     return _import("soundtrack", os.path.join(SHOW_DIR, "soundtrack.py")).SOUNDS
 
 
+# Seconds from the doorbell flicker to the call-to-action reveal (the renderer shows the text,
+# the mix lands the hit there).
+CTA_DELAY = 1.9
+
+
 def doorbell_clock(shot):
     """(clock seconds at shot start, seconds until the jump to frame B) for a doorbell shot.
 
