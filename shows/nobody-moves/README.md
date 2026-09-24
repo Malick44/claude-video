@@ -88,6 +88,26 @@ The `kokoro` command plays the plain preset voice. It doesn't apply `cast.py`'s 
 
 If voicing fails with `Error processing file ... phontab`, the folder's path is too long for espeak-ng (the pronunciation engine), which has a limit of about 160 characters. Move the project to a shorter path. Both scripts warn when a path is near the limit.
 
+## Score and sound effects
+
+There are no samples or stock audio: every sound is synthesized in code in [`pipeline/sounds.py`](pipeline/sounds.py), the show's sound library.
+
+| Sound | How it's made |
+|---|---|
+| Theme | A sparse A-minor piano ostinato (A C E C A C D# C, 0.62 s per note, with a D on every other bar) over a low 55 Hz drone. It plays under the whole episode and dips automatically under dialogue. |
+| Stings (title, end, soft) | A low A-minor piano cluster plus a sub-bass boom that sweeps from 48 to 30 Hz |
+| Piano | Additive synthesis: nine slightly stretched harmonics, each decaying at its own rate, plus a hammer thump |
+| Room | One shared reverb, made by convolving with a decaying-noise impulse response, so everything sounds like it's in the same space |
+| Camera shutter | Two filtered noise clicks and a flash-charge whine |
+| Typewriter | Filtered noise keys with a body thump, and a three-tone carriage bell |
+| Wind chimes, wind | Random strikes of five pitches with inharmonic overtones; low band-passed noise with slow gusts |
+| Night crickets | Three crickets at 4.4, 4.75 and 5.1 kHz, plus a faint 60 Hz porch-light hum |
+| Doorbell glitch | A square-wave buzz in noise |
+
+**Reuse.** Every episode uses this same library, so the next episode gets the same theme, stings and effects automatically; choose them per shot with `sfx`. Each sound seeds its own random stream, so it's identical in every episode no matter what else the episode contains. The mix levels are shared too (`LEVELS` in `sounds.py`). To change the show's sound, edit `sounds.py`: the theme notes are `THEME_NOTES`.
+
+**Sound kit.** `.venv/bin/python pipeline/sound_kit.py` exports every sound to `sound_kit/*.wav`: the theme (60 s), three stings, shutter, typewriter key, bell and a full typed question, 20 s beds of wind, chimes and crickets, and the glitch. Use them for Confessionals or trailers in CapCut; they match the episodes exactly.
+
 ## Posting
 
 Turn on TikTok's **AI-generated** label, and pin a comment that points at the hidden clue without giving it away. Main episodes run over 60 seconds, which TikTok's Creator Rewards program requires.
