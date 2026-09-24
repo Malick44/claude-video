@@ -15,7 +15,7 @@ Agent Skills package that gives an agent a video input. Installable across Claud
 - `CLAUDE.md` → `@AGENTS.md` — generic-agent entry point.
 - `tests/` — pytest suite (ffmpeg-synthesized clips; no network).
 - `platform/` — separate Next.js competitor content-intelligence app (Apify ingest, outlier scoring, multimodal analysis, dashboard). Independent of the skill; see `platform/README.md`. Tests: `cd platform && npm test`.
-- `shows/nobody-moves/` — TikTok series production pipeline (still images → Ken Burns + TTS voices + synthesized score → 1080×1920 MP4). Independent of the skill; one folder per episode under `episodes/`. See `shows/nobody-moves/README.md`.
+- `shows/nobody-moves/` — TikTok series production pipeline (still images → Ken Burns + TTS voices + synthesized score → 1080×1920 MP4). Independent of the skill; one folder per episode under `episodes/`. See `shows/nobody-moves/README.md`. Project skills `nobody-moves-write-episode` and `nobody-moves-produce-episode` (in `.agents/skills/`, symlinked from `.claude/skills/`) drive it.
 
 ## Orientation
 

@@ -17,7 +17,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from common import FONTS, load_episode
+from common import FONTS, SHOW_DIR, doorbell_clock, fmt_clock, load_episode
 
 W, H, FPS = 1080, 1920, 30
 YELLOW = (242, 194, 48)
@@ -112,10 +112,12 @@ def placeholder(key):
 
 
 def still_path(key):
-    for ext in ("png", "jpg", "jpeg", "webp"):
-        p = os.path.join(STILLS_DIR, f"{key}.{ext}")
-        if os.path.exists(p):
-            return p
+    """The episode's own still, else the series library in <show>/stills/ (recurring sets and cast)."""
+    for folder in (STILLS_DIR, os.path.join(SHOW_DIR, "stills")):
+        for ext in ("png", "jpg", "jpeg", "webp"):
+            p = os.path.join(folder, f"{key}.{ext}")
+            if os.path.exists(p):
+                return p
     return None
 
 
@@ -446,7 +448,10 @@ def polaroid(key, crop, label, size, rot, look=None):
     card = Image.new("RGBA", (size + 2 * pad, size + pad + bottom), (236, 232, 222, 255))
     card.paste(ph, (pad, pad))
     d = ImageDraw.Draw(card)
-    d.text((card.width / 2, size + pad + bottom * 0.52), label, font=font("PermanentMarker", int(size * 0.13)), fill=(30, 30, 40), anchor="mm")
+    fs = int(size * 0.13)
+    while fs > 12 and d.textlength(label, font=font("PermanentMarker", fs)) > card.width - 2 * pad:
+        fs -= 2
+    d.text((card.width / 2, size + pad + bottom * 0.52), label, font=font("PermanentMarker", fs), fill=(30, 30, 40), anchor="mm")
     return card.rotate(rot, resample=Image.BICUBIC, expand=True)
 
 
@@ -473,8 +478,8 @@ def procedural_cork():
 
 
 def board_sources(shot):
-    if _board:
-        return _board
+    if shot["id"] in _board:
+        return _board[shot["id"]]
     cork = (source("cork") if still_path("cork") else procedural_cork()).copy().convert("RGBA")
     sw, sh = cork.size
     lum = np.asarray(cork.convert("L"), dtype=np.float32) / 255.0
@@ -511,7 +516,11 @@ def board_sources(shot):
     for yy in range(95, 330, 56):
         dc.line((0, yy, 1180, yy), fill=(150, 180, 220, 255), width=3)
     dc.line((0, 70, 1180, 70), fill=(220, 90, 90, 255), width=3)
-    dc.text((590, 190), "WHO MOVED DEB?", font=font("PermanentMarker", 100), fill=(20, 20, 30, 255), anchor="mm")
+    text = shot.get("card", "WHO MOVED DEB?")
+    size = 100
+    while size > 50 and dc.textlength(text, font=font("PermanentMarker", size)) > 1080:
+        size -= 4
+    dc.text((590, 190), text, font=font("PermanentMarker", size), fill=(20, 20, 30, 255), anchor="mm")
     card = card.rotate(-4, resample=Image.BICUBIC, expand=True)
     with_card = no_card.copy()
     cx, cy = int(0.50 * sw - card.width / 2), int(0.72 * sh - card.height / 2)
@@ -521,9 +530,8 @@ def board_sources(shot):
     with_card.alpha_composite(card, (cx, cy))
     dp = ImageDraw.Draw(with_card)
     dp.ellipse((sw * 0.5 - 22, cy + 18, sw * 0.5 + 22, cy + 62), fill=(190, 30, 30, 255))
-    _board["a"] = no_card.convert("RGB")
-    _board["b"] = with_card.convert("RGB")
-    return _board
+    _board[shot["id"]] = {"a": no_card.convert("RGB"), "b": with_card.convert("RGB")}
+    return _board[shot["id"]]
 
 
 def render_board(shot, lt, fi, dur):
@@ -547,19 +555,30 @@ def night_vision(src):
 
 
 def door_sources(shot):
-    if _door:
-        return _door
+    """Night-vision frames A and B. Frame B carries the hidden clue:
+    alter_box (x0, y0, x1, y1) mirrors that region (something turned around);
+    alter_glow (x, y, r) lights up a point (something switched on)."""
+    if shot["id"] in _door:
+        return _door[shot["id"]]
     a = night_vision(source(shot["frame_a"]))
     b = night_vision(source(shot["frame_b"]))
-    x0, y0, x1, y1 = shot["alter_box"]
-    box = (int(x0 * b.width), int(y0 * b.height), int(x1 * b.width), int(y1 * b.height))
-    region = b.crop(box).transpose(Image.FLIP_LEFT_RIGHT)
-    mask = Image.new("L", region.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((6, 4, region.width - 6, region.height - 4), radius=18, fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(4))
-    b.paste(region, box[:2], mask)
-    _door["a"], _door["b"] = a, b
-    return _door
+    if shot.get("alter_box"):
+        x0, y0, x1, y1 = shot["alter_box"]
+        box = (int(x0 * b.width), int(y0 * b.height), int(x1 * b.width), int(y1 * b.height))
+        region = b.crop(box).transpose(Image.FLIP_LEFT_RIGHT)
+        mask = Image.new("L", region.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle((6, 4, region.width - 6, region.height - 4), radius=18, fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(4))
+        b.paste(region, box[:2], mask)
+    if shot.get("alter_glow"):
+        gx, gy, gr = shot["alter_glow"]
+        cx, cy, rad = gx * b.width, gy * b.height, gr * b.width
+        yy, xx = np.mgrid[0:b.height, 0:b.width].astype(np.float32)
+        glow = np.exp(-(((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)))[..., None]
+        arr = np.asarray(b, dtype=np.float32)
+        b = Image.fromarray(np.clip(arr + glow * 235 * np.array([0.86, 1.0, 0.88]), 0, 255).astype(np.uint8))
+    _door[shot["id"]] = {"a": a, "b": b}
+    return _door[shot["id"]]
 
 
 def render_doorbell(shot, lt, fi, dur):
@@ -567,13 +586,14 @@ def render_doorbell(shot, lt, fi, dur):
     fl = shot["flicker_at"] - shot["start"]
     phase = int((lt - fl) / 0.3) if lt >= fl else -1
     paused = phase >= 6
+    base, jump = doorbell_clock(shot)
+    frame_a, frame_b = shot.get("frames", (417, 418))
     if phase < 0:
-        total = shot["clock_start"] + int(lt)
-        use_b = total >= 60
-        clock = f"03:{11 + total // 60:02d}:{total % 60:02d}"
+        use_b = lt >= jump
+        clock = fmt_clock(base + int(lt))
     else:
         use_b = phase % 2 == 1 or paused
-        clock = "03:12:00" if use_b else "03:11:59"
+        clock = fmt_clock(base + jump if use_b else base + jump - 1)
     frame, _, _ = kb_view(ds["b"] if use_b else ds["a"], shot["kb"], lt / dur)
     frame = grade(frame, fi, grain=15, extra=lambda a: a * SCANLINES).convert("RGBA")
     frame.alpha_composite(bottom_gradient())
@@ -586,10 +606,10 @@ def render_doorbell(shot, lt, fi, dur):
         d.text((114, 200), "REC", font=mono, fill=(255, 255, 255))
     else:
         d.text((114, 200), "REC", font=mono, fill=(255, 255, 255))
-    d.text((W - 70, 200), "FRONT DOOR · NO. 5", font=mono, fill=(255, 255, 255), anchor="ra")
-    d.text((70, 252), f"06/14/2026  {clock} AM", font=mono, fill=(255, 255, 255))
+    d.text((W - 70, 200), shot.get("camera", "FRONT DOOR · NO. 5"), font=mono, fill=(255, 255, 255), anchor="ra")
+    d.text((70, 252), f"{shot.get('date', '06/14/2026')}  {clock} AM", font=mono, fill=(255, 255, 255))
     if phase >= 0:
-        d.text((W - 70, 252), f"FRAME {418 if use_b else 417}", font=mono, fill=YELLOW, anchor="ra")
+        d.text((W - 70, 252), f"FRAME {frame_b if use_b else frame_a}", font=mono, fill=YELLOW, anchor="ra")
     cta_t = fl + 1.9
     a = smooth((lt - cta_t) / 0.3)
     if a > 0:
@@ -597,12 +617,12 @@ def render_doorbell(shot, lt, fi, dur):
         do = ImageDraw.Draw(ov)
         f1 = font("Oswald", 66, "Bold")
         y = 1040
-        for ln in ("SOMETHING ELSE IN", "THIS FRAME MOVED."):
+        for ln in shot.get("cta", ("SOMETHING ELSE IN", "THIS FRAME MOVED.")):
             tw = do.textlength(ln, font=f1)
             do.rectangle((500 - tw / 2 - 22, y - 6, 500 + tw / 2 + 22, y + 86), fill=YELLOW + (255,))
             do.text((500, y + 40), ln, font=f1, fill=(15, 15, 15, 255), anchor="mm")
             y += 92
-        do.text((500, y + 40), "Comment the object + timestamp ↓", font=font("Inter", 42, "ExtraBold"), fill=(255, 255, 255, 255), anchor="mm", stroke_width=6, stroke_fill=(0, 0, 0, 255))
+        do.text((500, y + 40), shot.get("cta_sub", "Comment the object + timestamp ↓"), font=font("Inter", 42, "ExtraBold"), fill=(255, 255, 255, 255), anchor="mm", stroke_width=6, stroke_fill=(0, 0, 0, 255))
         frame.alpha_composite(with_alpha(ov, a))
     return frame
 

@@ -25,16 +25,23 @@ Outputs, in `episodes/<episode>/build/` (not committed):
 
 ## Making a new episode
 
-1. Copy `episodes/ep01_three_feet` to `episodes/ep02_<name>`. Empty its `stills/` and delete `SCRIPT.md`.
-2. Generate the stills you need with the style prompt in `SERIES.md`. Put them in `stills/` as `<key>.webp` (or `.png` / `.jpg`).
-3. Edit `episode.py`: the title, `NEXT_UP`, `ANSWER` and the `SHOTS` list.
-4. Check framing without a full render:
+With Claude Code, two skills in this repo do the whole loop:
+- **`nobody-moves-write-episode`** writes the script, the image prompts and the continuity updates.
+- **`nobody-moves-produce-episode`** builds, checks and delivers the video.
+
+Just ask for "the next episode". By hand:
+
+1. Copy an episode folder, or the template at `.agents/skills/nobody-moves-write-episode/references/episode-template.py`, to `episodes/epNN_<name>/episode.py`.
+2. Reuse the **series library** in `stills/` (`garrison`, `porch`, `holes`, `yard_before`, `yard_after`); every episode can use it by key. Episode-only stills go in `episodes/<ep>/stills/`, and a still there overrides a library still with the same key. To generate new ones, use the style prompt in `SERIES.md`.
+3. Edit `episode.py`: the title, `NEXT_UP`, `ANSWER`, `STILLS` (prompts for any new images) and the `SHOTS` list.
+4. Place coordinates with `.venv/bin/python pipeline/grid.py stills/<key>.webp [--box x0,y0,x1,y1] [--bright 2.5]`. It overlays a grid labeled in the same fractions `episode.py` uses.
+5. Check framing without a full render:
    ```bash
    .venv/bin/python pipeline/build_audio.py episodes/ep02_x
    .venv/bin/python pipeline/render.py episodes/ep02_x --contact            # one frame per shot -> build/contact.png
    .venv/bin/python pipeline/render.py episodes/ep02_x --preview 1,12.5,30  # frames at those seconds
    ```
-5. Run `./make_episode.sh episodes/ep02_x`.
+6. Run `./make_episode.sh episodes/ep02_x`.
 
 The voice clips are cached by line text, so rebuilding after an edit only re-voices the lines you changed.
 
@@ -56,8 +63,8 @@ P(0.5)                                                           # a pause, in s
 | `evidence` | A still plus a camera flash, an EXHIBIT tag and timestamp, and drawn annotations | as `still`, plus `label`, `stamp`, `annot_arrow={"from","to","label"}`, `annot_circles=[(x, y, r)]` |
 | `title` | Series title and episode name | `views`, `min` |
 | `qcard` | A black card where the interviewer's question types out | `text`, `min` |
-| `board` | Cork board with polaroids, red string and a "WHO MOVED DEB?" card | `kb`, `polaroids=[(still, (x0, y0, x1), label, fx, fy, size, rotation, look)]`; uses `stills/cork` if present, otherwise a drawn board |
-| `doorbell` | Night-vision cam that jump-cuts A to B when the clock reaches :00, then flickers and shows a call to action | `frame_a`, `frame_b`, `clock_start`, `kb`, `alter_box` (region mirrored in frame B: the hidden clue) |
+| `board` | Cork board with polaroids, red string and an index card that lands on the last line | `kb`, `card` (default "WHO MOVED DEB?"), `polaroids=[(still, (x0, y0, x1), label, fx, fy, size, rotation, look)]` (the first is the hub). Uses the `cork` still if present, otherwise a drawn board |
+| `doorbell` | Night-vision cam: jump-cuts from A to B, flickers after the last line, pauses on B and shows a call to action | `frame_a`, `frame_b`, `kb`, `clock_start` (seconds past 03:11:00, or `"HH:MM:SS"` with `jump_after`), `frames=(a, b)`, `cta=(line1, line2)`, `cta_sub`. For the hidden clue in frame B: `alter_box=(x0, y0, x1, y1)` mirrors a region (it turned around); `alter_glow=(x, y, r)` lights a point (it switched on) |
 | `end` | End card with `NEXT_UP` and the AI disclaimer | `min` |
 
 Every shot also takes `note` (the stage direction for `SCRIPT.md`) and `sfx`. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score and typewriter clicks are added automatically.
@@ -128,7 +135,7 @@ The looped names (`theme`, `wind`, `chimes`, `crickets`) are looped with a cross
 
 **Voices.** Any character in [`cast.py`](cast.py) can use an ElevenLabs voice instead of Kokoro. Your own takes beat both: save a line as `recordings/<name>.m4a` in the episode folder. `SCRIPT.md` shows the name for every line, for example `hook_1` or `chime_3`. A recording replaces that line's text-to-speech; the other lines keep their generated voice.
 
-**Images.** Stills are already local files: put any image in `episodes/<ep>/stills/`. To pull one from a stock library:
+**Images.** Stills are already local files: put any image in `stills/` (the series library) or `episodes/<ep>/stills/`. To pull one from a stock library into an episode:
 
 ```bash
 .venv/bin/python pipeline/stock.py image episodes/ep02_x aerial --pexels "suburban cul-de-sac at night"

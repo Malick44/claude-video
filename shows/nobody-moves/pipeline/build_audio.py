@@ -20,7 +20,7 @@ import numpy as np
 import soundfile as sf
 
 import stock
-from common import MODELS, SHOW_DIR, load_episode
+from common import MODELS, SHOW_DIR, doorbell_clock, load_episode
 from soundbank import Bank
 from sounds import LEVELS, SR, typewriter_gain
 
@@ -217,7 +217,7 @@ def main():
                 put(sfx, flick + j * 0.3, bank.get("glitch"), LEVELS["glitch"])
             s["flicker_at"] = round(flick, 3)
             # the jump cut when the clock rolls over to the next minute
-            put(sfx, s["start"] + (60 - s["clock_start"]), bank.get("jump"), LEVELS["jump"])
+            put(sfx, s["start"] + doorbell_clock(s)[1], bank.get("jump"), LEVELS["jump"])
 
     # duck the score under dialogue (smoothed voice envelope)
     env = np.abs(vox)

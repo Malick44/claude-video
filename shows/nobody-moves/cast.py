@@ -27,7 +27,7 @@ CAST = {
     "GARRISON": {"voice": "am_fenrir", "speed": 1.0, "pitch": 0.86},
     "LORRAINE": {"voice": "af_bella", "speed": 1.05, "pitch": 1.0},
     "CHIME": {"voice": "af_nicole", "speed": 1.05, "pitch": 0.72, "altered": True},
+    "MR. BASIN": {"voice": "bm_lewis", "speed": 0.95, "pitch": 0.92},  # birdbath, and his own lawyer (from Ep. 2)
     # Not cast yet - uncomment when they first speak (any of the 54 Kokoro presets works):
     # "RAY": {"voice": "am_puck", "speed": 1.1, "pitch": 1.08},       # solar frog, perky once charged
-    # "MR. BASIN": {"voice": "bm_lewis", "speed": 0.95, "pitch": 0.92},  # birdbath, and his own lawyer
 }

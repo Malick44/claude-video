@@ -39,3 +39,20 @@ def load_episode(ep_dir):
 def load_sound_sources():
     """The show-wide SOUNDS mapping from soundtrack.py (name -> stock source)."""
     return _import("soundtrack", os.path.join(SHOW_DIR, "soundtrack.py")).SOUNDS
+
+
+def doorbell_clock(shot):
+    """(clock seconds at shot start, seconds until the jump to frame B) for a doorbell shot.
+
+    clock_start is either an int of seconds past 03:11:00 (ep01 style; the jump happens at
+    03:12:00) or an "HH:MM:SS" string with an explicit jump_after (default 4 s).
+    """
+    cs = shot["clock_start"]
+    if isinstance(cs, int):
+        return 3 * 3600 + 11 * 60 + cs, shot.get("jump_after", 60 - cs)
+    h, m, sec = (int(x) for x in cs.split(":"))
+    return h * 3600 + m * 60 + sec, shot.get("jump_after", 4)
+
+
+def fmt_clock(seconds):
+    return f"{seconds // 3600:02d}:{seconds % 3600 // 60:02d}:{seconds % 60:02d}"
