@@ -1,0 +1,7 @@
+pillow
+numpy
+soundfile
+imageio-ffmpeg
+# pinned: the TTS engine and its phonemizer shape how every character sounds
+kokoro-onnx==0.6.1
+espeakng-loader==0.2.4
