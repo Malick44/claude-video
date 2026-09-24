@@ -27,6 +27,9 @@ ON CONFLICT DO NOTHING;
 
 SELECT recompute_competitor_baseline(id) FROM competitors;
 
+-- Outliers are always queued for analysis; only below-bar videos are 'skipped'.
+UPDATE competitor_videos SET processing_status = 'pending' WHERE is_outlier;
+
 UPDATE competitor_videos SET processing_status = 'done', raw_transcript =
   'Stop writing blog posts if you want clients in 2026. Look at this: three SaaS brands lost over half their Google traffic this year. Instead, publish programmatic micro case studies. Comment SCALE and I''ll send you the swipe file.'
 WHERE external_video_id = 'saasgrowthlab-2';
