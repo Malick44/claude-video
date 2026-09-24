@@ -23,9 +23,9 @@ These rules come from how the pilot was designed and what TikTok rewards. Each o
 - **Plant a new clue in a doorbell-cam frame at the end.** It must be *fair*: visible on a rewatch at phone size, and not obvious on first view. Supported mechanisms:
   - `alter_box`: mirror a region, so something has turned around.
   - `alter_glow`: light up a point, so something switched on.
-  - different `frame_a`/`frame_b` stills: something appears or moves.
+  - different `frame_a`/`frame_b` stills: something appears, disappears or moves. Derive frame B from the library still with a pixel edit in a `make_stills.py` beside the episode; Episode 3's removes Lorraine from the porch step. Two separately generated images never match, so a generated frame B would change everything at once.
 
-  Write the answer in `ANSWER` and in the SERIES.md ledger, including which episode pays it off.
+  Every doorbell frame of the night must agree with the doorbell table in SERIES.md: who has turned, what is lit, what is gone. Carry lights that are already on into later frames with `lit=[(x, y, r)]`. Write the answer in `ANSWER`, in the SERIES.md ledger (including which episode pays it off), and add the new frame to the table.
 - **Runtime 60–90 seconds.** TikTok's Creator Rewards needs 60 seconds or more; past about 90, completion drops. After building the audio, the shot table prints the exact runtime; trim lines rather than speeding up voices.
 - **Nobody moves.** Every witness is one still with a slow camera move. Never write action that needs animation. The comedy comes from the gap between prestige true-crime form and stakes no bigger than a flamingo three feet to the left.
 - **Captions carry the comedy.** Most people watch muted, so every joke has to read as text. Keep lines short, one idea each, and put the punchline last. Use a `P(...)` pause before a punchline; the silence is the joke's timing.

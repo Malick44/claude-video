@@ -55,7 +55,7 @@ Open the images and actually look at them. Pick preview times from `build/timeli
 - **Hook:** the first frame is a strong close-up, and the name card appears by about 0.4 s.
 - **Clutter:** captions (y about 1050–1300) don't collide with name cards, arrows or circles. Move the camera center rather than the overlay if they do.
 - **Annotations:** arrows and circles sit on the subject, at the moment the line mentions it.
-- **Clue fairness:** the doorbell frame B clue is visible at phone size (look at the frame scaled to about 360 px wide) but not obvious. A mirrored `alter_box` shows no seams, and the box stays tight around the object. The clue must not sit under the call-to-action text (y about 1040–1330).
+- **Clue fairness:** the doorbell frame B clue is visible at phone size (look at the frame scaled to about 360 px wide) but not obvious. A mirrored `alter_box` shows no seams, and the box stays tight around the object. A derived frame B (from a `make_stills.py`) shows no smudge at phone size. Lights listed in SERIES.md's doorbell table are lit in both frames. The clue must not sit under the call-to-action text (y about 1040–1330).
 - **Text fit:** the title, the board card text and the call-to-action fit the width.
 - **Script:** `SCRIPT.md` regenerates with `.venv/bin/python pipeline/script_md.py episodes/<ep>`. It lists every line's recording name and the credits for stock sounds.
 
