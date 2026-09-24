@@ -11,6 +11,8 @@ This folder is independent of the `watch` skill in the rest of the repo.
 ./make_episode.sh episodes/ep01_three_feet   # ~10 min on a laptop CPU
 ```
 
+You need Python 3.10–3.13, which Kokoro requires. `setup.sh` finds one automatically. On a Mac the built-in `python3` is too old, so run `brew install python@3.12` first if setup says none was found.
+
 Outputs, in `episodes/<episode>/build/` (not committed):
 
 | File | What |
@@ -71,6 +73,20 @@ The voices are defined once, in [`cast.py`](cast.py), and every episode uses the
 - **Changing an existing voice:** edit its `cast.py` entry. That character changes in every episode the next time each one is built.
 
 The voices are scratch tracks. Recording your own takes is the biggest quality upgrade.
+
+### Kokoro outside this project
+
+`tools/install-kokoro.sh` installs Kokoro for your whole user account: its own environment and model files go in `~/.kokoro`, and a `kokoro` command goes in `~/.local/bin`. It uses the same pinned versions and model files as the show, so you can audition voices or lines anywhere:
+
+```bash
+shows/nobody-moves/tools/install-kokoro.sh
+kokoro --voices                                              # all 54 preset voices
+kokoro "I didn't see nothing." garrison.wav am_fenrir && afplay garrison.wav
+```
+
+The `kokoro` command plays the plain preset voice. It doesn't apply `cast.py`'s pitch shift or "voice altered" filter; the episode pipeline adds those.
+
+If voicing fails with `Error processing file ... phontab`, the folder's path is too long for espeak-ng (the pronunciation engine), which has a limit of about 160 characters. Move the project to a shorter path. Both scripts warn when a path is near the limit.
 
 ## Posting
 
