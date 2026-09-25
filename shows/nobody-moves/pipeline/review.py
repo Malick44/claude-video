@@ -147,6 +147,13 @@ def beats(tl):
         add("cliff B + CTA", d, d.get("flicker_at", d["end"]) + CTA_DELAY + 0.8)
     end = first(lambda s: s["kind"] == "end")
     add("end card", end, end and end["start"] + 1.8)
+    # a beat that lands on the same moment as an earlier one (e.g. the music-out shot is the exhibit)
+    # is marked, so the sheet says "same as" instead of repeating the frame
+    seen = []
+    for i, (name, t, sid) in enumerate(out):
+        dup = next((n for n, t2, s2 in seen if s2 == sid and abs(t2 - t) < 0.5), None)
+        out[i] = (name, t, sid, dup)
+        seen.append((name, t, sid))
     return out
 
 
@@ -215,7 +222,11 @@ def draw_sheet(rows, cols, out, tmp):
                 d.text((x + 2, y + 36), "none", font=fs, fill=(150, 150, 150))
                 d.rectangle((x, y + head, x + CELL_W, y + head + CELL_H), fill=(40, 40, 40))
                 continue
-            t, sid = at[name]
+            t, sid, dup = (at[name] + (None,))[:3]
+            if dup:
+                d.text((x + 2, y + 36), f"same as {dup}", font=fs, fill=(150, 150, 150))
+                d.rectangle((x, y + head, x + CELL_W, y + head + CELL_H), fill=(40, 40, 40))
+                continue
             d.text((x + 2, y + 36), f"{t:.2f}s  {sid}", font=fs, fill=(170, 170, 170))
             fr = grab(path, t, tmp)
             if fr is not None:
@@ -224,11 +235,19 @@ def draw_sheet(rows, cols, out, tmp):
     return out
 
 
+def clear(out_dir, prefix):
+    """Remove an earlier run's numbered sheets, so a shorter run can't leave a stale _2.png behind."""
+    for f in os.listdir(out_dir):
+        if f.startswith(prefix) and f.endswith(".png"):
+            os.remove(os.path.join(out_dir, f))
+
+
 def beat_sheets(ref, new, out_dir):
     present = {b[0] for r in (ref, new) for b in r["beats"]}
     cols = [b for b in BEATS if b in present]
-    rows = [(r["episode"].split("_")[0] + (" (ref)" if r is ref else ""), r["file"], {b[0]: (b[1], b[2]) for b in r["beats"]})
+    rows = [(r["episode"].split("_")[0] + (" (ref)" if r is ref else ""), r["file"], {b[0]: (b[1], b[2], b[3]) for b in r["beats"]})
             for r in (ref, new)]
+    clear(out_dir, f"beats_vs_{ref['episode']}_")
     tmp = os.path.join(out_dir, "_grab.png")
     outs = []
     for i in range(0, len(cols), PER_SHEET):
@@ -243,6 +262,7 @@ def grab_sheet(res, times, out_dir):
     shots = res["timeline"]["shots"]
     cols = [f"{t:.2f}s" for t in times]
     at = {c: (t, shot_at(shots, t)["id"]) for c, t in zip(cols, times)}
+    clear(out_dir, "grabs_")
     tmp = os.path.join(out_dir, "_grab.png")
     outs = []
     for i in range(0, len(cols), PER_SHEET):
@@ -280,7 +300,7 @@ def check_file(info, tl, which):
     return checks
 
 
-def review(ep_dir, which, with_black=True):
+def review(ep_dir, which, with_black=True, measure=True):
     slug, build, path = episode_paths(ep_dir, which)
     tl_path = os.path.join(build, "timeline.json")
     if not os.path.exists(tl_path):
@@ -293,7 +313,7 @@ def review(ep_dir, which, with_black=True):
     for sid, hold in cta_holds(tl).items():
         if hold < CTA_MIN_S:
             res["warnings"].append(f"{sid}: call to action on screen {hold} s (under {CTA_MIN_S} s); raise the shot's \"post\"")
-    if info["exists"]:
+    if info["exists"] and measure:
         res["loudness"] = loudness(path)
         if with_black:
             bad = [(s0, s1) for s0, s1 in black_stretches(path) if not black_by_design(tl["shots"], s0, s1)]
@@ -337,10 +357,14 @@ def print_report(new, ref, which, out_dir):
 
 
 def main(argv):
+    usage = "usage: review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--grab t1,t2,...] [--json]"
+    if argv[:1] in (["-h"], ["--help"]):
+        print(usage + "\n\n" + __doc__.strip())
+        return 0
     if not argv or argv[0].startswith("--"):
-        sys.exit("usage: review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--grab t1,t2,...] [--json]")
+        sys.exit(usage)
     which = argv[argv.index("--file") + 1] if "--file" in argv else "tiktok"
-    new = review(argv[0], which)
+    new = review(argv[0], which, measure="--grab" not in argv)   # grabs need only the timeline and the file
     out_dir = os.path.join(os.path.dirname(new["file"]), "review")
     os.makedirs(out_dir, exist_ok=True)
     if "--grab" in argv:

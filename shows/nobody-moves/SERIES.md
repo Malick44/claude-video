@@ -46,7 +46,8 @@ The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_befor
 Still wanted for the library (episodes use crop fallbacks until these exist; the full prompts are in `episodes/ep02_i_was_right_here/episode.py`, `STILLS`):
 - **`lorraine`:** a close-up of the goose on the porch step, beak pointing to frame-left, framed like a documentary interview at 85mm.
 - **`chime`:** the wind chime backlit by the porch light, as a silhouette.
-- **`aerial`** and **`cork`:** the user has generated these, but they still need to be sent as files and saved into `stills/`.
+- **`basin_counsel`:** Mr. Basin with a tiny briefcase against his pedestal (Eps. 2 and 3).
+- **`aerial`** and **`cork`:** the user has generated these, but they still need to be sent as files and saved into `stills/`. There's no written prompt for either (Ep. 1 only notes "OPTIONAL drone shot of the cul-de-sac").
 - **`ray`:** the solar frog at the lawn edge under an overcast dusk sky (prompt in `episodes/ep03_the_goose/episode.py`). He testifies in Ep. 4, which will also want a lit, night version.
 - Ep. 3 only: **`lorraine_bee`** and **`lorraine_easter`**, the same close-up in two outfits. The episode's central sight gag; without them, the name cards carry it.
 
@@ -88,7 +89,7 @@ Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that ch
 1. **Three Feet** (done). Deb has moved. The witnesses are introduced. Something else moved in frame 418.
 2. **I Was Right Here** (written). Every witness gives the same alibi. The frame-418 replay: Lorraine turned around, and she argues that rotating isn't moving. Mr. Basin represents himself. The wind chime almost talks. New clue: in frame 423, Ray is lit.
 3. **The Goose** (written). Lorraine swears she wore the bumblebee costume that night; after the next cut she's in an Easter dress, and Exhibit A shows her in nothing: "I was between outfits." "I don't pick them, detective." Pays off Ep. 2 (Ray was awake; it's been cloudy for nine days). New clue: in frame 428 the porch step is empty.
-4. **Only When It's Sunny.** The key witness is Ray, who can only talk after a full day of sun. Pays off Ep. 2's frame 423: he was lit at 3:12, so he saw it. On day 12 he lights up: "I don't remember."
+4. **Only When It's Sunny.** The key witness is Ray, who can only talk after a full day of sun. Ep. 3's replay already revealed that he was lit at 3:12 (Ep. 2's frame 423), so he saw it; this episode is his testimony. On day 12 he lights up: "I don't remember."
 5. **Saturday.** A tense reenactment of the street's most feared event, The Mower, shown only as a shadow. Pays off Ep. 3's frame 428: where was Lorraine at 03:12:16? Her story ("I was at a fitting, hon") should connect to who dresses the goose.
 6. **The Inflatable.** The holiday inflatable nobody took down has an airtight alibi ("I was flat from 11 to 6"). Then its timer turns up, set for 3:10 AM.
 7. **Finale.** The original pitch was "Deb has two legs. She has been standing on one since 1994." The current Deb stills show her on two legs, so either rework this reveal or make one-leg Deb stills early and plant them.

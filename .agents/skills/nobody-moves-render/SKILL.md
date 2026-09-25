@@ -24,7 +24,7 @@ Every output lands in `episodes/<ep>/build/`.
 - **Setup:** `.venv/`, `assets/models/` and `assets/fonts/` exist. If not, run `./setup.sh` (PyPI and GitHub only).
 - **Derived stills:** if the episode has a `make_stills.py`, the stills it writes must exist (Episode 3's writes the library still `stills/yard_gone.webp`). Run it only if one is missing. It's deterministic, so rerunning it rewrites a tracked file with the same bytes.
 - **The reference episode:** by default the previous main episode (for Episode 3, Episode 2). For a Confessional, the latest main episode. Its `build/<ref>_tiktok.mp4` must exist. If it doesn't, render the reference first or review without `--ref`.
-- **Nothing else is building this episode.** `make_episode.sh` rewrites `build/soundtrack.wav` and the render reads it; two builds of one episode at once corrupt each other. Check with `pgrep -af "episodes/<ep>"`, which should print nothing. Rendering two different episodes at once is safe, just slower.
+- **Nothing else is building this episode.** `make_episode.sh` rewrites `build/soundtrack.wav` and the render reads it; two builds of one episode at once corrupt each other. Check with `pgrep -af '[m]ake_episode\.sh .*episodes/<ep>|[p]ipeline/(build_audio|render|deliver|script_md)\.py .*episodes/<ep>'`, which prints nothing when nothing is building. The bracketed first letters stop the pattern from matching the shell that runs it; a plain `pgrep -af "episodes/<ep>"` always matches itself, and any log monitor left running. Rendering two different episodes at once is safe, just slower.
 
 ## 2. Audio and the mix gate
 
@@ -35,7 +35,8 @@ $PY pipeline/mixcheck.py episodes/<ep>
 
 - **The timing table** gives the runtime: 60–90 s for a main episode, 15–25 s for a Confessional.
 - **mixcheck exit 1 stops the render.** Hand the failure to `nobody-moves-sound-design`. Run mixcheck here, right after the `--stems` build: `make_episode.sh` rebuilds the soundtrack without stems, so a later mixcheck can measure old stems.
-- **Fallbacks:** `render.py` (the next step) prints `fallback views (shot: wanted -> used): ...` for every shot not on its first-choice still, and `PLACEHOLDERS` for any still that's missing entirely. Fallbacks are allowed; placeholders mean a missing file. List the fallbacks in the report with their prompts. A key in this episode's `STILLS` has its prompt there. For a key requested by an earlier episode, find it with `grep -n '"<key>"' episodes/*/episode.py`.
+- **After the render, mixcheck prints `NOTE: stems are N min older than soundtrack.wav`.** That's expected: `make_episode.sh` rebuilds the soundtrack without stems. The numbers you checked before the render still stand if no audio input changed since, which is when this prints nothing: `find episodes/<ep>/episode.py cast.py soundtrack.py pipeline/build_audio.py pipeline/sounds.py -newer episodes/<ep>/build/stems/dialogue.wav`.
+- **Fallbacks:** `render.py` (the next step) prints `fallback views (shot: missing stills -> used): ...` for every shot not on its first-choice still, naming each missing choice (`hook: lorraine_bee, lorraine -> yard_before`), and `PLACEHOLDERS` for any still that's missing entirely. Fallbacks are allowed; placeholders mean a missing file. List the fallbacks in the report with their prompts. A key in this episode's `STILLS` has its prompt there. For a key requested by an earlier episode, find it with `grep -n '"<key>"' episodes/*/episode.py`. A key with no real prompt anywhere (`aerial`, `cork`) is reported as "no prompt yet".
 
 ## 3. A quick look before the long render
 
@@ -43,7 +44,7 @@ $PY pipeline/mixcheck.py episodes/<ep>
 $PY pipeline/render.py episodes/<ep> --contact          # one frame per shot, seconds -> build/contact.png
 ```
 
-Open `build/contact.png`. A missing still shows as a labeled placeholder card, and an unknown shot kind renders as the end card; both are cheaper to catch here than after 10 minutes. Doorbell shots are grabbed paused on the clue frame, with their call to action. Framing problems go back to `nobody-moves-produce-episode`, section 4.
+Open `build/contact.png`. A missing still shows as a labeled placeholder card, and an unknown shot kind renders as the end card; both are cheaper to catch here than after 10 minutes. Each cell is labeled with its shot id and time, and doorbell shots are grabbed paused on the clue frame, with their call to action. Framing problems go back to `nobody-moves-produce-episode`, section 4.
 
 ## 4. Render
 
@@ -95,16 +96,16 @@ It checks the TikTok copy (`--file master` checks the master), then compares the
 - cliff A (the cliffhanger's frame A, before the jump and the flicker), cliff B + CTA (paused on frame B);
 - end card.
 
-A beat the episode doesn't have is a gray "none" cell. Put cliff A and cliff B side by side to see the clue as a viewer comparing frames would. For each column, check:
+A beat the episode doesn't have is a gray "none" cell; a beat that lands on the same moment as an earlier one (Episode 3's music-out shot is its exhibit) reads "same as exhibit". Each run replaces the earlier sheets, so a sheet on disk is always from the latest run. Put cliff A and cliff B side by side to see the clue as a viewer comparing frames would. For each column, check:
 - **Same show:** the grade, fonts, caption style, lower thirds and doorbell HUD match the reference. A difference means a pipeline change leaked into the look.
 - **Text:** nothing clipped at the edges, and no caption colliding with a name card, arrow, circle or call to action.
-- **Hook:** the first frame is a strong, readable close-up with its name card. A soft long-lens crop here means the hero still is missing: flag its prompt as the top priority.
+- **Hook:** the hook cell (0.6 s, once the name card has animated in) is a strong, readable close-up. A soft long-lens crop here means the hero still is missing: flag its prompt as the top priority.
 - **Payoff and cliffhanger:** the answer to last week's clue is visible in the payoff cell. The new clue is findable in the cliffhanger cells at this size but not obvious, and not under the call-to-action text.
 - **End card:** `NEXT_UP` names the right next episode.
 
-**Moments the sheets don't cover:** `$PY pipeline/review.py episodes/<ep> --grab 36.2,40.4,80.6` tiles labeled frames from the video, with each one's shot id, into `build/review/grabs_N.png`, six per sheet. Take the times from `build/timeline.json`: a gag's name card, the flicker, a line you doubt. The pacing table and every check are also in the report JSON.
+**Moments the sheets don't cover:** `$PY pipeline/review.py episodes/<ep> --grab 36.2,40.4,80.6` tiles labeled frames from the video, with each one's shot id, into `build/review/grabs_N.png`, six per sheet, in a few seconds (it skips the checks). Take the times from `build/timeline.json`: a gag's name card, the flicker, a line you doubt. The pacing table and every check are also in the report JSON.
 
-**A line that mixcheck ranks worst:** the worst-line list names the line, not the cause. `nobody-moves-sound-design` shows whether the score or an effect sits over it (`soundprobe.py --lines`); hand it over if the line is under about 12 dB.
+**A line that mixcheck ranks worst:** the worst-line list names the line, not the cause. `nobody-moves-sound-design` shows whether the score or an effect sits over it (`soundprobe.py --lines`); hand it over if the line is under about 12 dB. First look in `.agents/skills/nobody-moves-sound-design/references/baselines.md`: a line listed there with its cause (Episode 3's Ray line, under the replay hit's tail) is known, so report it as known rather than new.
 
 ## 6. Report
 

@@ -2,7 +2,7 @@
 
 Runtime: **90.2s**, 9:16 vertical, 1080×1920 at 30 fps.
 
-**Cliffhanger answer (don't post this):** In frame 423 (03:12:08) Ray, the solar frog at the front edge of the lawn, is glowing. His light only comes on after a full day of sun, so Ray was charged, awake and watching at 3:12 AM. Pays off in Episode 4, 'Only When It's Sunny'.
+**Cliffhanger answer (don't post this):** In frame 423 (03:12:08) Ray, the solar frog at the front edge of the lawn, is glowing. His light only comes on after a full day of sun, so Ray was charged, awake and watching at 3:12 AM. Revealed in Episode 3's replay; Ray testifies in Episode 4, 'Only When It's Sunny'.
 
 ## Voices
 

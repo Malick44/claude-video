@@ -9,7 +9,7 @@ EPISODE = "EPISODE 2: I WAS RIGHT HERE"
 NEXT_UP = "NEXT: EPISODE 3 — THE GOOSE"
 ANSWER = ("In frame 423 (03:12:08) Ray, the solar frog at the front edge of the lawn, is glowing. "
           "His light only comes on after a full day of sun, so Ray was charged, awake and watching "
-          "at 3:12 AM. Pays off in Episode 4, 'Only When It's Sunny'.")
+          "at 3:12 AM. Revealed in Episode 3's replay; Ray testifies in Episode 4, 'Only When It's Sunny'.")
 
 _STYLE = ("Photorealistic, vertical 9:16. The same suburban house: grey vinyl siding, white porch railing "
           "and posts, black front door, brass lantern sconce, silver tubular wind chime, hostas and an "
@@ -17,7 +17,8 @@ _STYLE = ("Photorealistic, vertical 9:16. The same suburban house: grey vinyl si
           "fine film grain. No people, no text.")
 
 # New stills this episode would like (all optional: every shot falls back to the series library).
-# lorraine + chime are recurring -> put them in shows/nobody-moves/stills/; basin_counsel -> this episode's stills/.
+# All three recur (basin_counsel is also wanted by Ep. 3) -> put them in shows/nobody-moves/stills/.
+# An episode only sees its own stills/ and the library, so another episode's stills/ is invisible.
 STILLS = {
     "lorraine": ("Close-up portrait of a white ceramic goose statue sitting on the concrete front step of the "
                  "porch, 3/4 view with its beak pointing to frame-left, calm and dignified, framed like the "

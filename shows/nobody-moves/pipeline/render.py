@@ -690,11 +690,12 @@ def report_fallbacks():
             if not still_path(v["img"]):
                 ph.append(f'{s["id"]} ({s["views"][0]["img"]})')
             elif v is not s["views"][0]:
-                fb.append(f'{s["id"]}: {s["views"][0]["img"]} -> {v["img"]}')
+                skipped = [w["img"] for w in s["views"][: s["views"].index(v)]]
+                fb.append(f'{s["id"]}: {", ".join(skipped)} -> {v["img"]}')
         keys = [s.get("frame_a"), s.get("frame_b")] + [p[0] for p in s.get("polaroids", [])]
         ph += [f'{s["id"]} ({k})' for k in keys if k and not still_path(k)]
     if fb:
-        print("fallback views (shot: wanted -> used):", "; ".join(fb))
+        print("fallback views (shot: missing stills -> used):", "; ".join(fb))
     if ph:
         print("PLACEHOLDERS (no still found):", "; ".join(ph))
 
@@ -717,16 +718,22 @@ def main(argv):
         return
     if "--contact" in argv:
         thumbs = []
+        label = ImageFont.truetype(os.path.join(FONTS, "Inter.ttf"), 20)
         for s in SHOTS:
             t = s["start"] + (s["end"] - s["start"]) * 0.75
             if s["kind"] == "doorbell" and s.get("flicker_at"):   # the paused clue frame, not mid-flicker
                 t = min(s["end"] - 1.0 / FPS, s["flicker_at"] + CTA_DELAY + 0.6)
-            thumbs.append(render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS))
+            im = render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS)
+            d = ImageDraw.Draw(im)
+            d.rectangle((0, 0, 270, 30), fill=(0, 0, 0))
+            d.text((6, 4), f'{s["id"]}  {t:.2f}s', font=label, fill=(242, 194, 48))
+            thumbs.append(im)
         cols = 7
         sheet = Image.new("RGB", (cols * 270, math.ceil(len(thumbs) / cols) * 480), (0, 0, 0))
         for i, im in enumerate(thumbs):
             sheet.paste(im, ((i % cols) * 270, (i // cols) * 480))
         sheet.save(os.path.join(BUILD, "contact.png"))
+        print("wrote", os.path.join(BUILD, "contact.png"))
         return
     out = os.path.join(BUILD, f"{ep.SLUG}.mp4")
     n = int(math.ceil(TOTAL * FPS))
