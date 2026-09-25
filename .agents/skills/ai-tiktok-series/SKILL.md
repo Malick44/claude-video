@@ -143,7 +143,8 @@ Build the audio, measure it, look, then render:
 Before `make_episode.sh`, open the contact sheet and previews and look at them:
 
 - **The hook frame** is a strong close-up.
-- **Captions** (y about 1050–1300) don't collide with name cards or overlays.
+- **Captions** (y about 1050–1240, at most two lines) don't collide with name cards or overlays.
+- **Every app's UI:** `pipeline/safezones.py episodes/<ep>` shows no text under TikTok's, Reels' or Shorts' buttons, top bar or description (`build/review/zones.png`).
 - **Text fits:** the title, the cards and the end-card lines fit the width.
 - **The clue** is findable in a frame scaled to about 360 px wide.
 

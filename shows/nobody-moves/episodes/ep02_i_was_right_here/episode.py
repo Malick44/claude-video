@@ -45,8 +45,8 @@ BOARD_POLAROIDS = [
     ("yard_before", (0.478, 0.380, 0.829), "DEB (MOVED)", 0.50, 0.40, 620, -2.5, None),
     ("garrison", (0.228, 0.335, 0.717), "GARRISON", 0.24, 0.24, 420, 4, None),
     ("yard_before", (0.680, 0.200, 0.808), "LORRAINE (TURNED)", 0.77, 0.23, 420, -5, None),
-    ("porch", (0.234, 0.466, 0.978), "MR. BASIN, ESQ.", 0.23, 0.58, 420, -3, None),
-    ("porch", (0.696, 0.015, 1.0), "ANON.", 0.78, 0.58, 420, 5, "anon"),
+    ("porch", (0.234, 0.466, 0.978), "MR. BASIN, ESQ.", 0.29, 0.58, 420, -3, None),
+    ("porch", (0.696, 0.015, 1.0), "ANON.", 0.72, 0.58, 420, 5, "anon"),
 ]
 
 SHOTS = [
@@ -182,7 +182,7 @@ SHOTS = [
     {
         "id": "board", "kind": "board", "card": "WHAT ELSE CAN MOVE?",
         "note": "EVIDENCE BOARD, updated: Lorraine (TURNED), Mr. Basin, Esq.",
-        "kb": ((0.5, 0.5, 1.0), (0.5, 0.48, 1.18)),
+        "kb": ((0.5, 0.5, 1.0), (0.5, 0.53, 1.18)),   # ends framed low: the index card stays above every app's description
         "polaroids": BOARD_POLAROIDS,
         "items": [
             L("NARRATOR", "If a concrete goose can turn around..."),

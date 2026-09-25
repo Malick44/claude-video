@@ -2,6 +2,7 @@
 
 ## Contents
 - Delivery specs
+- Reels and Shorts
 - Labeling and disclosure
 - Licensing
 - Launch plan
@@ -21,9 +22,28 @@
 
 Check both files with `$FF -i <file>`, where `$FF` is the `imageio_ffmpeg` binary.
 
+## Reels and Shorts
+
+The same upload copy works as an Instagram Reel and a YouTube Short: the same frame, codec and loudness. No second render is needed. What differs:
+
+| | TikTok | Instagram Reels | YouTube Shorts |
+|---|---|---|---|
+| Length | 60–90 s for main episodes | up to 3 minutes | up to 3 minutes |
+| UI over the video (approximate, 1080×1920) | top 130 px; buttons x 940+ from y 880; description y 1500+ | top 200 px; buttons x 950+ from y 1100; description y 1500+ | top 160 px; buttons x 960+ from y 1000; description y 1540+ |
+| AI label | "AI-generated content" | "AI info" (Meta asks for it on photorealistic AI video and realistic voices) | "Altered or synthetic content" in YouTube Studio |
+| Cover | pick a frame | pick a frame; the profile grid crops it to 3:4, cutting 240 px from the top and the bottom | pick a frame (mobile upload) |
+| Money | Creator Rewards (60 s or more) | Reels bonuses are invitation-only and change often | Shorts revenue sharing through the YouTube Partner Program |
+
+- **Check the layout for all three.** `review.py` runs `pipeline/safezones.py`, which flags any text under each app's buttons, top bar or description and draws `build/review/zones.png`. The zone numbers above are estimates that the apps change. Check the first upload on a phone and update `ZONES` in `safezones.py` if an app has moved.
+- **Upload the clean file,** never a video saved from TikTok. The TikTok watermark looks like a repost, and Instagram has said it shows those less.
+- **Keep the Reels description to one line** and the Shorts title short. Longer text expands over the bottom of the video, where the name cards are.
+- **Don't boost an episode as a Reels ad as it is.** Meta's ad guide keeps text out of the bottom 35% (from y 1248), where a sponsored Reel's button sits and where the name cards and calls to action are. `safezones.py` lists those shots as "Reels ads" info. Cut a separate ad instead.
+- **YouTube re-compresses everything,** so the master (`build/<ep>.mp4`) looks a little sharper there than the 29 MB upload copy. Use it when you have it.
+- **Pin and link the start on every platform:** pin Episode 1 on Instagram, and put the episodes in a YouTube playlist, linked from each Short.
+
 ## Labeling and disclosure
 
-- **Turn on TikTok's AI-generated content label** on every post. The format is built to work with the label on.
+- **Turn on the AI label** on every post: TikTok's AI-generated content label, Instagram's "AI info", YouTube's "altered or synthetic content". The format is built to work with the label on.
 - **Write the disclaimer as a joke,** on the end card. NOBODY MOVES: "Reenactments dramatized with AI. The flamingo is real."
 - **Put "written and voiced by [creator]" in the bio.** Human authorship is what separates the show from slop, and it is the evidence of authorship.
 - **Disclose brand deals** as both paid and synthetic. Never present AI testimonials as real.

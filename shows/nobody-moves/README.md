@@ -19,7 +19,7 @@ Outputs, in `episodes/<episode>/build/` (not committed):
 |---|---|
 | `<episode>.mp4` | Master render, 1080×1920, 30 fps, about 9 Mbps |
 | `<episode>_tiktok.mp4` | Upload copy under 29 MB |
-| `soundtrack.wav`, `timeline.json` | The mixed audio and the shot/caption timings |
+| `soundtrack.wav`, `timeline.json` | The mixed audio and the shot, caption and word timings |
 
 `make_episode.sh` also rewrites `episodes/<episode>/SCRIPT.md`, the timecoded script.
 
@@ -73,6 +73,14 @@ P(0.5)                                                           # a pause, in s
 | `end` | End card with `NEXT_UP` and the AI disclaimer | `min` |
 
 Every shot also takes `note` (the stage direction for `SCRIPT.md`), `sfx`, `"music": "out"` to cut the score for that shot, and `"climax": True` to make the score build to that shot instead of the last doorbell shot (for an episode without a doorbell ending, like a Confessional). The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score, the typewriter clicks, and the risers, whooshes and hits are added automatically.
+
+## Captions
+
+Each line's caption is its `L(...)` text: white, 68 px, left of TikTok's buttons, with the word being spoken in the show's yellow.
+
+- **Timing comes from the voice itself.** `pipeline/words.py` measures each finished voice clip. The pauses at commas and full stops split the line into phrases, and each word gets its share of the phrase's voiced time by its length in phonemes. `build_audio.py` stores the result as `words` in each caption of `timeline.json`. It follows any voice (Kokoro, ElevenLabs or your own recording), and spoken text that differs from the caption ("three twelve" for "3:12") is mapped back onto the caption's words.
+- **At most two lines,** because a third would run into the name card. A line holds about 20 characters, so a longer caption is split into chunks that each appear when the voice reaches their first word. The splits prefer sentence ends, then commas, and avoid a lone word, a split name ("Birchwood / Court") or a chunk on screen under 0.7 s.
+- **Self-check:** `.venv/bin/python pipeline/words.py` checks the timing on synthetic speech, offline.
 
 ## Voices
 
@@ -181,3 +189,5 @@ The looped names (`theme`, `wind`, `chimes`, `crickets`) are looped with a cross
 ## Posting
 
 Turn on TikTok's **AI-generated** label, and pin a comment that points at the hidden clue without giving it away. Main episodes run over 60 seconds, which TikTok's Creator Rewards program requires.
+
+The same `_tiktok.mp4` works as an Instagram Reel and a YouTube Short. Turn on Instagram's "AI info" label and YouTube's "altered or synthetic content" setting, and keep the Reels description to one line so it doesn't cover the name cards. `pipeline/review.py` checks the on-screen text against all three apps' buttons, top bars and descriptions. It runs `pipeline/safezones.py`, which also works before the full render (`.venv/bin/python pipeline/safezones.py episodes/<ep>`), and writes `build/review/zones.png`. The full cross-posting notes are in `.agents/skills/ai-tiktok-series/references/posting-playbook.md`, under "Reels and Shorts".
