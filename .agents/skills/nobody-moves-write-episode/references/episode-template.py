@@ -83,7 +83,6 @@ SHOTS = [
             ("porch", (0.696, 0.015, 1.0), "ANON.", 0.78, 0.58, 420, 5, "anon"),
         ],
         "items": [L("NARRATOR", "The question...")], "post": 0.6, "sfx": ["sting_soft"],
-        # "music": "out",   # any shot: cut the score for this shot (silence before a punchline/reveal)
     },
     # --- DOORBELL CAM cliffhanger: jump cut A -> B at jump_after, flicker after the last line,
     #     pause on B, then the call to action. Frame B carries the hidden clue.
