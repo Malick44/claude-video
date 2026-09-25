@@ -67,7 +67,7 @@ P(0.5)                                                           # a pause, in s
 | `doorbell` | Night-vision cam: jump-cuts from A to B, flickers after the last line, pauses on B and shows a call to action | `frame_a`, `frame_b`, `kb`, `clock_start` (seconds past 03:11:00, or `"HH:MM:SS"` with `jump_after`), `frames=(a, b)`, `cta=(line1, line2)`, `cta_sub`. For the hidden clue in frame B: `alter_box=(x0, y0, x1, y1)` mirrors a region (it turned around); `alter_glow=(x, y, r)` lights a point (it switched on). `lit=[(x, y, r)]` lights points in both frames, for a light that is already on (continuity, not a clue) |
 | `end` | End card with `NEXT_UP` and the AI disclaimer | `min` |
 
-Every shot also takes `note` (the stage direction for `SCRIPT.md`), `sfx`, and `"music": "out"` to cut the score for that shot. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score, the typewriter clicks, and the risers, whooshes and hits are added automatically.
+Every shot also takes `note` (the stage direction for `SCRIPT.md`), `sfx`, `"music": "out"` to cut the score for that shot, and `"climax": True` to make the score build to that shot instead of the last doorbell shot. The `sfx` options are `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets`. The score, the typewriter clicks, and the risers, whooshes and hits are added automatically.
 
 ## Voices
 
