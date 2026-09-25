@@ -5,7 +5,7 @@ description: Create a new AI-generated, faceless comedy series for TikTok, Reels
 
 # Create an AI TikTok series
 
-This skill takes a channel idea to a show that produces episodes on demand. The worked example is NOBODY MOVES in `shows/nobody-moves/`. It went from "find me a TikTok channel idea" to a pilot, a pipeline in the repo, shared voices and sounds, and three episodes written through its own skills. Follow the same stages:
+This skill takes a channel idea to a show that produces episodes on demand. The worked example is NOBODY MOVES in `shows/nobody-moves/`. It went from "find me a TikTok channel idea" to a pilot, a pipeline in the repo, shared voices and sounds, and Episodes 2 and 3 written through its own skills. Follow the same stages:
 
 1. **Concept:** 3–5 scored concepts, one recommended.
 2. **Scaffold and bible:** `shows/<slug>/` and its `SERIES.md`.
@@ -111,7 +111,7 @@ From `shows/<slug>`, work through `references/new-show-checklist.md`, file by fi
   - A `README.md` for the show.
 - **Voices:** use Kokoro presets, English only (`af_*`, `am_*`, `bf_*`, `bm_*`), with `speed`, `pitch` and `altered`. Audition them by building the pilot's audio; clips are cached per line and settings, so a re-run only voices what changed. Freeze a character's entry once an episode is published, because changing it re-voices every episode. The user's own takes beat any TTS: `episodes/<ep>/recordings/<shot>_<n>.m4a`.
 - **New sounds and levels:** follow `nobody-moves-sound-design`'s `references/add-a-sound.md`. It walks every file a new sound touches: the generator, `soundbank.SYNTH`, a `LEVELS` entry set by measurement rather than guessed, the `build_audio.py` branch, `mixcheck.cues()` and the kit. Its `references/mix-knobs.md` lists every number that shapes the score. The numbers in both files are NOBODY MOVES's; measure your own.
-- **Measure single sounds from the show folder:** `.venv/bin/python ../../.agents/skills/nobody-moves-sound-design/scripts/soundprobe.py <name> ...`. It loads `pipeline/` from the working directory. Run from anywhere else, it silently falls back to `shows/nobody-moves` and measures the wrong show.
+- **Measure single sounds from the show folder:** `.venv/bin/python ../../.agents/skills/nobody-moves-sound-design/scripts/soundprobe.py <name> ...`. It loads `pipeline/` from the working directory. Run from anywhere else, it falls back to `shows/nobody-moves` (with a note on stderr) and measures the wrong show.
 - **Not `cinematic-sound-designer`:** `build_audio.py` regenerates all of an episode's audio from the shot list, so an SFX stem made by that skill bypasses `LEVELS` and mixcheck, and the next build discards it. Use it only for edits made outside the pipeline, such as a short cut in CapCut from the sound kit.
 - **Check your edits:** `.venv/bin/python -m py_compile pipeline/*.py cast.py soundtrack.py`, then `.venv/bin/python pipeline/selftest.py` again. `bash ../../.agents/skills/ai-tiktok-series/scripts/new_show.sh --check .` re-lists the leftovers with the scaffold's own pattern.
 

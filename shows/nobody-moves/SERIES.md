@@ -41,7 +41,7 @@ Append this to every image prompt so new stills match the existing ones:
 
 > Photorealistic, vertical 9:16. The same suburban house: grey vinyl siding, white porch railing and posts, black front door, brass lantern sconce, silver tubular wind chime, hostas and an echinacea flower bed. Dusk, blue hour or night. Shallow depth of field, muted teal-and-amber grade, fine film grain. No people, no text.
 
-The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`. Every episode can use it.
+The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
 
 Still wanted for the library (episodes use crop fallbacks until these exist; the full prompts are in `episodes/ep02_i_was_right_here/episode.py`, `STILLS`):
 - **`lorraine`:** a close-up of the goose on the porch step, beak pointing to frame-left, framed like a documentary interview at 85mm.

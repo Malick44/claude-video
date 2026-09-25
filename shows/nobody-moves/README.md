@@ -126,7 +126,7 @@ There are no samples or stock audio by default: every sound is synthesized in co
 - the doorbell jump cut gets a sub hit;
 - a riser runs across the flicker, and a braam and impact land on the call to action.
 
-**Dynamics.** The score starts quietly on the title card and builds toward the last doorbell shot: the pad swells, the heartbeat fades in around the middle, and the shimmer enters in the last stretch. It hushes under the doorbell flicker so the reveal hit lands. Give a shot `"music": "out"` to cut the score for that shot: silence before a punchline or a reveal is the most dramatic sound there is. The score and risers duck automatically under dialogue.
+**Dynamics.** The score starts quietly on the title card and builds toward the last shot marked `"climax": True`, else the last doorbell shot, else the end card: the pad swells, the heartbeat fades in around the middle, and the shimmer enters in the last stretch. It hushes under the doorbell flicker so the reveal hit lands. Give a shot `"music": "out"` to cut the score for that shot: silence before a punchline or a reveal is the most dramatic sound there is. The score and risers duck automatically under dialogue.
 
 **Mastering.** The mix is highpassed at 30 Hz, lightly compressed and limited, then normalized in two passes to −14 LUFS with true peaks at −1.5 dBTP, which is TikTok's loudness target. Build with `pipeline/build_audio.py <episode> --stems` to also write `build/stems/{dialogue,score,effects}.wav` for remixing in an editor.
 

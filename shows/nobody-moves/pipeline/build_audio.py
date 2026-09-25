@@ -7,9 +7,10 @@ audio format), the character's TTS provider in cast.py (Kokoro by default, or El
 Music and sound effects come from soundtrack.py (synthesized unless pointed at stock assets).
 
 The mix is 48 kHz stereo on three buses: dialogue; the score (theme layers whose intensity
-builds toward the episode's last doorbell shot, ducked under dialogue, dipped before each
-reveal and cut on shots marked "music": "out"); and effects (stings, impacts, risers,
-whooshes, foley, ambiences), most of them placed automatically from the shot kinds. The master
+builds toward the last shot marked "climax": True, else the last doorbell shot; ducked under
+dialogue, dipped before each reveal and cut on shots marked "music": "out"); and effects
+(stings, impacts, risers, whooshes, foley, ambiences), most of them placed automatically from
+the shot kinds. The master
 is compressed, limited and loudness-normalized to TikTok's level (-14 LUFS, -1.5 dBTP).
 
 Outputs (in <episode>/build/):

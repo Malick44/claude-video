@@ -23,7 +23,7 @@ These rules come from how the pilot was designed and what TikTok rewards. Each o
 - **Plant a new clue in a doorbell-cam frame at the end.** It must be *fair*: visible on a rewatch at phone size, and not obvious on first view. Supported mechanisms:
   - `alter_box`: mirror a region, so something has turned around.
   - `alter_glow`: light up a point, so something switched on.
-  - different `frame_a`/`frame_b` stills: something appears, disappears or moves. Derive frame B from the latest library frame with a pixel edit in a `make_stills.py` beside the episode, and save it in the library (see Stills). Episode 3's removes Lorraine from the porch step to make `yard_gone`. Two separately generated images never match, so a generated frame B would change everything at once.
+  - different `frame_a`/`frame_b` stills: something appears, disappears or moves. Derive frame B from the latest library frame with a pixel edit in a `make_stills.py` beside the episode, and save it in the library (see Stills). Episode 3's `make_stills.py` removes Lorraine from the porch step to make `yard_gone`. Two separately generated images never match, so a generated frame B would change everything at once.
 
   Every doorbell frame of the night must agree with the doorbell table in SERIES.md: who has turned, what is lit, what is gone. Carry lights that are already on into later frames with `lit=[(x, y, r)]`. Write the answer in `ANSWER`, in the SERIES.md ledger (including which episode pays it off), and add the new frame to the table.
 - **Runtime 60–90 seconds** (a Confessional is 15–25 s; see Confessionals). TikTok's Creator Rewards needs 60 seconds or more; past about 90, completion drops. After building the audio, the shot table prints the exact runtime; trim lines rather than speeding up voices.
@@ -31,7 +31,7 @@ These rules come from how the pilot was designed and what TikTok rewards. Each o
 - **Captions carry the comedy.** Most people watch muted, so every joke has to read as text. Keep lines short, one idea each, and put the punchline last. Use a `P(...)` pause before a punchline; the silence is the joke's timing.
 - **Each character has one mechanism; escalate it, don't swap it.** Lorraine is warm and evasive ("hon"; turning around isn't "going anywhere"). Garrison is defensive and "was facing the other way." The chime only talks when it's windy. Mr. Basin is his own lawyer. Ray only talks after a full day of sun. New jokes should come out of these rules.
 - **Silence is a sound cue.** The score builds toward the doorbell by itself, and the risers, whooshes and hits are automatic. Your one lever is `"music": "out"` on a shot, which cuts the score for it. Use it once or twice an episode, right before a punchline or a reveal (Episode 2: "The wind stopped."; Episode 3's Exhibit A reveal). The drop is what makes the next beat land; used everywhere, it stops meaning anything. It cuts only the score bed:
-  - never put it on a shot with `sting_soft`: the swell keeps playing, it counts as score, and mixcheck's silence check fails;
+  - never put it on a shot with `sting_soft` or on a doorbell shot: the swell or the flicker's riser keeps playing on the score bus, and mixcheck's silence check fails;
   - the shot's own `sfx` still sound, so give it none if you want real silence;
   - not right after a sting's tail, which would still be ringing through the drop.
 
@@ -90,10 +90,10 @@ The rules above apply, except the clue, the recap and the runtime.
   No doorbell, question card or board. One library still at two or three framings is enough (the test used `garrison` only).
 - **Build** from `shows/nobody-moves`, with the produce skill's checks:
   ```bash
-  .venv/bin/python pipeline/build_audio.py episodes/ep03c_<slug> --stems
-  .venv/bin/python pipeline/mixcheck.py episodes/ep03c_<slug>
-  .venv/bin/python pipeline/render.py episodes/ep03c_<slug> --contact
-  ./make_episode.sh episodes/ep03c_<slug>          # about 2.5 min for 19 s
+  .venv/bin/python pipeline/build_audio.py episodes/epNNc_<slug> --stems
+  .venv/bin/python pipeline/mixcheck.py episodes/epNNc_<slug>
+  .venv/bin/python pipeline/render.py episodes/epNNc_<slug> --contact
+  ./make_episode.sh episodes/epNNc_<slug>          # about 2.5 min for 19 s
   ```
   At this length the master is already under 29 MB (23 MB in the test), and `deliver.py` fills its whole 29 MB budget, so the TikTok copy comes out bigger (28.6 MB). Either can be sent.
 - **CapCut instead:** if the user wants to cut it by hand, export the sound kit (`nobody-moves-sound-design` recipe f) and give them the stills. `cinematic-sound-designer` (SFX cues from a transcript) and `capcut_video_assembler` exist in this repo for edits made outside the pipeline. Don't use them on a pipeline-built Confessional: the next `build_audio.py` run regenerates all its audio, so an outside SFX stem is thrown away.

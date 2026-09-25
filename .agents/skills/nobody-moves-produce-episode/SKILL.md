@@ -29,7 +29,7 @@ Every build output lands in `episodes/<ep>/build/`, not in the show folder.
 
 - **Where they go:** recurring sets and cast go in `stills/` (the series library). Episode-only shots go in `episodes/<ep>/stills/`. Name each file after the key the episode uses (`lorraine.webp`, `basin_counsel.png`). A shot uses the first of its `views` whose still exists, so dropping in a file upgrades the shot with no code change.
 - **Files that aren't on disk:** images the user sends *while you are mid-task* arrive as pictures only; they're not saved to disk. Only images in a normal message get a file path. If you can see an image but can't find its file, ask the user to send it again as a new message, rather than asking for a different image.
-- **Placing coordinates:** `.venv/bin/python pipeline/grid.py <still> -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`. Always pass `-o`: without it the grid image is written next to the still, into the library. Read the fractions for camera centers, `annot_arrow`, `annot_circles`, polaroid crops, `alter_box` and `alter_glow` straight off the grid.
+- **Placing coordinates:** `mkdir -p episodes/<ep>/build && .venv/bin/python pipeline/grid.py <still> -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`. The `mkdir` is for an episode that hasn't been built yet, since grid.py doesn't create folders. Always pass `-o`: without it the grid image is written next to the still, into the library. Read the fractions for camera centers, `annot_arrow`, `annot_circles`, polaroid crops, `alter_box` and `alter_glow` straight off the grid.
 
 ## 3. Audio, timing and the mix check
 
@@ -43,6 +43,11 @@ Every build output lands in `episodes/<ep>/build/`, not in the show folder.
   1. a recording at `episodes/<ep>/recordings/<shot>_<n>.*`;
   2. the character's provider in `cast.py`, which is Kokoro unless set to ElevenLabs.
 - **Caching:** voice clips are cached by line text and settings, so only changed lines are re-voiced.
+- **Swapping a voice:**
+  - **The user's own take wins.** Save it as `episodes/<ep>/recordings/<shot>_<n>.m4a` (or .wav/.mp3), using the names in `SCRIPT.md`. Add `"fx_on_recordings": True` to the character in `cast.py` to run its pitch and "voice altered" chain on the take, for example to disguise the user as the anonymous source.
+  - **One episode only:** override the character in that episode's `CAST`.
+  - **`cast.py`** only for a character in no published episode. A changed entry re-voices that character in every episode on its next build, so posted episodes stop matching.
+  - **English presets only** (`af_`, `am_`, `bf_`, `bm_`), also when auditioning with `kokoro --voices`, because the pipeline phonemizes other presets as English.
 - **Sounds:** they come from `soundtrack.py`, with the episode's `SOUNDS` overriding it, and are synthesized unless pointed at a file or an API. To swap or add a sound, use `nobody-moves-sound-design` (recipes b and c): it matches the new sound's level and handles licensing and credits. Anything fetched is pinned in `stock/sources.lock.json`; commit `stock/`.
 - **The mix:** 48 kHz stereo, mastered to −14 LUFS (TikTok's target). The risers, whooshes and hits come from the shot kinds. The score builds toward the last shot marked `"climax": True`, else the last doorbell shot, else the end card. `--stems` writes `episodes/<ep>/build/stems/{dialogue,score,effects}.wav`, which mixcheck reads.
 - **Gate on mixcheck, not on your ears** (you can't hear the mix):

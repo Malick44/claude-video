@@ -39,7 +39,7 @@ SHOTS = [
         # "lower_third_at": "last",   # show the name card on the last line instead of at 0.35 s
     },
     # --- TITLE card over a sting (a riser sweeps in; the score starts at the first "sting" and builds
-    #     to the last doorbell, or to the last shot marked "climax")
+    #     to the last shot marked "climax": True, else to the last doorbell)
     {
         "id": "title", "kind": "title", "note": "Title card over a piano sting.",
         "views": [V("aerial", (0.5, 0.45, 1.25), (0.5, 0.5, 1.12)), V("porch", (0.42, 0.32, 1.3), (0.42, 0.36, 1.12))],
@@ -67,9 +67,10 @@ SHOTS = [
         "items": [L("LORRAINE", "Setup."), P(0.5), L("LORRAINE", "Punchline.")],
         "post": 0.35,
         "lower_third": ("LORRAINE", "Porch goose · Front steps, No. 7", "Gag line"),
-        # "music": "out",   # cut the score bed for this shot. Fine here: no sfx. Never on a shot with sfx
-        #                   # (sting_soft and risers count as score, so mixcheck fails), and not right after
-        #                   # a sting's tail. Once or twice an episode, before a punchline or a reveal.
+        # "music": "out",   # cut the score bed for this shot. Never on a sting_soft shot or a doorbell shot
+        #                   # (their swell/riser play on the score bus, so mixcheck fails). The shot's own
+        #                   # effects sfx still play: give it none for real silence. Not right after a sting's
+        #                   # tail. Once or twice an episode, before a punchline or a reveal.
     },
     # --- ANONYMOUS SOURCE: sfx wind + chimes. For "the wind stopped", follow it with another chime
     #     shot with no sfx and "music": "out": that cuts the score bed, and with no sfx on that shot,
