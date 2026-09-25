@@ -1,6 +1,6 @@
 # Mix knobs
 
-Every number that shapes the show's sound, where it lives, and which way is "more dramatic". Find each one by searching for the quoted code. Every knob in the tables is show-wide: changing it changes every episode on its next build. The one per-episode lever for a synthesized sound is in "Per-episode trim" below.
+Every number that shapes the show's sound, where it lives, and which way is "more dramatic". Find each one by searching for the quoted code. Every code knob in the tables is show-wide: changing it changes every episode on its next build. Only the per-shot fields in `episode.py` (`"music": "out"`, `"climax": True`) and the "Per-episode trim" below change one episode. Measured values live in `baselines.md` and the "Measured" table in `sound-catalog.md`; this file gives the code and the method.
 
 ## `pipeline/sounds.py`
 
@@ -21,7 +21,7 @@ Every number that shapes the show's sound, where it lives, and which way is "mor
 |---|---|---|---|
 | Intensity floor | `intensity = 0.3 + 0.7 * ...` | 0.3 at the title, 1.0 at the climax | Raise the floor and lower the span with it, keeping floor + span = 1 (`0.45 + 0.55 * ...`). Raising only the floor lifts the climax too: `0.45 + 0.7` peaks at 1.15, and the pad weight goes from 0.90 to 0.98 |
 | Intensity curve | `... ** 1.3` | builds late | Lower it (0.9) to build sooner |
-| Climax | `climax = next((s["start"] for s in reversed(shots) if s["kind"] == "doorbell"), bed_end)` | last doorbell's start | Intensity reaches 1.0 here |
+| Climax | `marked = [s["start"] for s in shots if s.get("climax")]`, `doorbells = [s["start"] for s in shots if s["kind"] == "doorbell"]`, `climax = (marked or doorbells or [bed_end])[-1]` | the start of the last shot marked `"climax": True`; with none, the last doorbell's start; with neither, `bed_end` (the end card's start + 0.4 s) | Intensity reaches 1.0 here and holds to the end. Per episode, mark a shot `"climax": True` to move the peak there; a mark overrides the doorbell, so use it for an episode with no doorbell ending |
 | Piano | `L["piano"] * 0.85` | constant | The signature; keep it steady |
 | Drone | `L["drone"] * 0.25` | constant | 55 + 82.4 Hz. Raising it mostly adds mud |
 | Pad | `L["pad"] * (0.35 + 0.55 * intensity)` | swells with intensity | Raise the 0.55 |
@@ -40,8 +40,8 @@ Every number that shapes the show's sound, where it lives, and which way is "mor
 | Typing | `span = (s["end"] - s["start"]) * 0.6`, from `+ 0.15` | first 60% of the card | |
 | Glitches | `for j in range(6): put(... flick + j * 0.3 ...)` | 6, 0.3 s apart | |
 | Shutter impact | `put(fxbus, s["start"], bank.get("impact"), LEVELS["impact"] - 4)` | 4 dB under a reveal impact | Couples the shutter to `LEVELS["impact"]`: raising the impact raises every shutter hit (ep01 has 2, ep03 has 1) |
-| Reveal hit | `put(fxbus, flick + CTA_DELAY, bank.get("impact"), LEVELS["impact"])` and the same line for `braam` | impact placed -16.0 and braam -17.3; together -13.6 (power sum), -13.7 to -13.9 in the hit lists | For the reveal alone, raise `LEVELS["braam"]`, which only this line uses (`sting()` calls `snd.braam()` directly): +3 dB took ep02's reveals to -12.3/-12.4 (the power sum predicts -12.1). For the full +3, add the same offset to both lines (`LEVELS["impact"] + 3`), which leaves the shutter hits alone |
-| Board swell | `put(under, s["lines"][-1]["start"] - 0.1, bank.get(name), LEVELS[name])` (sfx `sting_soft`) | starts 0.1 s before the board shot's last line | Sits on `under`, so it counts as score. It is the usual cause of the board line being the second-worst line in every episode; see recipe (d) |
+| Reveal hit | `put(fxbus, flick + CTA_DELAY, bank.get("impact"), LEVELS["impact"])` and the same line for `braam` | impact and braam together; their power sum is the reveal's row in the hit list (worked in `sound-catalog.md`) | For the reveal alone, raise `LEVELS["braam"]`, which only this line uses (`sting()` calls `snd.braam()` directly); the reveal gains less than the offset, as the power sum predicts (a tested +3 dB is in `baselines.md`, "Measured changes"). For the full offset, add it to both lines (`LEVELS["impact"] + 3`), which leaves the shutter hits alone |
+| Board swell | `put(under, s["lines"][-1]["start"] - 0.1, bank.get(name), LEVELS[name])` (sfx `sting_soft`) | starts 0.1 s before the board shot's last line | Sits on `under`, so it counts as score. It is why the board line is among the worst lines in every episode; see recipe (d) |
 | Voice level | `y = y * (db(-17) / rms)` in `voice_line()`, peak cap -1.5 | every line at -17 dBFS RMS | Leave it. Fix balance with the bed and effects instead |
 | Pre-master peak | `norm = db(-1.0) / (np.max(np.abs(mix)) + 1e-9)` | mix peak at -1 dBFS; the stems are scaled by the same `norm` | |
 
@@ -53,7 +53,7 @@ Every number that shapes the show's sound, where it lives, and which way is "mor
 2. In that episode's `episode.py`, add `SOUNDS = {"sting_soft": {"file": "audio/sting_soft.wav", "gain_db": -3}}`. `Bank` looks in the episode folder first.
 3. Probe it with `$PY $PROBE --episode episodes/<ep> sting_soft`. `src` should read `stock`, and `placed` should drop by the `gain_db`.
 
-- **Why it's exact:** the generators and the kit are both peak-normalized, and `Bank` peak-normalizes the file again. At `gain_db` 0 the file matches the synthesized sound to 16-bit precision (a residual of -79 dB). Tested on ep02 with -3: the board line went from 12.4 to 14.6 dB, and nothing else in mixcheck moved.
+- **Why it's exact:** the generators and the kit are both peak-normalized, and `Bank` peak-normalizes the file again, so at `gain_db` 0 the file matches the synthesized sound to 16-bit precision, and a `gain_db` moves only that sound. The test on ep02 is in `baselines.md`, "Measured changes".
 - **Fixed-length sounds only:** `sting`, `sting_end`, `sting_soft`, `impact`, `braam`, `whoosh`, `shutter`, `ding`, `glitch`, `jump`. Not `riser`, whose length varies per use; not `typewriter`, which has 16 variants; not `theme`, which loses its layers as a file; and not the ambiences, which a file would loop and fade, so they no longer stop dead at the cut.
 - **Freezing `impact`** trims that episode's shutter hits too.
 - **Commit the WAV,** and tell the user it won't follow later changes to the generator. Re-freeze it after any change to that sound.

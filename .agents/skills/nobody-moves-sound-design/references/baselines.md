@@ -42,7 +42,18 @@ The reveal hits and stings cluster within 1 dB of each other at about -14 dBFS; 
 | dialogue stem: <60 Hz / >250 Hz | 0% / 33% | 0% / 31% | 0% / 32% |
 | soundtrack: <60 Hz | 3% | 3% | 3% |
 
-Before the redesign's mud fix, ep02's score had 36% of its energy below 60 Hz. The fix reduced the drone and cello, highpassed the bed at 45 Hz and the master at 30 Hz, and added a violin layer, which brought it down to 20%.
+## Measured changes
+
+What past changes did, measured, so the next one can be predicted. SKILL.md and `mix-knobs.md` point here instead of repeating these numbers. The level experiments ran on the current code and were reverted; the last two rows are how the current sound got here. Re-run an experiment before quoting it if the baselines above have changed.
+
+| Change | Result |
+|---|---|
+| `LEVELS["braam"]` +3 dB | ep02 reveals -13.7/-13.9 to -12.3/-12.4 dBFS (the power sum predicts -12.1) |
+| `LEVELS["sting_soft"]` -3 dB | board lines 14.6–14.9 dB (from 12.4–12.8) |
+| `LEVELS["sting_soft"]` -6 dB | board lines 16.2–16.5 dB |
+| `sting_soft` frozen to a file in ep02 with `gain_db` -3 ("Per-episode trim" in `mix-knobs.md`) | board line 12.4 to 14.6 dB; nothing else in mixcheck moved. At `gain_db` 0 the file differs from the synthesized sound by a residual of -79 dB |
+| The first `impact` (sub only) to the current one (mid body, noise boom, saturated harmonics, shorter sub) | energy above 250 Hz 1% to 21% |
+| The mud fix: less drone and cello, the bed highpassed at 45 Hz and the master at 30 Hz, an added violin layer | ep02 score stem below 60 Hz 36% to 20% |
 
 ## Timings
 

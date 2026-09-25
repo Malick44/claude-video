@@ -12,7 +12,7 @@ bash .agents/skills/ai-tiktok-series/scripts/new_show.sh <slug>
 
 Run it from the repo root. First note what `git status --short shows/nobody-moves` prints; section 5 compares against it. The script copies the files below, writes `SERIES.md` from `series-bible-template.md`, and creates empty `episodes/` and `stills/`. It skips `.venv/`, `assets/`, `build/`, `stock/`, `sound_kit/`, stills and episodes.
 
-The copy works as is on a fresh show: the self-test writes its own still, so it doesn't wait for images, and the score builds to any shot marked `"climax": True`.
+The copy works as is on a fresh show: the self-test writes its own still, so it doesn't wait for images, and the score builds to the last shot marked `"climax": True`.
 
 Last, it prints the NOBODY MOVES-specific lines a grep can find. That list is a starting point, not the whole job: section 3 covers what a grep can't see, such as what the climax and hush lines key on. Re-run the same search at the end (section 5) until it prints nothing you didn't mean to keep.
 
@@ -71,8 +71,10 @@ Empty `SOUNDS`. Update the docstring's list of names if you rename or add sounds
   Transpose all of them with the key, by the same `k` semitones: add `k` to MIDI numbers and multiply Hz by `2 ** (k / 12)`. Simplest is one constant at the top, `KEY = 0` (semitones from A), written into each (`midi(33 + KEY)`, `55 * 2 ** (KEY / 12)`). For a major key, also raise the sting's third (48 to 49) and rebuild `PAD_CHORDS` as major-key chords.
 - The foley functions (`shutter`, `typewriter_click`, `carriage_ding`, `chimes`, `wind`, `crickets`, `glitch`, `jump`) are NOBODY MOVES sounds. Keep what fits, and add your own foley in the same style. Before dropping or renaming one, check the self-test fixture (below): it uses `shutter`, `crickets` and `ding`.
 - Every new sound seeds its own stream with `_rng("<name>", ...)`. Never use a shared RNG or Python's `hash()`. That's why episode 12 sounds like episode 1.
-- Add a `LEVELS` entry for every new name, and rewrite the "doorbell-cam" comments on `crickets`, `glitch` and `jump` if you keep them for something else.
-- Mirror renamed or added sounds in `pipeline/soundbank.py` (`SYNTH`, and `LOOPED` for beds that fill a shot), in `pipeline/sound_kit.py` (`KIT`) and in the `soundtrack.py` docstring.
+- **For each new sound, follow `nobody-moves-sound-design`'s `references/add-a-sound.md`.** It is a worked example that touches every file: the generator, `soundbank.SYNTH`, a `LEVELS` entry set by measuring the sound next to its neighbors (a guessed level landed a knock under the doorbell jump), the `build_audio.py` branch, `mixcheck.cues()`, `KIT` and the docs. Its `references/mix-knobs.md` lists every number that shapes the score. The numbers in both files are NOBODY MOVES's; measure your own.
+- **Run that skill's `scripts/soundprobe.py` from `shows/<slug>`:** `.venv/bin/python ../../.agents/skills/nobody-moves-sound-design/scripts/soundprobe.py <name> ...`. It loads `pipeline/` from the working directory; run from the repo root, it silently falls back to `shows/nobody-moves` and measures the wrong show.
+- Rewrite the "doorbell-cam" comments on `crickets`, `glitch` and `jump` if you keep them for something else.
+- Mirror renamed sounds in `pipeline/soundbank.py` (`SYNTH`, and `LOOPED` for beds that fill a shot), in `pipeline/sound_kit.py` (`KIT`), in `mixcheck.cues()` and in the `soundtrack.py` docstring.
 
 ### `pipeline/sound_kit.py`
 It exports the sounds as WAVs for the user. `typing_line`'s default text is NOBODY MOVES's first question ("Where were you on the night of June 13th?"), and `KIT` names two files `doorbell_glitch` and `doorbell_jump`. Rewrite the line in your show's voice, and rename or drop the entries for kinds you don't keep, because the kit is what the user edits with.
@@ -80,7 +82,7 @@ It exports the sounds as WAVs for the user. `typing_line`'s default text is NOBO
 ### `pipeline/build_audio.py`: the effects vocabulary and the climax
 - **`sfx` names are hardcoded.** In the `for name in s.get("sfx", [])` chain, `sting`, `sting_end`, `sting_soft`, `shutter`, `wind`, `chimes` and `crickets` are handled. Any other name exits with `unknown sfx`. Add a branch for each new effect.
 - **Automatic hits are keyed to shot kinds.** A `qcard` gets a whoosh, typing and a bell. A `doorbell` gets glitches, a jump, a riser and a braam plus impact at `flicker_at + CTA_DELAY`. Add the equivalent for your show-specific kinds.
-- **The score** starts at the first shot whose `sfx` has `sting` (`bed_start`) and ends at the `end` shot. Its intensity builds toward `climax`: the last shot that is a `doorbell` or has `"climax": True`, or the end card if there is neither. Put `"climax": True` on each episode's reveal shot, or change the line to your own reveal kind. Otherwise the build peaks on the end card, too late.
+- **The score** starts at the first shot whose `sfx` has `sting` (`bed_start`) and ends at the `end` shot. Its intensity builds toward `climax`: the last shot marked `"climax": True`; if there is none, the last `doorbell` shot; if there is neither, the end of the bed (the end card plus 0.4 s). Put `"climax": True` on each episode's reveal shot, or point the `doorbells` fallback at your own reveal kind. Otherwise the build peaks on the end card, too late.
 - The `doorbell` hush (`dip`, under the flicker before the reveal hit) keys on the kind only. Point it at your reveal kind, or drop it if the reveal has no hit to land.
 
 ### `pipeline/render.py`: show-specific kinds and strings
@@ -104,7 +106,7 @@ It exports the sounds as WAVs for the user. `typing_line`'s default text is NOBO
 - `selftest.py`: its fixture episode (the `EPISODE` string) uses `TITLE = "NOBODY MOVES"`, a still keyed `garrison`, and a `GARRISON` line from the series cast. The fixture writes its own still (`garrison.jpg`), so it never needs a library file. Rename the key, and change `GARRISON` to one of your cast once `cast.py` is rewritten; otherwise the self-test fails with `GARRISON is not in the cast`. Also rename the `nm-selftest-` temp prefix.
 - **The fixture also depends on sound names and a kind.** Its `SOUNDS` uses `sting`, `shutter`, `crickets`, `theme` and `ding`; its shots use the `sfx` `sting`, `shutter`, `crickets` and `sting_end`, and the kind `evidence`. Every `SOUNDS` name must stay in `soundbank.SYNTH` (else `unknown sound name(s)`), and every `sfx` name needs its branch in `build_audio.py` (else `unknown sfx`). If you drop or rename one, swap in one of your own names of the same type (a one-shot for `shutter`, a looped bed for `crickets`), and keep four network sources so the `len(lock) == 4` check still holds. If you delete the `evidence` kind, change that shot to `still`: an unknown kind renders as the end card without an error, so the test would pass while checking the wrong thing.
 
-### `pipeline/mixcheck.py` (if present)
+### `pipeline/mixcheck.py`
 It imports `CTA_DELAY` and `doorbell_clock`, and it labels the loud hits it finds using the automatic cues of the `qcard` and `doorbell` kinds. Keep `common.py`'s names or update the import, and add a label for each automatic hit you add to `build_audio.py`.
 
 ### `setup.sh`
@@ -127,16 +129,16 @@ A venv can't be copied between folders; always create it with `setup.sh`.
 
 1. `.venv/bin/python -m py_compile pipeline/*.py cast.py soundtrack.py` compiles cleanly.
 2. `.venv/bin/python pipeline/selftest.py` passes.
-3. The pilot builds and measures: `pipeline/build_audio.py episodes/<ep> --stems`, `pipeline/render.py episodes/<ep> --contact`, `./make_episode.sh episodes/<ep>`, then `pipeline/mixcheck.py episodes/<ep>` (where present). `<ep>` is the pilot's folder, e.g. `ep01_three_feet`.
+3. The pilot builds and measures: `pipeline/build_audio.py episodes/<ep> --stems`, then right away `pipeline/mixcheck.py episodes/<ep>`, which must exit 0 (it also checks loudness and true peak), then `pipeline/render.py episodes/<ep> --contact` and `./make_episode.sh episodes/<ep>`. mixcheck goes before `make_episode.sh` because that script rebuilds the soundtrack without stems, and mixcheck's dialogue, music-out and hit checks read the stems. `<ep>` is the pilot's folder, e.g. `ep01_three_feet`.
 4. No leftovers. Re-run the scaffold's own search (one pattern, so the two can't drift apart). From the show folder:
    ```bash
    bash ../../.agents/skills/ai-tiktok-series/scripts/new_show.sh --check .
    ```
    Lines for kinds you kept (doorbell, evidence, board) can stay. Then re-read section 3 for what a grep can't see.
-5. The old show is untouched. From the repo root, `git status --short shows/nobody-moves` prints the same lines as before you scaffolded (section 1). It isn't always empty, because the tree can hold unrelated changes (an untracked `pipeline/mixcheck.py`, say); what matters is that nothing new appears.
+5. The old show is untouched. From the repo root, `git status --short shows/nobody-moves` prints the same lines as before you scaffolded (section 1). It isn't always empty, because the tree can hold unrelated changes; what matters is that nothing new appears.
 
 ## 6. Register the show in the repo
 
 - **Packaging:** `.gitattributes` already has `shows/ export-ignore` and `.skillignore` has `shows/`, so the new show's images never ship to people who install the `watch` skill. Check that both lines are still there.
 - **`AGENTS.md`:** add a one-line entry for `shows/<slug>/` under Structure, next to the `shows/nobody-moves/` entry.
-- **Skills:** write `.agents/skills/<slug>-write-episode/` and `<slug>-produce-episode/`, and link each from `.claude/skills/`. See the skill's stage 6.
+- **Skills:** write `.agents/skills/<slug>-write-episode/` and `<slug>-produce-episode/` (with the mixcheck step), optionally `<slug>-sound-design/`, and link each from `.claude/skills/`. See the skill's stage 6.

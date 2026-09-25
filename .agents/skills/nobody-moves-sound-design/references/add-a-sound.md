@@ -115,8 +115,10 @@ Add `"sfx": ["gavel"]` to the shot in `episode.py`, then:
 .venv/bin/python pipeline/build_audio.py episodes/ep02_i_was_right_here --stems
 .venv/bin/python pipeline/mixcheck.py episodes/ep02_i_was_right_here
 .venv/bin/python pipeline/sound_kit.py                # writes sound_kit/gavel.wav
-.venv/bin/python -m pyflakes pipeline/*.py soundtrack.py
+.venv/bin/python -m py_compile pipeline/*.py soundtrack.py   # silent when every file parses
 ```
+
+For unused names and typos, add pyflakes, which `requirements.txt` doesn't install: see "Validate before committing" in SKILL.md.
 
 Result on the scratch copy:
 - **Checks:** PASS 5/5.

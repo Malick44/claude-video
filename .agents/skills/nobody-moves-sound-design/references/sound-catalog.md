@@ -23,11 +23,11 @@ Every named sound in the show, where it is made, where the mix puts it and how l
 | `glitch` | `glitch()`: 880 Hz square buzz in noise | Six times, 0.3 s apart, from each doorbell's `flicker_at` | effects | -22 | `doorbell_glitch` |
 | `jump` | `jump()`: the glitch over a short sub hit + harmonics | Each doorbell at `start + doorbell_clock(shot)[1]` (the cut to frame B) | effects | -14 | `doorbell_jump` |
 
-"Every doorbell" includes the replay doorbells that open ep02 and ep03 (`"id": "replay"`, `"kind": "doorbell"`). Each gets the full flicker, riser, reveal hit and score hush. Only the **last** doorbell sets the intensity climax.
+"Every doorbell" includes the replay doorbells that open ep02 and ep03 (`"id": "replay"`, `"kind": "doorbell"`). Each gets the full flicker, riser, reveal hit and score hush. The intensity climax is the start of the **last** shot marked `"climax": True`; with none, the last doorbell; with neither, the end of the bed ("Climax" in `mix-knobs.md`).
 
 ## Measured (soundprobe.py, current code)
 
-`0.5s` is the loudest 0.5 s window. `placed` is `0.5s + LEVELS`. For a sound placed alone, it predicts the level mixcheck's hit list shows to within about 1 dB: the title sting reads -14.3 placed and -14.1 in ep02's hit list, and the jump reads -28.2 placed and -27.5. For sounds placed together, power-sum their placed levels, `10*log10(10**(a/10) + 10**(b/10))`: the reveal is impact -16.0 plus braam -17.3, which sums to -13.6 (hit lists: -13.7 to -13.9), and the shutter hit is shutter -32.0 plus the impact at `LEVELS["impact"] - 4`, placed -20.0, which sums to -19.7 (hit list: -19.8).
+`0.5s` is the loudest 0.5 s window. `placed` is `0.5s + LEVELS`. For a sound placed alone, it predicts the level mixcheck's hit list shows to within about 1 dB (compare with the hit lists in `baselines.md`). For sounds placed together, power-sum their placed levels, `10*log10(10**(a/10) + 10**(b/10))`. Worked example, the reveal: impact -16.0 plus braam -17.3 sums to -13.6, within about 0.5 dB of the reveal rows in the hit lists. This table and `baselines.md` are the only places the measured values live; re-measure both after a change.
 
 | Name | sec | 0.5s dBFS | placed | >250 Hz | <60 Hz | L/R |
 |---|---|---|---|---|---|---|
@@ -48,12 +48,12 @@ Every named sound in the show, where it is made, where the mix puts it and how l
 | glitch | 0.18 | -21.3 | -43.3 | 100% | 0% | mono |
 | jump | 0.6 | -14.2 | -28.2 | 15% | 4% | mono |
 
-The impact and braam carry 13 to 18 dB more `LEVELS` gain than the ambiences on purpose: they are the moments. Placed, they sit 15 to 18 dB above wind and chimes and 22 to 24 dB above crickets. The shutter hit is the impact at -4 (placed -20.0), which is why ep01's shutter shots read -19.8 in its hit list.
+The impact and braam carry 13 to 18 dB more `LEVELS` gain than the ambiences on purpose: they are the moments. Placed, they sit 15 to 18 dB above wind and chimes and 22 to 24 dB above crickets. A shutter hit is mostly its impact, placed at `LEVELS["impact"] - 4`; the click itself sits far below it.
 
 ## Notes and known quirks
 
 - **`theme` has two versions.** When `theme` is synthesized, `build_audio.py` calls `snd.theme_layers()` and mixes the layers itself: piano 0.85, drone 0.25, pad `0.35 + 0.55 * intensity`, pulse, shimmer. `SYNTH["theme"]` is `motif_bed()`, a fixed-intensity mixdown with different weights, and only `sound_kit.py`'s `theme_60s` uses it. So editing `motif_bed` never changes an episode, and editing the `bed = ...` weights never changes the kit. Mirror a bed change into `motif_bed` if the kit should keep matching. The probe's `theme` row measures `motif_bed`; measure the episodes' score with `soundprobe.py --stems episodes/<ep>`.
-- **`sting_soft` is mostly sub.** 77% of its energy is below 60 Hz and 7% above 250 Hz, so a phone speaker plays little more than its string chord. That is fine for a swell under a line. If the user says the board's question lands weakly on a phone, add a harmonics layer (the pattern in "Phone speakers" in SKILL.md).
+- **`sting_soft` is mostly sub** (its row above), so a phone speaker plays little more than its string chord. That is fine for a swell under a line. If the user says the board's question lands weakly on a phone, add a harmonics layer (the pattern in "Phone speakers" in SKILL.md).
 - **`crickets` peaks at +0.8 dBFS** because the hum is added after `normalize()`. It's harmless: the mix is float and the sound goes in at -25. If you touch `crickets()`, add the hum before normalizing.
 - **Ambiences stop dead at the cut.** The synthesized `wind`, `chimes` and `crickets` are generated exactly as long as the shot, with no fade. Ep02's "The wind stopped." relies on that hard stop. A stock ambience goes through `soundbank.fit()` instead, which adds a 0.3 s fade-out.
 - **`impact` is used twice.** Replacing or re-leveling it changes both the shutter hit and every reveal hit.

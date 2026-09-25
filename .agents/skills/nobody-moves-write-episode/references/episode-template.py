@@ -16,9 +16,12 @@ STILLS = {
     # "basin_counsel": "A weathered white concrete birdbath ... <style block>",
 }
 
-# Optional: one-off speakers (series voices live in cast.py) and per-episode sound swaps.
+# Optional: one-off speakers (series voices live in cast.py; English presets af_/am_/bf_/bm_ only)
+# and per-episode sound swaps. A "file" is looked up in this episode's folder, then the show folder.
+# Freesound and ElevenLabs sources need hosts that cloud sessions block; ask the user for the file.
+# Swapping a sound is nobody-moves-sound-design's recipe (c): it matches the level with gain_db.
 # CAST = {"MAILMAN": {"voice": "am_puck", "speed": 1.0, "pitch": 1.0}}
-# SOUNDS = {"crickets": {"freesound_search": "crickets night", "max_seconds": 60}}
+# SOUNDS = {"crickets": {"file": "audio/crickets.wav", "credit": "Title by Author, CC0"}}
 
 L = lambda who, text, say=None: ("line", who, text, say or text)  # noqa: E731
 P = lambda s: ("pause", s)  # noqa: E731
@@ -35,7 +38,8 @@ SHOTS = [
         "lower_third": ("GARRISON", "Garden gnome · Flower bed, No. 7", "Gag line"),
         # "lower_third_at": "last",   # show the name card on the last line instead of at 0.35 s
     },
-    # --- TITLE card over a sting (a riser sweeps in; the score starts here and builds to the doorbell)
+    # --- TITLE card over a sting (a riser sweeps in; the score starts at the first "sting" and builds
+    #     to the last doorbell, or to the last shot marked "climax")
     {
         "id": "title", "kind": "title", "note": "Title card over a piano sting.",
         "views": [V("aerial", (0.5, 0.45, 1.25), (0.5, 0.5, 1.12)), V("porch", (0.42, 0.32, 1.3), (0.42, 0.36, 1.12))],
@@ -49,6 +53,9 @@ SHOTS = [
         "post": 0.5, "sfx": ["shutter"],
         # "annot_arrow": {"from": (x, y), "to": (x, y), "label": "3 FT"},   # draws on the last line
         # "annot_circles": [(x, y, r)],                                     # r = fraction of image width
+        # "climax": True,   # only when this reveal, not a later doorbell, is the episode's peak (e.g. no
+        #                   # doorbell ending). The score builds to the LAST shot marked "climax"; with none,
+        #                   # to the last doorbell; with neither, to the end card. Then it holds at full.
     },
     # --- QUESTION card: the interviewer types (typewriter + bell automatic)
     {"id": "q1", "kind": "qcard", "text": "Question?", "items": [], "min": 2.0, "note": "BLACK CARD."},
@@ -60,9 +67,13 @@ SHOTS = [
         "items": [L("LORRAINE", "Setup."), P(0.5), L("LORRAINE", "Punchline.")],
         "post": 0.35,
         "lower_third": ("LORRAINE", "Porch goose · Front steps, No. 7", "Gag line"),
+        # "music": "out",   # cut the score bed for this shot. Fine here: no sfx. Never on a shot with sfx
+        #                   # (sting_soft and risers count as score, so mixcheck fails), and not right after
+        #                   # a sting's tail. Once or twice an episode, before a punchline or a reveal.
     },
-    # --- ANONYMOUS SOURCE: sfx wind + chimes; drop them in the next shot for "the wind stopped"
-    #     (and give that shot "music": "out", so the whole soundtrack goes silent for the beat)
+    # --- ANONYMOUS SOURCE: sfx wind + chimes. For "the wind stopped", follow it with another chime
+    #     shot with no sfx and "music": "out": that cuts the score bed, and with no sfx on that shot,
+    #     only the line is heard
     {
         "id": "chime", "kind": "still", "note": "...",
         "views": [V("chime", (0.5, 0.45, 1.1), (0.5, 0.42, 1.3), "anon"),

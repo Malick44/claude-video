@@ -43,15 +43,19 @@ import numpy as np
 
 
 def _pipeline_dir():
-    """shows/nobody-moves/pipeline: from the working directory, else relative to this repo."""
+    """The show's pipeline/: the working directory's, else shows/nobody-moves in this repo (said on stderr,
+    so a copied show run from the wrong folder isn't silently measured as NOBODY MOVES)."""
     here = os.path.join(os.getcwd(), "pipeline")
     if os.path.exists(os.path.join(here, "sounds.py")):
         return here
     repo = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))))
     alt = os.path.join(repo, "shows", "nobody-moves", "pipeline")
     if os.path.exists(os.path.join(alt, "sounds.py")):
+        if "--worker" not in sys.argv:
+            print(f"note: no pipeline/ in {os.getcwd()}; measuring {os.path.dirname(alt)}. "
+                  "Run from the show's folder to measure that show.", file=sys.stderr)
         return alt
-    sys.exit("run this from shows/nobody-moves (no pipeline/sounds.py found)")
+    sys.exit("run this from the show's folder, e.g. shows/nobody-moves (no pipeline/sounds.py found)")
 
 
 sys.path.insert(0, _pipeline_dir())

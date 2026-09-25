@@ -1,6 +1,6 @@
 ---
 name: ai-tiktok-series
-description: Create a new AI-generated, faceless comedy series for TikTok, Reels or Shorts, from finding the channel idea to a built pilot and a reusable episode factory in shows/<slug>/. It uses NOBODY MOVES (shows/nobody-moves) as the worked example and as the template to copy. Covers concept research and scoring, the series bible, still-image prompts for the user to generate, the cast's voices, the synthesized score, the pilot (60-90 s, 1080x1920, -14 LUFS, an upload copy under 29 MB) and the show's own write and produce skills. Use this whenever the user asks for a TikTok, Reels, Shorts or YouTube channel idea using AI content ("find me a funny TikTok channel idea using AI"), wants to start a new show or series, make a pilot, spin off another show, or "set up a pipeline like nobody moves for another show", even if they don't name this skill. For anything inside NOBODY MOVES itself (new episodes, Confessionals or other shorts, rebuilding, re-rendering or fixing existing episodes including its pilot, or its sound), use nobody-moves-write-episode, nobody-moves-produce-episode or nobody-moves-sound-design instead.
+description: Create a new AI-generated, faceless comedy series for TikTok, Reels or Shorts, from the channel idea to a built pilot and a reusable episode factory in a new folder under shows/, using NOBODY MOVES (shows/nobody-moves) as the worked example and template. Covers concept research and scoring, the series bible, still-image prompts for the user to generate, the cast's voices, the synthesized score, the pilot (60-90 s, 1080x1920, -14 LUFS, an upload copy under 29 MB) and the show's own write and produce skills. Use this whenever the user asks for a TikTok, Reels, Shorts or YouTube channel idea using AI content, wants to start a new show or series, make a pilot for a new show, spin off another show, or set up a pipeline like NOBODY MOVES for another show, even if they don't name this skill. For anything inside NOBODY MOVES itself (its episodes, Confessionals, re-renders, fixes or sound), use nobody-moves-write-episode, nobody-moves-produce-episode or nobody-moves-sound-design instead.
 ---
 
 # Create an AI TikTok series
@@ -92,6 +92,7 @@ Fill in every section of `SERIES.md`, following `shows/nobody-moves/SERIES.md`. 
 - **Receiving files:** images in a normal message get a file path; images sent while you're mid-task arrive as pictures only and are never saved. If you can see an image but can't find its file, ask the user to send the same image again in a new message.
 - **Where they go:** recurring sets and cast go in `stills/` (the series library). Episode-only shots go in `episodes/<ep>/stills/`, where `<ep>` is the episode folder (Stage 5). Name each file after its key; `.webp`, `.png` and `.jpg` all work.
 - **Clue frames:** derive frame B from the library still with a deterministic pixel edit in `episodes/<ep>/make_stills.py`. Two separately generated images never match, so a generated frame B changes everything at once. Episode 3's `make_stills.py` is the example.
+- **Where derived frames go:** if a later episode will replay the frame or derive the next one from it, write it to `stills/` (the library). An episode sees only its own `stills/` and the library, so a frame left in `episodes/<ep>/stills/` is invisible to the next episode. Episode 3 writes `yard_gone` to `../../stills/` for this reason. A frame only one episode uses can stay in that episode's `stills/`.
 - **Coordinates:** `mkdir -p episodes/<ep>/build`, then `.venv/bin/python pipeline/grid.py stills/<key>.webp -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`, and read the fractions off the grid. Placing them by eye failed. Always pass `-o` into `build/` (gitignored): without it, grid.py writes `<key>_grid.png` next to the still, into the library you commit.
 
 ## Stage 4: adapt the pipeline
@@ -104,53 +105,60 @@ From `shows/<slug>`, work through `references/new-show-checklist.md`, file by fi
   - The theme in `pipeline/sounds.py` (`THEME_NOTES`, `THEME_TURN`, `THEME_STEP`, `PAD_CHORDS`) and its foley. If you change the key, also transpose the pitches hard-coded in A minor: the drone (55 and 82.4 Hz), `shimmer`, `braam(root=33)`, the `sting` cluster, `swell`'s sub and `chimes`. The checklist has the table. You can't hear a clash, so nothing else will catch it.
   - `soundtrack.py`.
   - In `render.py`: the show-specific shot kinds, the end-card disclaimer, `"INTERVIEWER"`, the doorbell and board defaults, and the caption-split abbreviations. An unknown kind silently renders as the end card.
-  - In `build_audio.py`: the `sfx` vocabulary, the climax and the hush. The climax is the last `doorbell` shot or shot marked `"climax": True`, else the end card.
+  - In `build_audio.py`: the `sfx` vocabulary, the climax and the hush. The score builds to the last shot marked `"climax": True`; if there is none, to the last `doorbell` shot; if there is neither, to the end card. Mark each reveal shot, or key the fallback on your own reveal kind.
   - `sound_kit.py`: the `typing_line` default and the `doorbell_*` kit names.
   - The names in `selftest.py` and `stock.py`. The self-test fixture's sound names and `sfx` must stay valid, so update it when you drop or rename a sound.
   - A `README.md` for the show.
 - **Voices:** use Kokoro presets, English only (`af_*`, `am_*`, `bf_*`, `bm_*`), with `speed`, `pitch` and `altered`. Audition them by building the pilot's audio; clips are cached per line and settings, so a re-run only voices what changed. Freeze a character's entry once an episode is published, because changing it re-voices every episode. The user's own takes beat any TTS: `episodes/<ep>/recordings/<shot>_<n>.m4a`.
+- **New sounds and levels:** follow `nobody-moves-sound-design`'s `references/add-a-sound.md`. It walks every file a new sound touches: the generator, `soundbank.SYNTH`, a `LEVELS` entry set by measurement rather than guessed, the `build_audio.py` branch, `mixcheck.cues()` and the kit. Its `references/mix-knobs.md` lists every number that shapes the score. The numbers in both files are NOBODY MOVES's; measure your own.
+- **Measure single sounds from the show folder:** `.venv/bin/python ../../.agents/skills/nobody-moves-sound-design/scripts/soundprobe.py <name> ...`. It loads `pipeline/` from the working directory. Run from anywhere else, it silently falls back to `shows/nobody-moves` and measures the wrong show.
+- **Not `cinematic-sound-designer`:** `build_audio.py` regenerates all of an episode's audio from the shot list, so an SFX stem made by that skill bypasses `LEVELS` and mixcheck, and the next build discards it. Use it only for edits made outside the pipeline, such as a short cut in CapCut from the sound kit.
 - **Check your edits:** `.venv/bin/python -m py_compile pipeline/*.py cast.py soundtrack.py`, then `.venv/bin/python pipeline/selftest.py` again. `bash ../../.agents/skills/ai-tiktok-series/scripts/new_show.sh --check .` re-lists the leftovers with the scaffold's own pattern.
 
 ## Stage 5: the pilot
 
-Write `episodes/<ep>/episode.py` as data, where `<ep>` is `ep01_` plus the episode's title in lowercase with underscores (`ep01_three_feet`), not the show slug. The folder name becomes the output names, `build/<ep>.mp4` and `build/<ep>_tiktok.mp4`. Start from `references/pilot-template.py`: it uses only the generic shot kinds, defines a placeholder speaker `WITNESS`, and builds on a fresh scaffold. Replace `WITNESS` with names from your `cast.py` and delete its `CAST` line. Model the pacing on `shows/nobody-moves/episodes/ep01_three_feet/episode.py`. One file drives both the audio and the video, so a changed line updates both.
+Write `episodes/<ep>/episode.py` as data, where `<ep>` is `ep01_` plus the episode's title in lowercase with underscores (`ep01_three_feet`), not the show slug. The folder name becomes the output names, `episodes/<ep>/build/<ep>.mp4` and `<ep>_tiktok.mp4`. Start from `references/pilot-template.py`: it uses only the generic shot kinds, defines a placeholder speaker `WITNESS`, and builds on a fresh scaffold. Replace `WITNESS` with names from your `cast.py` and delete its `CAST` line. Put each new still's prompt in `STILLS`. Model the pacing on `shows/nobody-moves/episodes/ep01_three_feet/episode.py`. One file drives both the audio and the video, so a changed line updates both.
 
-- **Hook within 2 seconds:** a character's line over a tight close-up, never the title. Scrollers decide in about a second.
+Follow "What makes an episode work" and "Writing the file" in `.agents/skills/nobody-moves-write-episode/SKILL.md`. Each rule there says why, and each holds for any show in this format: read NOBODY MOVES's cast, rule and doorbell as your show's own, from your `SERIES.md`. For a pilot, these differ:
+
+- **There is no earlier clue to answer.** The pilot plants the first one.
 - **Title card at about 5 seconds,** right after the hook, with `"sfx": ["sting"]`. The score starts there. The hook gets its setup and punchline first, then the title names the show while new viewers are still deciding. The NOBODY MOVES episodes reach it at 4.8–6 s.
-- **60–90 seconds.** Creator Rewards needs 60 s or more, and completion drops past about 90. Trim lines that repeat what the screen already shows; don't speed up voices.
-- **Captions carry the comedy.** Most viewers watch muted. Keep lines short, one idea each, punchline last, with a `P(...)` pause before it.
-- **One mechanism per character.** Escalate it; don't swap it.
-- **`"music": "out"`** once or twice an episode, right before a punchline or reveal. The drop is what makes the beat land.
-- **End on one fair clue:** visible on a rewatch at phone size, not obvious on first view. Put the answer in `ANSWER`: `SCRIPT.md` prints it, and the video never shows it. Mark the reveal shot `"climax": True` so the score peaks there.
-- **`NEXT_UP`** on the end card, so viewers know there's more. Every new still gets a prompt in `STILLS`.
-- **Spoken text:** numbers and abbreviations go in `L()`'s third argument: `L("NARRATOR", "Since 1994.", "Since nineteen ninety-four.")`.
+- **The clue can sit in any shot kind,** not only a doorbell frame. Derive its frames as in Stage 3. `SCRIPT.md` prints `ANSWER`, and the video never shows it.
+- **Mark the reveal shot `"climax": True`.** The score builds to the last marked shot. With no mark it builds to the last `doorbell` shot, and with neither to the end card, which is too late.
 
-Build, look, then render:
+Build the audio, measure it, look, then render:
 
 ```bash
-FF=$(.venv/bin/python -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())")   # there is no ffprobe
-.venv/bin/python pipeline/build_audio.py episodes/<ep> --stems     # timing table; stems for mixcheck
-.venv/bin/python pipeline/render.py episodes/<ep> --contact        # build/contact.png
+.venv/bin/python pipeline/build_audio.py episodes/<ep> --stems     # timing table, soundtrack and stems
+.venv/bin/python pipeline/mixcheck.py episodes/<ep>                # exit 1 = a HARD check failed
+.venv/bin/python pipeline/render.py episodes/<ep> --contact        # episodes/<ep>/build/contact.png
 .venv/bin/python pipeline/render.py episodes/<ep> --preview 0.5,4,30
 ./make_episode.sh episodes/<ep>                                    # about 10 minutes
 ```
 
-Run `make_episode.sh` in the background and watch its output for `wrote|MB|Traceback|Error`. Before it, open the contact sheet and previews and look at them:
+- **Run mixcheck right after the `--stems` build.** Its dialogue-over-music, music-out and hit checks read the stems. `make_episode.sh` rebuilds the soundtrack without stems, so stems read after it may describe an older mix. After any sound or timing change, run both lines again.
+- **mixcheck also checks loudness and true peak** (−14 ± 1 LUFS, −1.0 dBTP or lower), so there is no separate loudness step.
+- **On exit 1, fix it before rendering.** For a failure or a line under 8 dB, use `nobody-moves-sound-design` from `shows/<slug>`: recipe (d) for a buried line, (e) for a music-out shot that isn't silent.
+
+Before `make_episode.sh`, open the contact sheet and previews and look at them:
 
 - **The hook frame** is a strong close-up.
 - **Captions** (y about 1050–1300) don't collide with name cards or overlays.
 - **Text fits:** the title, the cards and the end-card lines fit the width.
 - **The clue** is findable in a frame scaled to about 360 px wide.
 
-Then measure:
+Run `make_episode.sh` in the background and watch its output for `wrote|MB|Traceback|Error`. Then check the video. There is no ffprobe, so use the bundled ffmpeg:
 
-- **Loudness:** `$FF -i episodes/<ep>/build/soundtrack.wav -af ebur128=peak=true -f null -` should give about −14 LUFS and a peak of −1.5 dBFS or lower.
-- **The mix:** `.venv/bin/python pipeline/mixcheck.py episodes/<ep>` checks dialogue over music, the music-out shots and the hits, and exits 1 on a hard failure. It needs the stems from `build_audio.py --stems`; without them it runs only the soundtrack-level checks. It ships in `shows/nobody-moves/pipeline/`; if your copy lacks it, say those checks weren't run.
-- **The video:** `$FF -i episodes/<ep>/build/<ep>_tiktok.mp4` should show 1080×1920, 30 fps, AAC 48 kHz stereo. `$FF -i` doesn't print the file size: check under 29 MB with `ls -l episodes/<ep>/build/` (`deliver.py` also prints it on its `wrote` line).
+```bash
+FF=$(.venv/bin/python -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())")
+$FF -i episodes/<ep>/build/<ep>_tiktok.mp4   # 1080x1920, 30 fps, AAC 48 kHz stereo
+ls -l episodes/<ep>/build/                     # the _tiktok.mp4 under 29 MB ($FF -i doesn't print the size)
+```
 
 Send the user the `_tiktok.mp4` and the episode's `SCRIPT.md`; the master is about 9 Mbps and too big for chat. Report:
 - the runtime and the beats, in plain language;
 - the clue, labeled as a spoiler;
+- the mixcheck `RESULT` line and the dialogue-over-bed median;
 - the stills still using fallbacks, with their prompts;
 - what you couldn't verify.
 
@@ -159,10 +167,12 @@ Send the user the `_tiktok.mp4` and the episode's `SCRIPT.md`; the master is abo
 Go back to the repo root first (`cd ../..` from the show folder): the skill paths and the symlinks below are relative to it.
 
 - **Write the show's skills.** Create `.agents/skills/<slug>-write-episode/` (with `references/episode-template.py`) and `.agents/skills/<slug>-produce-episode/` by copying the `nobody-moves-*` skills. Replace every show fact: paths, cast and mechanisms, library keys, shot kinds and fields, clue mechanics, fallback crops. Keep their structure and their "why" for each rule. Name the show and its characters in each description, and end it with "even if they don't name the show". Descriptions are how the skill gets found.
+- **The produce copy must measure the mix:** `build_audio.py episodes/<ep> --stems`, then `mixcheck.py episodes/<ep>`, before the previews and `make_episode.sh`, and no delivery on exit 1. Every later episode follows that skill, so a step it lacks never runs.
+- **Offer an optional `<slug>-sound-design` skill** once the show's sound has settled, copied from `nobody-moves-sound-design`. Re-measure every number in it on the new show's episodes (`references/baselines.md`, the "Measured" table in `references/sound-catalog.md`), and point the fallback in `scripts/soundprobe.py`'s `_pipeline_dir()` at `shows/<slug>`. Until it exists, use `nobody-moves-sound-design` from `shows/<slug>` (Stage 4).
 - **Link them for Claude Code:** `ln -s ../../.agents/skills/<name> .claude/skills/<name>`, relative like the existing links, because a relative link keeps working in any checkout path and an absolute one breaks on every other machine. `.agents/skills/` holds the real files; the link is how Claude Code finds them.
-- **Test both skills** by writing Episode 2 through the write skill and building it through the produce skill. That's how the NOBODY MOVES skills were validated; any gap in them shows up at once.
-- **Register the show:** add a line for `shows/<slug>/` under Structure in `AGENTS.md`. `shows/` is already export-ignored in `.gitattributes` and `.skillignore`, so the user's images never ship with the `watch` skill.
-- **What to commit:** `shows/<slug>/`, the two skills and the symlinks. That covers `SERIES.md`, `README.md`, `cast.py`, `soundtrack.py`, `pipeline/`, `tools/`, each episode's `episode.py`, `SCRIPT.md` and `make_stills.py`, `stills/`, and `stock/` if anything was fetched. Never commit `build/`, `.venv/`, `assets/`, `sound_kit/` or `.env`. Open PRs as drafts and merge only when the user says so, because they review the pilot first and say "merge it" when ready. Use a merge commit, like the repo's earlier PRs, so each show's history stays intact.
+- **Test the skills** by writing Episode 2 through the write skill and building it through the produce skill. That's how the NOBODY MOVES skills were validated; any gap in them shows up at once.
+- **Register the show:** add a line for `shows/<slug>/` under Structure in `AGENTS.md`, naming its skills as the `shows/nobody-moves/` line does. `shows/` is already export-ignored in `.gitattributes` and `.skillignore`, so the user's images never ship with the `watch` skill.
+- **What to commit:** `shows/<slug>/`, the show's skills and their symlinks. That covers `SERIES.md`, `README.md`, `cast.py`, `soundtrack.py`, `pipeline/`, `tools/`, each episode's `episode.py`, `SCRIPT.md` and `make_stills.py`, `stills/`, and `stock/` if anything was fetched. Never commit `build/`, `.venv/`, `assets/`, `sound_kit/` or `.env`. Open PRs as drafts and merge only when the user says so, because they review the pilot first and say "merge it" when ready. Use a merge commit, like the repo's earlier PRs, so each show's history stays intact.
 - **Check the old show is untouched:** `git status --short shows/nobody-moves` should print what it printed before Stage 2. It may not be empty, because the tree can hold unrelated changes; nothing new should appear.
 - **Keep the ledger.** After every episode, update `SERIES.md`: mark the paid-off clue, add the new one, mark the roadmap entry written. The next writer depends on it.
 
@@ -174,7 +184,7 @@ Go back to the repo root first (`cd ../..` from the show folder): the skill path
 - **`<NAME> is not in the cast`:** the speaker isn't in `cast.py` or the episode's `CAST`. The pilot template's `WITNESS` lives in its own `CAST` line until you replace it.
 - **A shot draws as the end card:** its kind is missing from `render()`'s dispatch.
 - **`unknown sfx`:** add a branch for the name in `build_audio.py`.
-- **The preview shows old text:** re-run `build_audio.py`. The renderer reads `build/timeline.json`.
+- **The preview shows old text:** re-run `build_audio.py`. The renderer reads `episodes/<ep>/build/timeline.json`.
 - **Runtime over 90 s:** cut narration that repeats the screen, and fold narration into character lines.
 - **The render is over 30 MB:** send `_tiktok.mp4`, not the master. `pipeline/deliver.py --max-mb` sets the cap.
 

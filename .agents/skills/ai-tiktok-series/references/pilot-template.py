@@ -2,13 +2,13 @@
 
 Copy to shows/<slug>/episodes/ep01_<episode_title>/episode.py: the episode's title in lowercase with
 underscores (NOBODY MOVES: ep01_three_feet), not the show slug. The folder name becomes the output
-names, build/<folder>.mp4 and build/<folder>_tiktok.mp4.
+names, episodes/<folder>/build/<folder>.mp4 and <folder>_tiktok.mp4.
 
 This skeleton uses only the show-neutral shot kinds (still, title, qcard, end) and defines its
-placeholder speaker WITNESS below, so it builds on a fresh scaffold from new_show.sh (which also
-applies the string_pad fix and the "climax" flag). For show-specific kinds (NOBODY MOVES has
-evidence, board and doorbell), see shows/nobody-moves/episodes/ep01_three_feet/episode.py and
-your show's pipeline/render.py.
+placeholder speaker WITNESS below, so it builds on a fresh scaffold from new_show.sh. That script
+copies shows/nobody-moves's pipeline as it is, which already has the string_pad fix and honors
+"climax": True. For show-specific kinds (NOBODY MOVES has evidence, board and doorbell), see
+shows/nobody-moves/episodes/ep01_three_feet/episode.py and your show's pipeline/render.py.
 
 pipeline/build_audio.py turns this file into voice clips, a timeline and the mix, and
 pipeline/render.py turns the same timeline into 1080x1920 frames. Change a line here and both
@@ -105,8 +105,8 @@ SHOTS = [
             L("NARRATOR", "Comment what changed."),
         ],
         "post": 0.8, "sfx": ["sting_soft"],
-        # The score's build peaks here. new_show.sh patched build_audio.py's climax line to honor
-        # this flag; without it (and with no doorbell shot) the build peaks on the end card.
+        # The score builds to the last shot marked "climax": True. Without a mark it builds to the
+        # last doorbell shot, and with neither to the end card, which is too late.
         "climax": True,
     },
     # END CARD: TITLE, NEXT_UP and the AI disclaimer (its text lives in the show's render.py).
