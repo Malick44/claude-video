@@ -5,7 +5,7 @@ turns on Lorraine: she swears she wore the bumblebee that night, is in an Easter
 the next cut, and Exhibit A shows her wearing nothing at all. "I don't pick them, detective."
 New clue: in frame 428 the porch step is empty. Lorraine is gone.
 
-The clue frame (stills/yard_gone.webp) is derived from the library still by make_stills.py.
+The clue frame (library still yard_gone) is derived from yard_after by make_stills.py.
 """
 
 TITLE = "NOBODY MOVES"

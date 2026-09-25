@@ -224,8 +224,10 @@ def main():
     # ---- score: theme from the title card (first "sting") to the end card
     bed_start = next((s["start"] for s in shots if "sting" in s.get("sfx", [])), 0.0)
     bed_end = next((s["start"] for s in shots if s["kind"] == "end"), total) + 0.4
-    # the score builds to the last doorbell shot, or to a shot marked "climax": True
-    climax = next((s["start"] for s in reversed(shots) if s["kind"] == "doorbell" or s.get("climax")), bed_end)
+    # the score builds to the last shot marked "climax": True, else to the last doorbell shot
+    marked = [s["start"] for s in shots if s.get("climax")]
+    doorbells = [s["start"] for s in shots if s["kind"] == "doorbell"]
+    climax = (marked or doorbells or [bed_end])[-1]
     length = bed_end - bed_start
     tt = np.arange(int(length * SR)) / SR + bed_start
     intensity = 0.3 + 0.7 * np.clip((tt - bed_start) / max(1e-3, climax - bed_start), 0, 1) ** 1.3

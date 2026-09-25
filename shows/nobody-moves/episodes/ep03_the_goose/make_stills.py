@@ -2,8 +2,10 @@
 
   .venv/bin/python episodes/ep03_the_goose/make_stills.py
 
-stills/yard_gone.webp is stills/yard_after.webp with Lorraine removed from the porch step, so
-doorbell frames 427 -> 428 differ only by the missing goose. It is a pixel edit of the same
+shows/nobody-moves/stills/yard_gone.webp is stills/yard_after.webp with Lorraine removed from the
+porch step, so doorbell frames 427 -> 428 differ only by the missing goose. It goes in the series
+library, not this episode's stills/, because every later frame of that night (428 on) shows the
+empty step and later episodes replay it. It is a pixel edit of the same
 photo, which keeps every other detail identical (two separately generated images never are).
 The fill is a harmonic (smooth) inpaint plus matching grain: invisible at phone size in night
 vision, a soft smudge if you zoom in. Deterministic; re-run it if yard_after changes.
@@ -16,7 +18,7 @@ from PIL import Image, ImageFilter
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "..", "..", "stills", "yard_after.webp")
-OUT = os.path.join(HERE, "stills", "yard_gone.webp")
+OUT = os.path.join(HERE, "..", "..", "stills", "yard_gone.webp")
 
 # Lorraine in yard_after (fractions): body x 0.720-0.781, y 0.219-0.278; the porch post ends at x 0.7205
 BOX = (0.7205, 0.215, 0.786, 0.281)

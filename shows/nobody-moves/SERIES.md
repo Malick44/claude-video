@@ -79,9 +79,9 @@ Every doorbell shot of that night must agree with this table. Frames tick roughl
 | 422 | 03:12:07 | Lorraine facing front again (nobody has noticed she turned back) | `yard_after` |
 | 423 | 03:12:08 | **Ray lit**, and he stays lit from here on | `yard_after` + `alter_glow` on Ray |
 | 427 | 03:12:15 | As 423 | `yard_after` + `lit=[Ray]` |
-| 428 | 03:12:16 | **Lorraine gone from the porch step** | `yard_gone` (from `ep03_the_goose/make_stills.py`) + `lit=[Ray]` |
+| 428 | 03:12:16 | **Lorraine gone from the porch step** | `yard_gone` (library; made by `ep03_the_goose/make_stills.py`) + `lit=[Ray]` |
 
-Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that changes something else, derive a new still from the latest one with a pixel edit, as Ep. 3 does. Two separately generated images never match.
+Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that changes something else, derive a new still from the latest one with a pixel edit, as Ep. 3 does, and save it in `stills/`, where every episode can replay it. Two separately generated images never match.
 
 ## Episode roadmap
 
