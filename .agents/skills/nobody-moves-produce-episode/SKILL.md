@@ -1,12 +1,13 @@
 ---
 name: nobody-moves-produce-episode
-description: Build, check and deliver a NOBODY MOVES episode or Confessional video with the shows/nobody-moves pipeline. Covers setup, placing user images as stills, voices (Kokoro, ElevenLabs, the user's own recordings), framing previews, the mixcheck gate, the full 1080x1920 render, the under-30 MB TikTok copy and the draft PR. Use this whenever the user wants to render, build, export or preview a NOBODY MOVES episode, has sent new images or voice recordings for it, wants a shot reframed or a voice swapped, asks to "install Kokoro on my computer", or just says "make the video" or "render episode 4", even without naming the pipeline. Sound and music changes, and measuring or fixing the mix, belong to nobody-moves-sound-design. Writing or rewriting the script belongs to nobody-moves-write-episode.
+description: Build, check and deliver a NOBODY MOVES episode or Confessional video with the shows/nobody-moves pipeline. Covers setup, placing user images as stills, voices (Kokoro, ElevenLabs, the user's own recordings), framing previews, the mixcheck gate, handing the render to nobody-moves-render, and the draft PR. Use this whenever the user wants to build, export or preview a NOBODY MOVES episode, has sent new images or voice recordings for it, wants a shot reframed or a voice swapped, asks to "install Kokoro on my computer", or just says "make the video", even without naming the pipeline. Rendering, verifying and reviewing the finished video belong to nobody-moves-render. Sound and music changes, and measuring or fixing the mix, belong to nobody-moves-sound-design. Writing or rewriting the script belongs to nobody-moves-write-episode.
 ---
 
 # Produce a NOBODY MOVES episode
 
 Pipeline: `shows/nobody-moves/`. Other skills own the rest:
 - **`nobody-moves-write-episode`** writes the episode. If `episodes/<ep>/` doesn't exist yet (e.g. "render episode 4" before it's written), write it with that skill first.
+- **`nobody-moves-render`** (or the `nobody-moves-renderer` subagent, which preloads it) renders the final videos, verifies them and reviews them against a reference episode.
 - **`nobody-moves-sound-design`** owns sound and music changes and diagnosing the mix. Hand off to it for any mixcheck FAIL, a line under 8 dB, or a request to change a sound.
 
 Run everything from the show folder:
@@ -75,15 +76,9 @@ Open the images and actually look at them. Pick preview times from `episodes/<ep
 
 ## 5. Render and deliver
 
-```bash
-./make_episode.sh episodes/<ep>
-```
-
-It rebuilds the audio (without stems), then writes `SCRIPT.md`, the master render and the TikTok copy, into `episodes/<ep>/build/`:
+Follow `nobody-moves-render`, or delegate the whole step to the `nobody-moves-renderer` subagent. It runs `./make_episode.sh episodes/<ep>` in the background (about 10 minutes), then `pipeline/review.py` to verify the files and compare the episode with the previous one, beat by beat. Its outputs, in `episodes/<ep>/build/`:
 - `<ep>.mp4`, the master at about 9 Mbps, too big to send in chat for a main episode;
 - `<ep>_tiktok.mp4`, under 29 MB. **Send this one.**
-
-Verify with `$FF -i episodes/<ep>/build/<ep>_tiktok.mp4`: 1080×1920, 30 fps, AAC stereo at 48 kHz, and the duration matching the timing table.
 
 **Audio-only change:** if only the audio changed and `timeline.json` keeps the same `total`, `shots` and `captions`, remux the new soundtrack into the existing MP4 in seconds instead of re-rendering. Follow `nobody-moves-sound-design`, "Re-render or remux".
 

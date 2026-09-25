@@ -25,9 +25,10 @@ Outputs, in `episodes/<episode>/build/` (not committed):
 
 ## Making a new episode
 
-With Claude Code (or any Agent Skills host), three skills in this repo do the whole loop:
+With Claude Code (or any Agent Skills host), four skills in this repo do the whole loop:
 - **`nobody-moves-write-episode`** writes the script, the image prompts and the continuity updates.
-- **`nobody-moves-produce-episode`** builds, checks and delivers the video.
+- **`nobody-moves-produce-episode`** builds and checks the episode.
+- **`nobody-moves-render`** renders the final videos, verifies them and reviews them against another episode (the `nobody-moves-renderer` subagent runs it).
 - **`nobody-moves-sound-design`** changes the score and sound effects and measures the mix.
 
 To start a different show with this pipeline, use the **`ai-tiktok-series`** skill.
@@ -45,7 +46,7 @@ Just ask for "the next episode". By hand:
    .venv/bin/python pipeline/render.py episodes/ep02_x --contact            # one frame per shot -> build/contact.png
    .venv/bin/python pipeline/render.py episodes/ep02_x --preview 1,12.5,30  # frames at those seconds
    ```
-6. Run `./make_episode.sh episodes/ep02_x`.
+6. Run `./make_episode.sh episodes/ep02_x`, then `.venv/bin/python pipeline/review.py episodes/ep02_x --ref episodes/ep01_three_feet` to verify the video and compare it with an earlier episode, beat by beat (`build/review/beats_vs_<ref>.png`).
 
 The voice clips are cached by line text, so rebuilding after an edit only re-voices the lines you changed.
 
