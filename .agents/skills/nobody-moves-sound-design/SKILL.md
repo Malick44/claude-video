@@ -215,7 +215,7 @@ Run `$PY pipeline/sound_kit.py`. It writes every `KIT` entry to `sound_kit/*.wav
 
 **Remux** when both are true:
 - the change touched only audio;
-- `episodes/<ep>/build/timeline.json` has the same `total`, `shots` and `captions` as before. Copy it aside before rebuilding and compare; those are the only keys `render.py` reads.
+- `episodes/<ep>/build/timeline.json` has the same `total`, `shots` and `captions` as before. Copy it aside before rebuilding and compare; those are the only keys `render.py` reads. Each caption's `words` (the highlight timing) come from the voice clips alone, so a change to the score or effects leaves them the same.
 
 Remuxing swaps the new audio into the existing MP4 in about 9 s, instead of a 10-minute render, with the same audio encoding `render.py` uses. The TikTok copy still takes about 4 minutes:
 

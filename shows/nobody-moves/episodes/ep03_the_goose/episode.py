@@ -55,8 +55,8 @@ BOARD_POLAROIDS = [
     ("yard_before", (0.478, 0.380, 0.829), "DEB (MOVED)", 0.50, 0.40, 620, -2.5, None),
     ("garrison", (0.228, 0.335, 0.717), "GARRISON", 0.24, 0.24, 420, 4, None),
     ("yard_before", (0.680, 0.200, 0.808), "LORRAINE (NO BEE)", 0.77, 0.23, 420, -5, None),
-    ("porch", (0.234, 0.466, 0.978), "MR. BASIN, ESQ.", 0.23, 0.58, 420, -3, None),
-    ("yard_after", (0.130, 0.745, 0.250), "RAY (AWAKE)", 0.78, 0.58, 420, 5, None),
+    ("porch", (0.234, 0.466, 0.978), "MR. BASIN, ESQ.", 0.29, 0.58, 420, -3, None),
+    ("yard_after", (0.130, 0.745, 0.250), "RAY (AWAKE)", 0.72, 0.58, 420, 5, None),
 ]
 
 SHOTS = [
@@ -194,7 +194,7 @@ SHOTS = [
     {
         "id": "board", "kind": "board", "card": "WHO DRESSES THE GOOSE?",
         "note": "EVIDENCE BOARD, updated: Lorraine (NO BEE), Ray (AWAKE).",
-        "kb": ((0.5, 0.5, 1.0), (0.5, 0.48, 1.18)),
+        "kb": ((0.5, 0.5, 1.0), (0.5, 0.53, 1.18)),   # ends framed low: the index card stays above every app's description
         "polaroids": BOARD_POLAROIDS,
         "items": [
             L("NARRATOR", "At 3:12 AM, someone moved Deb.", "At three twelve AM, someone moved Deb."),
