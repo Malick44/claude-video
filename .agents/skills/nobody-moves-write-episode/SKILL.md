@@ -47,7 +47,6 @@ Reuse before generating. `shows/nobody-moves/stills/` is the series library, ava
 - `yard_before` / `yard_after`: the night yard, with Deb in place and moved.
 - `yard_gone`: doorbell frame 428 on, `yard_after` with Lorraine gone from the porch step (derived by `episodes/ep03_the_goose/make_stills.py`). Add Ray's light with `lit=`.
 - `ray_night`: `ray` at night with his solar light on (derived by `episodes/ep04_only_when_its_sunny/make_stills.py`), the stand-in for a generated `ray_lit`.
-- `yard_shadow`: doorbell frame 343 (03:10:00), `yard_before` with a long shadow across the lawn from something off-frame left (derived by `episodes/ep05_saturday/make_stills.py`). Gone again by frame 417.
 
 The library also has `aerial`, `lorraine` (and `lorraine_bee`, `lorraine_easter`), `chime`, `basin_counsel`, `ray` and `cork`; SERIES.md lists every still.
 
