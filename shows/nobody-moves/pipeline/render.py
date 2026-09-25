@@ -681,6 +681,24 @@ def render(t, fi):
     return frame.convert("RGB")
 
 
+def report_fallbacks():
+    """Every shot that isn't using its first-choice still, and every still that will draw as a placeholder."""
+    fb, ph = [], []
+    for s in SHOTS:
+        if s.get("views"):
+            v = pick_view(s)
+            if not still_path(v["img"]):
+                ph.append(f'{s["id"]} ({s["views"][0]["img"]})')
+            elif v is not s["views"][0]:
+                fb.append(f'{s["id"]}: {s["views"][0]["img"]} -> {v["img"]}')
+        keys = [s.get("frame_a"), s.get("frame_b")] + [p[0] for p in s.get("polaroids", [])]
+        ph += [f'{s["id"]} ({k})' for k in keys if k and not still_path(k)]
+    if fb:
+        print("fallback views (shot: wanted -> used):", "; ".join(fb))
+    if ph:
+        print("PLACEHOLDERS (no still found):", "; ".join(ph))
+
+
 def main(argv):
     if not argv or argv[0].startswith("--"):
         sys.exit("usage: render.py episodes/<episode> [--preview t1,t2,... | --contact]")
@@ -691,6 +709,7 @@ def main(argv):
     missing = [k for k in getattr(ep, "STILLS", {}) if not still_path(k)]
     if missing:
         print("not provided (using fallbacks):", ", ".join(missing))
+    report_fallbacks()
     if "--preview" in argv:
         ts = [float(x) for x in argv[argv.index("--preview") + 1].split(",")]
         for t in ts:
@@ -700,6 +719,8 @@ def main(argv):
         thumbs = []
         for s in SHOTS:
             t = s["start"] + (s["end"] - s["start"]) * 0.75
+            if s["kind"] == "doorbell" and s.get("flicker_at"):   # the paused clue frame, not mid-flicker
+                t = min(s["end"] - 1.0 / FPS, s["flicker_at"] + CTA_DELAY + 0.6)
             thumbs.append(render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS))
         cols = 7
         sheet = Image.new("RGB", (cols * 270, math.ceil(len(thumbs) / cols) * 480), (0, 0, 0))

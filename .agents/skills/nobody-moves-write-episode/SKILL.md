@@ -19,7 +19,7 @@ The show lives in `shows/nobody-moves/`. Writing an episode means producing a da
 These rules come from how the pilot was designed and what TikTok rewards. Each one says why.
 
 - **Hook in the first two seconds.** Open on a character's line over a tight close-up, never on a title. Scrollers decide in about a second, and a gnome saying something absurd in deadpan stops the thumb.
-- **Answer last episode's clue early, within about 25 seconds.** Commenters who solved it get paid off, and people who missed it get the recap. That's what turns one-off viewers into followers.
+- **Answer last episode's clue early, within about 25 seconds.** Commenters who solved it get paid off, and people who missed it get the recap. That's what turns one-off viewers into followers. A doorbell replay's call to action appears about 2 s after its last line ends, so give the shot `"post": 3.6` or more to hold it on screen for at least 1.5 s; Episodes 2 and 3 used 3.0 and held it for 0.95 s.
 - **Plant a new clue in a doorbell-cam frame at the end.** It must be *fair*: visible on a rewatch at phone size, and not obvious on first view. Supported mechanisms:
   - `alter_box`: mirror a region, so something has turned around.
   - `alter_glow`: light up a point, so something switched on.
