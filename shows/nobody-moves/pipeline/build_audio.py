@@ -29,6 +29,7 @@ import numpy as np
 import soundfile as sf
 
 import sounds as snd
+import words as wordtimes
 import stock
 from common import CTA_DELAY, MODELS, SHOW_DIR, doorbell_clock, load_episode
 from soundbank import Bank
@@ -144,6 +145,19 @@ def voice_line(who, say, rec):
     return stock.decode_audio(out, SR)  # resampled to the mix rate
 
 
+_phonemizers = {}
+
+
+def phonemizer(who):
+    """Word -> phonemes in the speaker's accent, for word timing (any provider's audio).
+    One function per accent, so words.weight's cache (keyed by it) is shared across lines."""
+    voice = ep.CAST[who].get("voice", "a")
+    lang = "en-us" if voice[0] == "a" else "en-gb"
+    if lang not in _phonemizers:
+        _phonemizers[lang] = lambda w: kokoro().tokenizer.phonemize(w, lang)
+    return _phonemizers[lang]
+
+
 # ---------------------------------------------------------------- mastering
 
 def master(raw_path, out_path):
@@ -186,8 +200,10 @@ def main():
             y = voice_line(who, say, rec)
             dur = len(y) / SR
             voice.append((t, y))
+            # when each caption word is spoken, for the renderer's word highlight
+            spoken = [[w, round(t + a, 3), round(t + b, 3)] for w, a, b in wordtimes.caption_times(y, SR, say, text, phonemizer(who))]
             captions.append({"start": round(t, 3), "end": round(t + dur, 3), "who": who, "text": text, "shot": shot["id"],
-                             "rec": rec, "recorded": bool(recording(rec))})
+                             "rec": rec, "recorded": bool(recording(rec)), "words": spoken})
             lines.append({"start": round(t, 3), "end": round(t + dur, 3), "text": text})
             t += dur
         t += shot.get("post", 0.0)

@@ -95,7 +95,8 @@ It exports the sounds as WAVs for the user. `typing_line`'s default text is NOBO
 - **Show-specific kinds:** `evidence` (EXHIBIT tag, flash, `annot_arrow`/`annot_circles`), `board` (cork, polaroids, red string) and `doorbell` (night vision, REC, frame numbers, `alter_box`/`alter_glow`/`lit`). Keep them if your format uses them, reskin them, or delete them. Model new kinds on them: a function `render_<kind>(shot, lt, fi, dur)` that returns an RGBA frame, with per-shot caches keyed by the shot id (a global cache made Episode 2's second doorbell reuse the first one's frames).
 - **Looks:** `apply_look` has `anon` and `longlens`. Add looks for the format, such as a news-cam grade or a nature-doc long lens.
 - **Palette and fonts:** `YELLOW (242, 194, 48)` and `RED (208, 52, 44)`. The fonts are Oswald, Inter, PlexMono, PermanentMarker and SpecialElite, from `assets/fonts/`. If you change fonts, change the downloads in `setup.sh` too (Google Fonts from `raw.githubusercontent.com/google/fonts/main/`, which is reachable).
-- **Caption splitter:** `caption_chunks` splits at sentence ends, with lookbehinds for `No.` and `Mr.`. Add your show's abbreviations (`Dr.`, `Mrs.`, `St.`), or "Dr. Pebble" becomes two captions.
+- **Caption splitter:** `split_words` breaks long captions at sentence ends, skipping the abbreviations in `ABBREV` (`No.`, `Mr.`, `Mrs.`, `Ms.`, `Dr.`, `St.`). Add your show's own, or "Sgt. Pebble" becomes two captions. `legacy_chunks` (for timelines built before word timing) has its own lookbehinds for `No.` and `Mr.`.
+- **Caption style:** `CAP_SIZE` (68 px), `CAP_Y` (1052) and `CAP_MAX_LINES` (2) keep captions above the name card at y 1262. The spoken word is drawn in `YELLOW`. Change them together if you move the name card.
 
 ### `pipeline/common.py`
 - The docstring names NOBODY MOVES.

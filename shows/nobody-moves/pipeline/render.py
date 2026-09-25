@@ -229,46 +229,140 @@ def bottom_gradient():
     return GRADIENT
 
 
+CAP_SIZE, CAP_LH, CAP_STROKE, CAP_W, CAP_X, CAP_Y = 68, 82, 8, 840, 500, 1052   # x left of TikTok's buttons
+CAP_MAX_LINES = 2          # keeps a caption clear of the name card at y 1262
+CAP_GAP = 4                # px added to each space: words are drawn one by one
+
+
+def cap_font():
+    return font("Inter", CAP_SIZE, "ExtraBold")
+
+
+SENTENCE_END = re.compile(r"[.?!]['\")]*$")
+CLAUSE_END = re.compile(r"[,;:\u2014\u2013]['\")]*$")
+ABBREV = re.compile(r"(No|Mr|Mrs|Ms|Dr|St)\.$")
+FUNCTION_WORDS = set("a an the of to for and but or nor in on at with by from into onto that this "
+                     "these those my your our their his her its is was were be been as than".split())
+
+
+def ends_sentence(word):
+    return bool(SENTENCE_END.search(word)) and not ABBREV.fullmatch(word)
+
+
+def split_words(words, cap_start, cap_end, long_caption, fits):
+    """Best split of one caption's timed words into chunks that each fit in two lines.
+    Cheapest wins: every chunk costs 1; a cut costs 0 at a sentence end (a bonus in a long caption,
+    as before), 0.3 at a comma, 1 mid-clause, and 2 after a word like "a" or "the" or inside a
+    name; a fragment of one or two words cut off from its phrase, or a chunk on screen under 0.7 s,
+    costs 2 more; a little extra evens out the lengths."""
+    n = len(words)
+    start = lambda i: cap_start if i == 0 else words[i][1]  # noqa: E731
+    end = lambda j: cap_end if j == n else words[j][1]      # noqa: E731
+    best, back = [0.0] + [float("inf")] * n, [0] * (n + 1)
+    for j in range(1, n + 1):
+        for i in range(j - 1, -1, -1):
+            ws = [w[0] for w in words[i:j]]
+            if not fits(ws) and j - i > 1:     # a single word always gets a chunk
+                break
+            cost = 1 + 0.3 * (len(" ".join(ws)) / 40) ** 2
+            if j < n:
+                cost += -1.2 if ends_sentence(ws[-1]) and long_caption else \
+                    0 if ends_sentence(ws[-1]) else 0.3 if CLAUSE_END.search(ws[-1]) else \
+                    2 if ws[-1].lower() in FUNCTION_WORDS else 1
+                if ws[-1][:1].isupper() and words[j][0][:1].isupper() and not ends_sentence(ws[-1]):
+                    cost += 1                  # don't split a name: "Birchwood / Court"
+            phrase = lambda w: ends_sentence(w) or CLAUSE_END.search(w)  # noqa: E731
+            if len(ws) <= 2 and not ((i == 0 or phrase(words[i - 1][0])) and (j == n or phrase(ws[-1]))):
+                cost += 2
+            if end(j) - start(i) < 0.7 and (i, j) != (0, n):
+                cost += 2
+            if best[i] + cost < best[j]:
+                best[j], back[j] = best[i] + cost, i
+    cuts, j = [], n
+    while j:
+        cuts.append((back[j], j))
+        j = back[j]
+    return [words[i:j] for i, j in reversed(cuts)]
+
+
 def caption_chunks():
-    """Split multi-sentence captions into timed chunks (time proportional to characters)."""
+    """Timed caption chunks. With word timings (build_audio's "words"), each chunk is at most two
+    lines, starts when its first word is spoken and highlights the current word. Older timelines
+    fall back to splitting by sentence, timed by length."""
     out = []
+    tmp = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    fits = lambda ws: len(wrap(tmp, " ".join(ws), cap_font(), CAP_W)) <= CAP_MAX_LINES  # noqa: E731
     for c in CAPTIONS:
-        text = c["text"]
-        parts = re.split(r"(?<!\bNo\.)(?<!\bMr\.)(?<=[.?!])\s+(?=[A-Z])", text)
-        if len(text) <= 40 or len(parts) == 1:
-            out.append(c)
+        words = c.get("words")
+        if not words:
+            out += legacy_chunks(c)
             continue
-        # merge tiny parts forward
-        merged = []
-        for p in parts:
-            if merged and len(merged[-1]) < 18:
-                merged[-1] += " " + p
-            else:
-                merged.append(p)
-        total = sum(len(p) for p in merged)
-        t = c["start"]
-        for p in merged:
-            d = (c["end"] - c["start"]) * len(p) / total
-            out.append(dict(c, start=t, end=t + d, text=p))
-            t += d
+        groups = split_words(words, c["start"], c["end"], len(c["text"]) > 40, fits)
+        for g, grp in enumerate(groups):
+            start = c["start"] if g == 0 else grp[0][1]
+            end = groups[g + 1][0][1] if g + 1 < len(groups) else c["end"]
+            out.append(dict(c, start=start, end=end, text=" ".join(w[0] for w in grp),
+                            words=[(w[0], w[1]) for w in grp]))
+    return out
+
+
+def legacy_chunks(c):
+    """Split a multi-sentence caption into chunks timed by length (timelines without word timings)."""
+    text = c["text"]
+    parts = re.split(r"(?<!\bNo\.)(?<!\bMr\.)(?<=[.?!])\s+(?=[A-Z])", text)
+    if len(text) <= 40 or len(parts) == 1:
+        return [c]
+    merged = []
+    for p in parts:
+        if merged and len(merged[-1]) < 18:
+            merged[-1] += " " + p
+        else:
+            merged.append(p)
+    total, t, out = sum(len(p) for p in merged), c["start"], []
+    for p in merged:
+        d = (c["end"] - c["start"]) * len(p) / total
+        out.append(dict(c, start=t, end=t + d, text=p))
+        t += d
     return out
 
 
 _cap_cache = {}
 
 
-def caption_image(text):
-    if text not in _cap_cache:
-        fnt = font("Inter", 58, "ExtraBold")
-        tmp = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
-        lines = wrap(tmp, text, fnt, 820)
-        lh = 72
-        im = Image.new("RGBA", (W, lh * len(lines) + 30), (0, 0, 0, 0))
+def caption_layout(text):
+    """Lines of (word, x) positions for a caption, centered on CAP_X."""
+    tmp = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+    fnt = cap_font()
+    space = tmp.textlength(" ", font=fnt) + CAP_GAP    # a little extra so the outlines don't touch
+    layout = []
+    for ln in wrap(tmp, text, fnt, CAP_W):
+        ws = ln.split()
+        widths = [tmp.textlength(w, font=fnt) for w in ws]
+        x = CAP_X - (sum(widths) + space * (len(ws) - 1)) / 2
+        row = []
+        for w, wd in zip(ws, widths):
+            row.append((w, x))
+            x += wd + space
+        layout.append(row)
+    return layout
+
+
+def caption_image(text, active=None):
+    """The caption in white; the word at index `active` (spoken now) in the show's yellow."""
+    key = (text, active)
+    if key not in _cap_cache:
+        fnt = cap_font()
+        layout = caption_layout(text)
+        im = Image.new("RGBA", (W, CAP_LH * len(layout) + 34), (0, 0, 0, 0))
         d = ImageDraw.Draw(im)
-        for i, ln in enumerate(lines):
-            d.text((500, 10 + i * lh), ln, font=fnt, fill=(255, 255, 255), anchor="ma", stroke_width=7, stroke_fill=(0, 0, 0))
-        _cap_cache[text] = im
-    return _cap_cache[text]
+        i = 0
+        for r, row in enumerate(layout):
+            for w, x in row:
+                d.text((x, 10 + r * CAP_LH), w, font=fnt, fill=YELLOW if i == active else (255, 255, 255),
+                       stroke_width=CAP_STROKE, stroke_fill=(0, 0, 0))
+                i += 1
+        _cap_cache[key] = im
+    return _cap_cache[key]
 
 
 def lower_third(name, sub, note):
@@ -304,7 +398,11 @@ def draw_lower_third(frame, shot, lt):
 def draw_caption(frame, t):
     for c in CHUNKS:
         if c["start"] - 0.02 <= t < c["end"] + 0.12:
-            frame.alpha_composite(caption_image(c["text"]), (0, 1052))
+            active = None
+            for i, (_, w0) in enumerate(c.get("words", [])):   # the last word to have started
+                if w0 - 0.02 <= t:
+                    active = i
+            frame.alpha_composite(caption_image(c["text"], active), (0, CAP_Y))
             return
 
 

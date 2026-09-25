@@ -97,7 +97,7 @@ It checks the TikTok copy (`--file master` checks the master), then compares the
 - end card.
 
 A beat the episode doesn't have is a gray "none" cell; a beat that lands on the same moment as an earlier one (Episode 3's music-out shot is its exhibit) reads "same as exhibit". Each run replaces the earlier sheets, so a sheet on disk is always from the latest run. Put cliff A and cliff B side by side to see the clue as a viewer comparing frames would. For each column, check:
-- **Same show:** the grade, fonts, caption style, lower thirds and doorbell HUD match the reference. A difference means a pipeline change leaked into the look.
+- **Same show:** the grade, fonts, caption style, lower thirds and doorbell HUD match the reference. A difference means a pipeline change leaked into the look. Captions are white at 68 px, at most two lines, with the spoken word in yellow. A reference rendered before the word highlight has smaller, all-white captions; re-render it before comparing.
 - **Text:** nothing clipped at the edges, and no caption colliding with a name card, arrow, circle or call to action.
 - **Hook:** the hook cell (0.6 s, once the name card has animated in) is a strong, readable close-up. A soft long-lens crop here means the hero still is missing: flag its prompt as the top priority.
 - **Payoff and cliffhanger:** the answer to last week's clue is visible in the payoff cell. The new clue is findable in the cliffhanger cells at this size but not obvious, and not under the call-to-action text.

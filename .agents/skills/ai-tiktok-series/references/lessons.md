@@ -60,7 +60,9 @@ Concrete problems hit while making the pilot and Episodes 2–3, and what fixed 
 ## Writing and runtime
 
 - **Runtimes run long.** Episode 3's draft was 111.37 s and shipped at 88.7 s. The cuts were narration that repeated what the screen already said ("the stamp already says 5:41 AM"), a narration beat folded into a character line, and one whole beat deleted. Trim lines; don't speed up voices. (The pilot was first brought under 90 s by speeding voices up; later episodes cut lines instead.)
-- **The caption splitter broke "No. 5" into two captions.** The split regex has lookbehinds for `No.` and `Mr.`. Add your show's abbreviations.
+- **The caption splitter broke "No. 5" into two captions.** The splitter now skips the abbreviations in `ABBREV` in `render.py`. Add your show's own.
+- **"Make the captions bigger and highlight the spoken word."** Kokoro reports no word timings, so `pipeline/words.py` measures them from each finished voice clip: the pauses at punctuation mark the phrases, and phoneme counts share out the time inside each one. At 68 px only about 20 characters fit on a line, so long captions split into two-line chunks. A greedy split left lone words on screen for 0.2 s ("hon.", "before."), so the split is a small cost search: sentence end, then comma, and no lone words, split names or flashes under 0.7 s.
+- **"AM" as "A.M." was read as two letters.** The pronunciation engine takes each period as a sentence break. Write abbreviations without periods in the spoken text.
 - **Text overflowed** on polaroid labels and board cards. Auto-fit the font size, and shorten the label ("LORRAINE (BETWEEN OUTFITS)" became "LORRAINE (NO BEE)").
 - **The preview showed stale labels.** The renderer reads shot fields from `build/timeline.json`, so re-run `build_audio.py` before previewing. Voices are cached, so it takes seconds.
 
