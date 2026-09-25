@@ -513,7 +513,7 @@ def render_qcard(shot, lt, fi, dur):
     span = dur * 0.6
     n = int(len(txt) * clamp((lt - 0.15) / span))
     fnt = font("SpecialElite", 70)
-    lines = wrap(d, txt, fnt, 860)
+    lines = wrap(d, txt, fnt, 780)            # centered, so lines end before x 930: clear of the apps' buttons
     d.text((W / 2, 760), "INTERVIEWER", font=font("PlexMono", 30), fill=(130, 130, 130), anchor="mm")
     y = 840
     shown = n
@@ -742,7 +742,10 @@ def render_end(shot, lt, fi, dur):
     a3 = int(255 * smooth((lt - 1.4) / 0.4))
     spaced_text(d, (W / 2, 690), ep.TITLE, font("Oswald", 116, "Bold"), (255, 255, 255, a1), 9)
     d.rectangle((W / 2 - 150, 870, W / 2 + 150, 874), fill=YELLOW + (a1,))
-    d.text((W / 2, 930), ep.NEXT_UP, font=font("Inter", 38, "Bold"), fill=YELLOW + (a2,), anchor="mm")
+    size = 38                                  # shrink a long "NEXT" line to end before x 930 (the apps' buttons)
+    while size > 26 and d.textlength(ep.NEXT_UP, font=font("Inter", size, "Bold")) > 780:
+        size -= 1
+    d.text((W / 2, 930), ep.NEXT_UP, font=font("Inter", size, "Bold"), fill=YELLOW + (a2,), anchor="mm")
     d.text((W / 2, 1020), "Follow the case.", font=font("Inter", 54, "ExtraBold"), fill=(255, 255, 255, a3), anchor="mm")
     d.text((W / 2, 1330), "Reenactments dramatized with AI.", font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a3), anchor="mm")
     d.text((W / 2, 1374), "The flamingo is real.", font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a3), anchor="mm")

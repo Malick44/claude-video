@@ -76,7 +76,7 @@ It checks the TikTok copy (`--file master` checks the master), then compares the
 | size | under 29 MB, in the decimal MB that `deliver.py` prints | `$PY pipeline/deliver.py episodes/<ep> --max-mb 28` |
 | black frames | no black stretch of 0.4 s or more, except question cards and the end card's fade from black | a missing still or a broken shot; find the stretch with `--grab` |
 | WARN call to action | each doorbell's call to action stays on screen 1.5 s or more | raise that shot's `"post"` (write skill). Episodes 2 and 3 hold the replay's for only 0.95 s |
-| PASS/WARN TikTok, Reels, Shorts | no text under that app's buttons, top bar or description (`pipeline/safezones.py`) | open `build/review/zones.png`: text under an app's UI is magenta. Move the camera (`kb`) or the element, per `nobody-moves-produce-episode` section 4. Episodes 1–3 warn on the board's index card, which ends at y 1553 under every app's description |
+| PASS/WARN TikTok, Reels, Shorts | no text under that app's buttons, top bar or description (`pipeline/safezones.py`) | open `build/review/zones.png`: text under an app's UI is magenta. Move the camera (`kb`) or the element, per `nobody-moves-produce-episode` section 4. Episodes 1–3 pass on all three |
 | info Reels ads | shots with text below y 1248, Meta's limit for sponsored Reels | nothing, for ordinary posts. Only matters if the user boosts a Reel |
 | loudness (info) | about −14 LUFS, true peak −1.0 to −1.2 dBFS after AAC | off by more than 1 LU means the soundtrack wasn't mastered: rebuild the audio |
 | ref (info) | "all file checks pass" for the reference | the reference's video doesn't match its timeline, so its beat grabs are misplaced: re-render it before comparing |
