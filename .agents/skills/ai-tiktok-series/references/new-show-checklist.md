@@ -31,6 +31,7 @@ These files are show-neutral. Don't touch them unless you have a reason.
 | `.gitignore`, `.env.example` | Ignore `.venv/`, `assets/`, `episodes/*/build/`, `sound_kit/`, `.env`; list the three stock-API keys. |
 | `pipeline/deliver.py` | Two-pass H.264 copy under `--max-mb 29` (default). |
 | `pipeline/grid.py` | Coordinate grid overlay: `grid.py <still> -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`. Without `-o` it writes next to the still, into the library you commit. |
+| `pipeline/safezones.py` | Renders sample moments with and without text and flags any text under TikTok's, Reels' or Shorts' UI (`ZONES`); `review.py` runs it. Writes `build/review/zones.png`. |
 | `pipeline/script_md.py` | Writes the timecoded `SCRIPT.md`, with the `ANSWER`, voices, recording names and credits. |
 | `pipeline/soundbank.py` (mechanism) | Resolves each named sound: synthesized, or stock per `soundtrack.py`. Edit `SYNTH`/`LOOPED` only when you rename or add sounds. |
 | `pipeline/build_audio.py` (voice path) | Recordings, then Kokoro or ElevenLabs. Pitch via rubberband, the "altered" chain, a trim at −45 dB, RMS at −17 dB per line, a cache keyed by line and settings, the timeline (`pre`, `post`, `min`), and `master()` (two-pass loudnorm to −14 LUFS, −1.5 dBTP). |

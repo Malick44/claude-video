@@ -1,6 +1,6 @@
 """Verify a rendered episode and review it side by side against another episode.
 
-  python pipeline/review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--json]
+  python pipeline/review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--no-zones] [--json]
   python pipeline/review.py episodes/<ep> --grab 12.5,40,81.2          # extra labelled frames, one sheet
 
 Reads <ep>/build/timeline.json and the rendered MP4 (the TikTok copy by default). Checks (exit 1 on any FAIL):
@@ -9,6 +9,8 @@ Reads <ep>/build/timeline.json and the rendered MP4 (the TikTok copy by default)
   FAIL  the TikTok copy is under 29 MB (decimal MB, as deliver.py prints it)
   FAIL  a black stretch (0.4 s or longer) outside question cards and the end card's fade-in
   WARN  a doorbell call to action on screen for less than 1.5 s (too short to read)
+  WARN  text under TikTok's, Instagram Reels' or YouTube Shorts' own buttons, top bar or description
+        (pipeline/safezones.py; writes build/review/zones.png; about 45 s, skip with --no-zones)
   info  the file's loudness (about -14 LUFS, true peak about -1.0 to -1.2 dBFS after AAC)
   info  pacing and structure: shots, shot lengths, when the title/payoff/first question land,
         words per minute, speech share, music-out shots, the shot the score builds to
@@ -29,6 +31,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+import safezones
 from common import CTA_DELAY, FONTS, doorbell_clock
 
 FPS = 30
@@ -332,6 +335,8 @@ def print_report(new, ref, which, out_dir):
     if new.get("loudness"):
         ln = new["loudness"]
         print(f"  info  loudness      {ln['lufs']} LUFS, true peak {ln['true_peak']} dBFS (encoded; about -14, peak -1.0 to -1.2)")
+    for status, text in new.get("zone_rows", []):
+        print(f"  {status:4s}  {text}")
     if ref:
         bad = [c["check"] for c in ref["checks"] if not c["ok"]]
         print(f"  ref   {ref['episode']}: {'all file checks pass' if not bad else 'FAILS ' + ', '.join(bad) + ' - its beat grabs may be misplaced; re-render it'}")
@@ -357,7 +362,7 @@ def print_report(new, ref, which, out_dir):
 
 
 def main(argv):
-    usage = "usage: review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--grab t1,t2,...] [--json]"
+    usage = "usage: review.py episodes/<ep> [--ref episodes/<ref>] [--file tiktok|master] [--grab t1,t2,...] [--no-zones] [--json]"
     if argv[:1] in (["-h"], ["--help"]):
         print(usage + "\n\n" + __doc__.strip())
         return 0
@@ -375,6 +380,10 @@ def main(argv):
     ref = review(argv[argv.index("--ref") + 1], which, with_black=False) if "--ref" in argv else None
     if ref and new["probe"]["exists"] and ref["probe"]["exists"]:
         new["sheets"] = beat_sheets(ref, new, out_dir)
+    if "--no-zones" not in argv:                           # rendered from the timeline, not read from the file
+        new["zones"] = safezones.check(argv[0], out_dir)
+        new["zone_rows"] = safezones.report_lines(new["zones"])
+        new.setdefault("sheets", []).append(new["zones"]["sheet"])
     new["report"] = os.path.join(out_dir, f"report_{which}" + (f"_vs_{ref['episode']}" if ref else "") + ".json")
     report = {"new": new, "ref": ref}
     for r in (new, ref):
@@ -383,12 +392,13 @@ def main(argv):
     with open(new["report"], "w") as f:
         json.dump(report, f, indent=1)
     failed = [c["check"] for c in new["checks"] if not c["ok"]]
+    warns = len(new["warnings"]) + sum(1 for status, _ in new.get("zone_rows", []) if status == "WARN")
     if "--json" in argv:
         print(json.dumps(report, indent=1))
     else:
         print_report(new, ref, which, out_dir)
         print(f"\nRESULT: {'FAIL - ' + ', '.join(failed) if failed else 'PASS'}"
-              + (f" ({len(new['warnings'])} warning{'s' if len(new['warnings']) != 1 else ''})" if new["warnings"] else ""))
+              + (f" ({warns} warning{'s' if warns != 1 else ''})" if warns else ""))
     return 1 if failed else 0
 
 

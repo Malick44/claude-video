@@ -189,3 +189,5 @@ The looped names (`theme`, `wind`, `chimes`, `crickets`) are looped with a cross
 ## Posting
 
 Turn on TikTok's **AI-generated** label, and pin a comment that points at the hidden clue without giving it away. Main episodes run over 60 seconds, which TikTok's Creator Rewards program requires.
+
+The same `_tiktok.mp4` works as an Instagram Reel and a YouTube Short. Turn on Instagram's "AI info" label and YouTube's "altered or synthetic content" setting, and keep the Reels description to one line so it doesn't cover the name cards. `pipeline/review.py` checks the on-screen text against all three apps' buttons, top bars and descriptions. It runs `pipeline/safezones.py`, which also works before the full render (`.venv/bin/python pipeline/safezones.py episodes/<ep>`), and writes `build/review/zones.png`. The full cross-posting notes are in `.agents/skills/ai-tiktok-series/references/posting-playbook.md`, under "Reels and Shorts".
