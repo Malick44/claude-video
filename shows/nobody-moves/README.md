@@ -36,7 +36,7 @@ To start a different show with this pipeline, use the **`ai-tiktok-series`** ski
 Just ask for "the next episode". By hand:
 
 1. Copy an episode folder, or the template at `.agents/skills/nobody-moves-write-episode/references/episode-template.py`, to `episodes/epNN_<name>/episode.py`.
-2. Reuse the **series library** in `stills/` (`garrison`, `porch`, `holes`, `yard_before`, `yard_after`, and the derived doorbell frame `yard_gone`); every episode can use it by key. Episode-only stills go in `episodes/<ep>/stills/`, and a still there overrides a library still with the same key. To generate new ones, use the style prompt in `SERIES.md`.
+2. Reuse the **series library** in `stills/` (`garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial`, `lorraine`, `chime`, `basin_counsel`, `ray`, and the derived doorbell frame `yard_gone`); every episode can use it by key. Episode-only stills go in `episodes/<ep>/stills/`, and a still there overrides a library still with the same key. To generate new ones, use the style prompt in `SERIES.md`.
 3. Edit `episode.py`: the title, `NEXT_UP`, `ANSWER`, `STILLS` (prompts for any new images) and the `SHOTS` list.
 4. Place coordinates with `.venv/bin/python pipeline/grid.py stills/<key>.webp -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`. It overlays a grid labeled in the same fractions `episode.py` uses. Always pass `-o`: without it the grid image lands next to the still, in the library.
 5. Check framing without a full render:

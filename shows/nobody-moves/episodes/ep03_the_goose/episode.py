@@ -93,11 +93,11 @@ SHOTS = [
             P(0.4),
             L("NARRATOR", "Frame 423.", "Frame four twenty-three."),
         ],
-        "post": 3.0, "sfx": ["crickets"],
+        "post": 3.6, "sfx": ["crickets"],
     },
     {
         "id": "ray", "kind": "still", "note": "Ray the solar frog under grey skies. Unlit.",
-        "views": [V("ray", (0.5, 0.55, 1.05), (0.5, 0.53, 1.2)),
+        "views": [V("ray", (0.42, 0.66, 1.4), (0.40, 0.665, 1.55)),   # Ray above the caption band
                   V("yard_after", (0.19, 0.775, 4.5), (0.19, 0.778, 5.0), "longlens")],
         "items": [
             L("NARRATOR", "Ray only lights up after a full day of sun."),

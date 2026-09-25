@@ -39,7 +39,7 @@ LORRAINE_VIEWS = [V("lorraine", (0.5, 0.5, 1.05), (0.5, 0.47, 1.22)),
                   V("yard_before", (0.744, 0.245, 3.0), (0.744, 0.25, 3.35), "longlens")]
 BASIN_VIEWS = [V("basin_counsel", (0.5, 0.55, 1.05), (0.5, 0.58, 1.25)),
                V("porch", (0.6, 0.64, 1.05), (0.63, 0.62, 1.32))]
-CHIME_VIEWS = [V("chime", (0.5, 0.45, 1.1), (0.5, 0.42, 1.3), "anon"),
+CHIME_VIEWS = [V("chime", (0.545, 0.44, 1.1), (0.6, 0.42, 1.3), "anon"),   # centered on the tubes
                V("porch", (0.86, 0.13, 3.0), (0.86, 0.12, 3.35), "anon")]
 BOARD_POLAROIDS = [
     ("yard_before", (0.478, 0.380, 0.829), "DEB (MOVED)", 0.50, 0.40, 620, -2.5, None),
@@ -174,7 +174,7 @@ SHOTS = [
     },
     {
         "id": "calm", "kind": "still", "note": "Same shot. The wind and chimes cut out. Silence.",
-        "views": [V("chime", (0.5, 0.42, 1.3), (0.5, 0.42, 1.32), "anon"),
+        "views": [V("chime", (0.6, 0.42, 1.3), (0.6, 0.42, 1.32), "anon"),
                   V("porch", (0.86, 0.12, 3.35), (0.86, 0.12, 3.4), "anon")],
         "items": [P(1.2), L("NARRATOR", "The wind stopped.")],
         "post": 0.9, "music": "out",

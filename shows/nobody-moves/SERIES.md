@@ -41,15 +41,12 @@ Append this to every image prompt so new stills match the existing ones:
 
 > Photorealistic, vertical 9:16. The same suburban house: grey vinyl siding, white porch railing and posts, black front door, brass lantern sconce, silver tubular wind chime, hostas and an echinacea flower bed. Dusk, blue hour or night. Shallow depth of field, muted teal-and-amber grade, fine film grain. No people, no text.
 
-The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
+The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial` (the cul-de-sac from above, behind every title card), `lorraine` (her interview close-up), `chime`, `basin_counsel` (Mr. Basin with his briefcase), `ray` (under grey skies), and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
 
-Still wanted for the library (episodes use crop fallbacks until these exist; the full prompts are in `episodes/ep02_i_was_right_here/episode.py`, `STILLS`):
-- **`lorraine`:** a close-up of the goose on the porch step, beak pointing to frame-left, framed like a documentary interview at 85mm.
-- **`chime`:** the wind chime backlit by the porch light, as a silhouette.
-- **`basin_counsel`:** Mr. Basin with a tiny briefcase against his pedestal (Eps. 2 and 3).
-- **`aerial`** and **`cork`:** the user has generated these, but they still need to be sent as files and saved into `stills/`. There's no written prompt for either (Ep. 1 only notes "OPTIONAL drone shot of the cul-de-sac").
-- **`ray`:** the solar frog at the lawn edge under an overcast dusk sky (prompt in `episodes/ep03_the_goose/episode.py`). He testifies in Ep. 4, which will also want a lit, night version.
-- Ep. 3 only: **`lorraine_bee`** and **`lorraine_easter`**, the same close-up in two outfits. The episode's central sight gag; without them, the name cards carry it.
+Stills still wanted (episodes use crop fallbacks until these exist):
+- **`cork`:** the evidence board's cork background. The user has generated it; it needs to arrive as a file. Until then the board is drawn.
+- Ep. 3 only: **`lorraine_bee`** and **`lorraine_easter`**, the `lorraine` close-up in two outfits (prompts in `episodes/ep03_the_goose/episode.py`). The user has generated both; they need to arrive as files. They're the episode's central sight gag; until then the plain `lorraine` close-up and the name cards carry it.
+- Ep. 4: a lit, night version of `ray` for his testimony.
 
 ## Clue ledger (continuity)
 
