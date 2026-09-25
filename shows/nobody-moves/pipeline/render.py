@@ -17,7 +17,7 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from common import FONTS, load_episode
+from common import CTA_DELAY, FONTS, SHOW_DIR, doorbell_clock, fmt_clock, load_episode
 
 W, H, FPS = 1080, 1920, 30
 YELLOW = (242, 194, 48)
@@ -112,10 +112,12 @@ def placeholder(key):
 
 
 def still_path(key):
-    for ext in ("png", "jpg", "jpeg", "webp"):
-        p = os.path.join(STILLS_DIR, f"{key}.{ext}")
-        if os.path.exists(p):
-            return p
+    """The episode's own still, else the series library in <show>/stills/ (recurring sets and cast)."""
+    for folder in (STILLS_DIR, os.path.join(SHOW_DIR, "stills")):
+        for ext in ("png", "jpg", "jpeg", "webp"):
+            p = os.path.join(folder, f"{key}.{ext}")
+            if os.path.exists(p):
+                return p
     return None
 
 
@@ -446,7 +448,10 @@ def polaroid(key, crop, label, size, rot, look=None):
     card = Image.new("RGBA", (size + 2 * pad, size + pad + bottom), (236, 232, 222, 255))
     card.paste(ph, (pad, pad))
     d = ImageDraw.Draw(card)
-    d.text((card.width / 2, size + pad + bottom * 0.52), label, font=font("PermanentMarker", int(size * 0.13)), fill=(30, 30, 40), anchor="mm")
+    fs = int(size * 0.13)
+    while fs > 12 and d.textlength(label, font=font("PermanentMarker", fs)) > card.width - 2 * pad:
+        fs -= 2
+    d.text((card.width / 2, size + pad + bottom * 0.52), label, font=font("PermanentMarker", fs), fill=(30, 30, 40), anchor="mm")
     return card.rotate(rot, resample=Image.BICUBIC, expand=True)
 
 
@@ -473,8 +478,8 @@ def procedural_cork():
 
 
 def board_sources(shot):
-    if _board:
-        return _board
+    if shot["id"] in _board:
+        return _board[shot["id"]]
     cork = (source("cork") if still_path("cork") else procedural_cork()).copy().convert("RGBA")
     sw, sh = cork.size
     lum = np.asarray(cork.convert("L"), dtype=np.float32) / 255.0
@@ -511,7 +516,11 @@ def board_sources(shot):
     for yy in range(95, 330, 56):
         dc.line((0, yy, 1180, yy), fill=(150, 180, 220, 255), width=3)
     dc.line((0, 70, 1180, 70), fill=(220, 90, 90, 255), width=3)
-    dc.text((590, 190), "WHO MOVED DEB?", font=font("PermanentMarker", 100), fill=(20, 20, 30, 255), anchor="mm")
+    text = shot.get("card", "WHO MOVED DEB?")
+    size = 100
+    while size > 50 and dc.textlength(text, font=font("PermanentMarker", size)) > 1080:
+        size -= 4
+    dc.text((590, 190), text, font=font("PermanentMarker", size), fill=(20, 20, 30, 255), anchor="mm")
     card = card.rotate(-4, resample=Image.BICUBIC, expand=True)
     with_card = no_card.copy()
     cx, cy = int(0.50 * sw - card.width / 2), int(0.72 * sh - card.height / 2)
@@ -521,9 +530,8 @@ def board_sources(shot):
     with_card.alpha_composite(card, (cx, cy))
     dp = ImageDraw.Draw(with_card)
     dp.ellipse((sw * 0.5 - 22, cy + 18, sw * 0.5 + 22, cy + 62), fill=(190, 30, 30, 255))
-    _board["a"] = no_card.convert("RGB")
-    _board["b"] = with_card.convert("RGB")
-    return _board
+    _board[shot["id"]] = {"a": no_card.convert("RGB"), "b": with_card.convert("RGB")}
+    return _board[shot["id"]]
 
 
 def render_board(shot, lt, fi, dur):
@@ -546,20 +554,38 @@ def night_vision(src):
     return Image.fromarray(np.clip(np.stack([g * 0.86, g * 1.0, g * 0.88], -1), 0, 255).astype(np.uint8))
 
 
+def glow(img, gx, gy, gr):
+    """A light at (gx, gy) (fractions of the image), radius gr (fraction of the width)."""
+    cx, cy, rad = gx * img.width, gy * img.height, gr * img.width
+    yy, xx = np.mgrid[0:img.height, 0:img.width].astype(np.float32)
+    g = np.exp(-(((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)))[..., None]
+    arr = np.asarray(img, dtype=np.float32)
+    return Image.fromarray(np.clip(arr + g * 235 * np.array([0.86, 1.0, 0.88]), 0, 255).astype(np.uint8))
+
+
 def door_sources(shot):
-    if _door:
-        return _door
+    """Night-vision frames A and B. Frame B carries the hidden clue:
+    alter_box (x0, y0, x1, y1) mirrors that region (something turned around);
+    alter_glow (x, y, r) lights up a point (something switched on).
+    lit [(x, y, r), ...] are lights already on in both frames (continuity, not a clue)."""
+    if shot["id"] in _door:
+        return _door[shot["id"]]
     a = night_vision(source(shot["frame_a"]))
     b = night_vision(source(shot["frame_b"]))
-    x0, y0, x1, y1 = shot["alter_box"]
-    box = (int(x0 * b.width), int(y0 * b.height), int(x1 * b.width), int(y1 * b.height))
-    region = b.crop(box).transpose(Image.FLIP_LEFT_RIGHT)
-    mask = Image.new("L", region.size, 0)
-    ImageDraw.Draw(mask).rounded_rectangle((6, 4, region.width - 6, region.height - 4), radius=18, fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(4))
-    b.paste(region, box[:2], mask)
-    _door["a"], _door["b"] = a, b
-    return _door
+    for gx, gy, gr in shot.get("lit", []):
+        a, b = glow(a, gx, gy, gr), glow(b, gx, gy, gr)
+    if shot.get("alter_box"):
+        x0, y0, x1, y1 = shot["alter_box"]
+        box = (int(x0 * b.width), int(y0 * b.height), int(x1 * b.width), int(y1 * b.height))
+        region = b.crop(box).transpose(Image.FLIP_LEFT_RIGHT)
+        mask = Image.new("L", region.size, 0)
+        ImageDraw.Draw(mask).rounded_rectangle((6, 4, region.width - 6, region.height - 4), radius=18, fill=255)
+        mask = mask.filter(ImageFilter.GaussianBlur(4))
+        b.paste(region, box[:2], mask)
+    if shot.get("alter_glow"):
+        b = glow(b, *shot["alter_glow"])
+    _door[shot["id"]] = {"a": a, "b": b}
+    return _door[shot["id"]]
 
 
 def render_doorbell(shot, lt, fi, dur):
@@ -567,13 +593,14 @@ def render_doorbell(shot, lt, fi, dur):
     fl = shot["flicker_at"] - shot["start"]
     phase = int((lt - fl) / 0.3) if lt >= fl else -1
     paused = phase >= 6
+    base, jump = doorbell_clock(shot)
+    frame_a, frame_b = shot.get("frames", (417, 418))
     if phase < 0:
-        total = shot["clock_start"] + int(lt)
-        use_b = total >= 60
-        clock = f"03:{11 + total // 60:02d}:{total % 60:02d}"
+        use_b = lt >= jump
+        clock = fmt_clock(base + int(lt))
     else:
         use_b = phase % 2 == 1 or paused
-        clock = "03:12:00" if use_b else "03:11:59"
+        clock = fmt_clock(base + jump if use_b else base + jump - 1)
     frame, _, _ = kb_view(ds["b"] if use_b else ds["a"], shot["kb"], lt / dur)
     frame = grade(frame, fi, grain=15, extra=lambda a: a * SCANLINES).convert("RGBA")
     frame.alpha_composite(bottom_gradient())
@@ -586,23 +613,23 @@ def render_doorbell(shot, lt, fi, dur):
         d.text((114, 200), "REC", font=mono, fill=(255, 255, 255))
     else:
         d.text((114, 200), "REC", font=mono, fill=(255, 255, 255))
-    d.text((W - 70, 200), "FRONT DOOR · NO. 5", font=mono, fill=(255, 255, 255), anchor="ra")
-    d.text((70, 252), f"06/14/2026  {clock} AM", font=mono, fill=(255, 255, 255))
+    d.text((W - 70, 200), shot.get("camera", "FRONT DOOR · NO. 5"), font=mono, fill=(255, 255, 255), anchor="ra")
+    d.text((70, 252), f"{shot.get('date', '06/14/2026')}  {clock} AM", font=mono, fill=(255, 255, 255))
     if phase >= 0:
-        d.text((W - 70, 252), f"FRAME {418 if use_b else 417}", font=mono, fill=YELLOW, anchor="ra")
-    cta_t = fl + 1.9
+        d.text((W - 70, 252), f"FRAME {frame_b if use_b else frame_a}", font=mono, fill=YELLOW, anchor="ra")
+    cta_t = fl + CTA_DELAY
     a = smooth((lt - cta_t) / 0.3)
     if a > 0:
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         do = ImageDraw.Draw(ov)
         f1 = font("Oswald", 66, "Bold")
         y = 1040
-        for ln in ("SOMETHING ELSE IN", "THIS FRAME MOVED."):
+        for ln in shot.get("cta", ("SOMETHING ELSE IN", "THIS FRAME MOVED.")):
             tw = do.textlength(ln, font=f1)
             do.rectangle((500 - tw / 2 - 22, y - 6, 500 + tw / 2 + 22, y + 86), fill=YELLOW + (255,))
             do.text((500, y + 40), ln, font=f1, fill=(15, 15, 15, 255), anchor="mm")
             y += 92
-        do.text((500, y + 40), "Comment the object + timestamp ↓", font=font("Inter", 42, "ExtraBold"), fill=(255, 255, 255, 255), anchor="mm", stroke_width=6, stroke_fill=(0, 0, 0, 255))
+        do.text((500, y + 40), shot.get("cta_sub", "Comment the object + timestamp ↓"), font=font("Inter", 42, "ExtraBold"), fill=(255, 255, 255, 255), anchor="mm", stroke_width=6, stroke_fill=(0, 0, 0, 255))
         frame.alpha_composite(with_alpha(ov, a))
     return frame
 
@@ -654,6 +681,25 @@ def render(t, fi):
     return frame.convert("RGB")
 
 
+def report_fallbacks():
+    """Every shot that isn't using its first-choice still, and every still that will draw as a placeholder."""
+    fb, ph = [], []
+    for s in SHOTS:
+        if s.get("views"):
+            v = pick_view(s)
+            if not still_path(v["img"]):
+                ph.append(f'{s["id"]} ({s["views"][0]["img"]})')
+            elif v is not s["views"][0]:
+                skipped = [w["img"] for w in s["views"][: s["views"].index(v)]]
+                fb.append(f'{s["id"]}: {", ".join(skipped)} -> {v["img"]}')
+        keys = [s.get("frame_a"), s.get("frame_b")] + [p[0] for p in s.get("polaroids", [])]
+        ph += [f'{s["id"]} ({k})' for k in keys if k and not still_path(k)]
+    if fb:
+        print("fallback views (shot: missing stills -> used):", "; ".join(fb))
+    if ph:
+        print("PLACEHOLDERS (no still found):", "; ".join(ph))
+
+
 def main(argv):
     if not argv or argv[0].startswith("--"):
         sys.exit("usage: render.py episodes/<episode> [--preview t1,t2,... | --contact]")
@@ -661,9 +707,10 @@ def main(argv):
     argv = argv[1:]
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
-    missing = [k for k in ep.STILLS if not still_path(k)]
+    missing = [k for k in getattr(ep, "STILLS", {}) if not still_path(k)]
     if missing:
         print("not provided (using fallbacks):", ", ".join(missing))
+    report_fallbacks()
     if "--preview" in argv:
         ts = [float(x) for x in argv[argv.index("--preview") + 1].split(",")]
         for t in ts:
@@ -671,14 +718,22 @@ def main(argv):
         return
     if "--contact" in argv:
         thumbs = []
+        label = ImageFont.truetype(os.path.join(FONTS, "Inter.ttf"), 20)
         for s in SHOTS:
             t = s["start"] + (s["end"] - s["start"]) * 0.75
-            thumbs.append(render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS))
+            if s["kind"] == "doorbell" and s.get("flicker_at"):   # the paused clue frame, not mid-flicker
+                t = min(s["end"] - 1.0 / FPS, s["flicker_at"] + CTA_DELAY + 0.6)
+            im = render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS)
+            d = ImageDraw.Draw(im)
+            d.rectangle((0, 0, 270, 30), fill=(0, 0, 0))
+            d.text((6, 4), f'{s["id"]}  {t:.2f}s', font=label, fill=(242, 194, 48))
+            thumbs.append(im)
         cols = 7
         sheet = Image.new("RGB", (cols * 270, math.ceil(len(thumbs) / cols) * 480), (0, 0, 0))
         for i, im in enumerate(thumbs):
             sheet.paste(im, ((i % cols) * 270, (i // cols) * 480))
         sheet.save(os.path.join(BUILD, "contact.png"))
+        print("wrote", os.path.join(BUILD, "contact.png"))
         return
     out = os.path.join(BUILD, f"{ep.SLUG}.mp4")
     n = int(math.ceil(TOTAL * FPS))

@@ -139,7 +139,7 @@ SHOTS = [
     },
     {
         "id": "chime", "note": 'ANONYMOUS SOURCE: the wind chime, blurred and cold-graded to hide its identity. Voice disguised, wind chimes underneath.', "kind": "still",
-        "views": [V("chime", (0.5, 0.45, 1.1), (0.5, 0.42, 1.3), "anon"),
+        "views": [V("chime", (0.545, 0.44, 1.1), (0.6, 0.42, 1.3), "anon"),   # centered on the tubes
                   V("porch", (0.86, 0.13, 3.0), (0.86, 0.12, 3.35), "anon")],
         "items": [
             P(0.4),
@@ -186,7 +186,7 @@ SHOTS = [
         "alter_box": (0.7163, 0.2129, 0.7800, 0.2787),
         "items": [
             L("NARRATOR", "At 3:12 AM, the doorbell camera at No. 5 captured this.",
-              "At three twelve A.M., the doorbell camera at number five captured this."),
+              "At three twelve AM, the doorbell camera at number five captured this."),
             P(0.5),
             L("NARRATOR", "Look closer."),
         ],
