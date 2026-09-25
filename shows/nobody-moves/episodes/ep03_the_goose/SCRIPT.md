@@ -1,6 +1,6 @@
 # NOBODY MOVES, Episode 3: "The Goose"
 
-Runtime: **89.3s**, 9:16 vertical, 1080×1920 at 30 fps.
+Runtime: **89.0s**, 9:16 vertical, 1080×1920 at 30 fps.
 
 **Cliffhanger answer (don't post this):** In frame 428 (03:12:16) the porch step is empty: Lorraine is gone. She is there in frame 427 a second earlier (and in frame 423). The goose who 'doesn't go anywhere' left the porch 16 seconds after Deb moved. Pays off in Episode 5, 'Saturday'.
 
@@ -116,22 +116,22 @@ Mr. Basin, through counsel.
 
 **NARRATOR** (1:05.87) · record as `basin_2`: There is no judge.
 
-### 1:07.68–1:16.39 · BOARD
+### 1:07.68–1:16.09 · BOARD
 EVIDENCE BOARD, updated: Lorraine (NO BEE), Ray (AWAKE).
 
 **NARRATOR** (1:07.68) · record as `board_1`: At 3:12 AM, someone moved Deb.
 
-**NARRATOR** (1:11.19) · record as `board_2`: And someone keeps changing the goose.
+**NARRATOR** (1:10.89) · record as `board_2`: And someone keeps changing the goose.
 
-**NARRATOR** (1:13.97) · record as `board_3`: What if it's the same someone?
+**NARRATOR** (1:13.67) · record as `board_3`: What if it's the same someone?
 
-### 1:16.39–1:25.70 · DOORBELL
+### 1:16.09–1:25.39 · DOORBELL
 DOORBELL CAM, a few seconds later. Jump cut to frame 428; on 'Frame 428' the frames flicker. In 428 the porch step is empty: Lorraine is gone. Pauses on 'SOMEONE WASN'T RIGHT HERE.'
 
-**NARRATOR** (1:16.39) · record as `doorbell_1`: Everyone on Birchwood Court says they were right here.
+**NARRATOR** (1:16.09) · record as `doorbell_1`: Everyone on Birchwood Court says they were right here.
 
-**NARRATOR** (1:20.16) · record as `doorbell_2`: Frame 428.
+**NARRATOR** (1:19.85) · record as `doorbell_2`: Frame 428.
 
-### 1:25.70–1:29.30 · END
+### 1:25.39–1:28.99 · END
 END CARD: title, next episode, 'Follow the case.', AI disclaimer.
 
