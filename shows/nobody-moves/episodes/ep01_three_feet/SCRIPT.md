@@ -1,6 +1,6 @@
 # NOBODY MOVES, Episode 1: "Three Feet"
 
-Runtime: **80.1s**, 9:16 vertical, 1080×1920 at 30 fps.
+Runtime: **79.8s**, 9:16 vertical, 1080×1920 at 30 fps.
 
 **Cliffhanger answer (don't post this):** In frame 418 Lorraine the porch goose has turned to face the other way. Deb's jump is the obvious change; the goose is the hidden one - the same goose who said "Where would I go? I'm concrete."
 
@@ -111,13 +111,13 @@ EVIDENCE BOARD: polaroids of every witness joined by red string to Deb. On the l
 
 **NARRATOR** (1:04.42) · record as `board_3`: who moved Deb?
 
-### 1:06.25–1:16.49 · DOORBELL
+### 1:06.25–1:16.24 · DOORBELL
 DOORBELL CAM, night vision. The clock ticks 03:11:56 to 59. At 03:12:00 Deb has jumped three feet, with nobody seen moving her. On "Look closer," frames 417 and 418 flicker back and forth; in 418 Lorraine the goose has turned around. The footage pauses on "SOMETHING ELSE IN THIS FRAME MOVED. Comment the object + timestamp."
 
 **NARRATOR** (1:06.25) · record as `doorbell_1`: At 3:12 AM, the doorbell camera at No. 5 captured this.
 
-**NARRATOR** (1:11.39) · record as `doorbell_2`: Look closer.
+**NARRATOR** (1:11.14) · record as `doorbell_2`: Look closer.
 
-### 1:16.49–1:20.09 · END
+### 1:16.24–1:19.84 · END
 END CARD: title, next episode, "Follow the case." Disclaimer: "Reenactments dramatized with AI. The flamingo is real."
 

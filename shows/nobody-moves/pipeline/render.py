@@ -554,14 +554,26 @@ def night_vision(src):
     return Image.fromarray(np.clip(np.stack([g * 0.86, g * 1.0, g * 0.88], -1), 0, 255).astype(np.uint8))
 
 
+def glow(img, gx, gy, gr):
+    """A light at (gx, gy) (fractions of the image), radius gr (fraction of the width)."""
+    cx, cy, rad = gx * img.width, gy * img.height, gr * img.width
+    yy, xx = np.mgrid[0:img.height, 0:img.width].astype(np.float32)
+    g = np.exp(-(((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)))[..., None]
+    arr = np.asarray(img, dtype=np.float32)
+    return Image.fromarray(np.clip(arr + g * 235 * np.array([0.86, 1.0, 0.88]), 0, 255).astype(np.uint8))
+
+
 def door_sources(shot):
     """Night-vision frames A and B. Frame B carries the hidden clue:
     alter_box (x0, y0, x1, y1) mirrors that region (something turned around);
-    alter_glow (x, y, r) lights up a point (something switched on)."""
+    alter_glow (x, y, r) lights up a point (something switched on).
+    lit [(x, y, r), ...] are lights already on in both frames (continuity, not a clue)."""
     if shot["id"] in _door:
         return _door[shot["id"]]
     a = night_vision(source(shot["frame_a"]))
     b = night_vision(source(shot["frame_b"]))
+    for gx, gy, gr in shot.get("lit", []):
+        a, b = glow(a, gx, gy, gr), glow(b, gx, gy, gr)
     if shot.get("alter_box"):
         x0, y0, x1, y1 = shot["alter_box"]
         box = (int(x0 * b.width), int(y0 * b.height), int(x1 * b.width), int(y1 * b.height))
@@ -571,12 +583,7 @@ def door_sources(shot):
         mask = mask.filter(ImageFilter.GaussianBlur(4))
         b.paste(region, box[:2], mask)
     if shot.get("alter_glow"):
-        gx, gy, gr = shot["alter_glow"]
-        cx, cy, rad = gx * b.width, gy * b.height, gr * b.width
-        yy, xx = np.mgrid[0:b.height, 0:b.width].astype(np.float32)
-        glow = np.exp(-(((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)))[..., None]
-        arr = np.asarray(b, dtype=np.float32)
-        b = Image.fromarray(np.clip(arr + glow * 235 * np.array([0.86, 1.0, 0.88]), 0, 255).astype(np.uint8))
+        b = glow(b, *shot["alter_glow"])
     _door[shot["id"]] = {"a": a, "b": b}
     return _door[shot["id"]]
 
@@ -674,6 +681,25 @@ def render(t, fi):
     return frame.convert("RGB")
 
 
+def report_fallbacks():
+    """Every shot that isn't using its first-choice still, and every still that will draw as a placeholder."""
+    fb, ph = [], []
+    for s in SHOTS:
+        if s.get("views"):
+            v = pick_view(s)
+            if not still_path(v["img"]):
+                ph.append(f'{s["id"]} ({s["views"][0]["img"]})')
+            elif v is not s["views"][0]:
+                skipped = [w["img"] for w in s["views"][: s["views"].index(v)]]
+                fb.append(f'{s["id"]}: {", ".join(skipped)} -> {v["img"]}')
+        keys = [s.get("frame_a"), s.get("frame_b")] + [p[0] for p in s.get("polaroids", [])]
+        ph += [f'{s["id"]} ({k})' for k in keys if k and not still_path(k)]
+    if fb:
+        print("fallback views (shot: missing stills -> used):", "; ".join(fb))
+    if ph:
+        print("PLACEHOLDERS (no still found):", "; ".join(ph))
+
+
 def main(argv):
     if not argv or argv[0].startswith("--"):
         sys.exit("usage: render.py episodes/<episode> [--preview t1,t2,... | --contact]")
@@ -684,6 +710,7 @@ def main(argv):
     missing = [k for k in getattr(ep, "STILLS", {}) if not still_path(k)]
     if missing:
         print("not provided (using fallbacks):", ", ".join(missing))
+    report_fallbacks()
     if "--preview" in argv:
         ts = [float(x) for x in argv[argv.index("--preview") + 1].split(",")]
         for t in ts:
@@ -691,14 +718,22 @@ def main(argv):
         return
     if "--contact" in argv:
         thumbs = []
+        label = ImageFont.truetype(os.path.join(FONTS, "Inter.ttf"), 20)
         for s in SHOTS:
             t = s["start"] + (s["end"] - s["start"]) * 0.75
-            thumbs.append(render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS))
+            if s["kind"] == "doorbell" and s.get("flicker_at"):   # the paused clue frame, not mid-flicker
+                t = min(s["end"] - 1.0 / FPS, s["flicker_at"] + CTA_DELAY + 0.6)
+            im = render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS)
+            d = ImageDraw.Draw(im)
+            d.rectangle((0, 0, 270, 30), fill=(0, 0, 0))
+            d.text((6, 4), f'{s["id"]}  {t:.2f}s', font=label, fill=(242, 194, 48))
+            thumbs.append(im)
         cols = 7
         sheet = Image.new("RGB", (cols * 270, math.ceil(len(thumbs) / cols) * 480), (0, 0, 0))
         for i, im in enumerate(thumbs):
             sheet.paste(im, ((i % cols) * 270, (i // cols) * 480))
         sheet.save(os.path.join(BUILD, "contact.png"))
+        print("wrote", os.path.join(BUILD, "contact.png"))
         return
     out = os.path.join(BUILD, f"{ep.SLUG}.mp4")
     n = int(math.ceil(TOTAL * FPS))

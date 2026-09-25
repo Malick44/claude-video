@@ -17,7 +17,7 @@ Agent Skills package that gives an agent a video input. Installable across Claud
 - `CLAUDE.md` → `@AGENTS.md` — generic-agent entry point.
 - `tests/` — pytest suite (ffmpeg-synthesized clips; no network).
 - `platform/` — separate Next.js competitor content-intelligence app (Apify ingest, outlier scoring, multimodal analysis, dashboard). Independent of the skill; see `platform/README.md`. Tests: `cd platform && npm test`.
-- `shows/nobody-moves/` — TikTok series production pipeline (still images → Ken Burns + TTS voices + synthesized score → 1080×1920 MP4). Independent of the skill; one folder per episode under `episodes/`. See `shows/nobody-moves/README.md`. Project skills `nobody-moves-write-episode` and `nobody-moves-produce-episode` (in `.agents/skills/`, symlinked from `.claude/skills/`) drive it.
+- `shows/nobody-moves/` — TikTok series production pipeline (still images → Ken Burns + TTS voices + synthesized score → 1080×1920 MP4). Independent of the skill; one folder per episode under `episodes/`. See `shows/nobody-moves/README.md`. Project skills `nobody-moves-write-episode`, `nobody-moves-produce-episode`, `nobody-moves-render` and `nobody-moves-sound-design` (in `.agents/skills/`, symlinked from `.claude/skills/`) drive it; the `nobody-moves-renderer` subagent (`.claude/agents/`) preloads the render skill. `pipeline/mixcheck.py` measures a built episode's mix, and `pipeline/review.py` verifies a rendered video and compares it with another episode. The `ai-tiktok-series` skill scaffolds a new show from it under `shows/<slug>/`. For episodes the pipeline builds, sound changes go through `nobody-moves-sound-design`, not `cinematic-sound-designer` (build_audio.py regenerates all episode audio).
 
 ## Orientation
 

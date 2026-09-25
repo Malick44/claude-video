@@ -1,6 +1,6 @@
 """Export the show's sounds as WAV files (for CapCut, Confessionals, trailers...).
 
-  python pipeline/sound_kit.py            # -> sound_kit/*.wav (48 kHz stereo, peaks at -1 dBFS)
+  python pipeline/sound_kit.py            # -> sound_kit/*.wav (48 kHz, mono or stereo as generated, peaks at -1 dBFS)
 
 Each sound comes from the same place the episodes use (soundtrack.py): synthesized by
 pipeline/sounds.py, which is deterministic, or the pinned stock asset it points at.

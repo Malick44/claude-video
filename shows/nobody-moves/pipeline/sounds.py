@@ -201,7 +201,8 @@ def string_pad(total, start_at=0.0):
                  + 0.4 * _ensemble((chord[0] - 12,), tt, (-4, 0, 5), ("cello", k))
                  + 0.3 * _ensemble(tuple(x + 12 for x in chord[1:]), tt, (-7, 0, 8), ("violins", k)))
         env = np.minimum(1, tt / 1.2) * np.minimum(1, np.maximum(0, (seg_len - tt) / 1.5))
-        y[s0: s0 + len(tt)] += voice * env
+        seg = (voice * env)[: len(y) - s0]   # int() rounding can leave one sample less room
+        y[s0: s0 + len(seg)] += seg
         pos += bar
         k += 1
     y = highpass(lowpass(y, 2600, 2), 70, 1)

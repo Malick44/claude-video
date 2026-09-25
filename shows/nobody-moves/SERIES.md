@@ -30,10 +30,10 @@ The voices are defined in [`cast.py`](cast.py) and shared by every episode.
 | Narrator | A serious true-crime narrator | `bm_george` |
 | **Garrison** | Gruff and defensive. "Thirty-one years on the lawn." Says he was facing the other way. | `am_fenrir`, pitched down |
 | **Deb** | Plastic pink flamingo, unharmed. "Condition: unharmed. Position: wrong." Doesn't speak (yet). | none |
-| **Lorraine** | Warm, unbothered, calls everyone "hon". Insists she can't go anywhere because she's concrete. Her outfit is "seasonal". | `af_bella` |
+| **Lorraine** | Warm, unbothered, calls everyone "hon". Insists she can't go anywhere because she's concrete. Her outfit is "seasonal", and it changes between cuts ("I don't pick them"). When cornered, "hon" becomes "detective". | `af_bella` |
 | **Mr. Basin** | Declines to comment. Represents himself ("My client has no comment"). Has never lost a case, and has never had one. | `bm_lewis`, pitched down (from Ep. 2) |
 | **The wind chime** | Anonymous source, voice altered. Only talks when it's windy. | `af_nicole`, disguised |
-| **Ray** | Solar frog. Can only talk after a full day of sun. | not cast yet |
+| **Ray** | Solar frog. Can only talk after a full day of sun. It has been cloudy since the interview request (day 9 in Ep. 3). | not cast yet (suggestion in `cast.py`) |
 
 ## Image style
 
@@ -41,12 +41,11 @@ Append this to every image prompt so new stills match the existing ones:
 
 > Photorealistic, vertical 9:16. The same suburban house: grey vinyl siding, white porch railing and posts, black front door, brass lantern sconce, silver tubular wind chime, hostas and an echinacea flower bed. Dusk, blue hour or night. Shallow depth of field, muted teal-and-amber grade, fine film grain. No people, no text.
 
-The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`. Every episode can use it.
+The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial` (the cul-de-sac from above, behind every title card), `lorraine` (her interview close-up), `chime`, `basin_counsel` (Mr. Basin with his briefcase), `ray` (under grey skies), `lorraine_bee` and `lorraine_easter` (the `lorraine` close-up in two of her outfits), `cork` (the evidence board), and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
 
-Still wanted for the library (episodes use crop fallbacks until these exist; the full prompts are in `episodes/ep02_i_was_right_here/episode.py`, `STILLS`):
-- **`lorraine`:** a close-up of the goose on the porch step, beak pointing to frame-left, framed like a documentary interview at 85mm.
-- **`chime`:** the wind chime backlit by the porch light, as a silhouette.
-- **`aerial`** and **`cork`:** the user has generated these, but they still need to be sent as files and saved into `stills/`.
+Stills still wanted:
+- Ep. 4: a lit, night version of `ray` for his testimony.
+- A new Lorraine outfit is an edit of `lorraine` with only the outfit changed, so every version keeps the same framing and cuts cleanly.
 
 ## Clue ledger (continuity)
 
@@ -60,15 +59,34 @@ Still wanted for the library (episodes use crop fallbacks until these exist; the
 | 1 | Ray the solar frog is visible at the edge of the lawn in the doorbell cam. | see Ep. 2 |
 | 2 | Mr. Basin is his own lawyer: "My client has no comment." He has never had a case. | running gag |
 | 2 | The wind chime starts to say what it saw ("At 3:12, the flamingo was—"), then the wind stops. | open: it finishes the sentence the next windy night |
-| 2 | **Hidden:** in frame 423 (03:12:08), **Ray the solar frog is glowing**. He only lights up after a full day of sun, so he was charged, awake and watching. | unrevealed; pay off in Ep. 4 |
+| 2 | **Hidden:** in frame 423 (03:12:08), **Ray the solar frog is glowing**. He only lights up after a full day of sun, so he was charged, awake and watching. | **paid off in Ep. 3** (replay: "RAY WAS AWAKE."). His testimony waits for sun: Ep. 4 |
+| 3 | Lorraine swears she wore the bumblebee that night; after the next cut she's in an Easter dress. Exhibit A (5:41 AM) shows her wearing nothing: "I was between outfits." "I don't pick them, detective." | open: **who dresses the goose?** The narrator asks if it's whoever moved Deb |
+| 3 | Garrison: "Eleven outfits since March. I've had this hat since 1994." He was facing the other way for all eleven. | running gag |
+| 3 | Mr. Basin objects. There is no judge. | running gag |
+| 3 | **Hidden:** in frame 428 (03:12:16), **the porch step is empty: Lorraine is gone.** She's there in frame 427, a second earlier. The goose who "doesn't go anywhere" left the porch 16 seconds after Deb moved. | unrevealed; pay off in Ep. 5 |
+
+## Doorbell cam: No. 5, night of June 13–14
+
+Every doorbell shot of that night must agree with this table. Frames tick roughly every 1.6 seconds.
+
+| Frame | Time | What the frame shows | Still and fields |
+|---|---|---|---|
+| 417 | 03:11:59 | Everything in place | `yard_before` |
+| 418 | 03:12:00 | Deb moved three feet left; **Lorraine turned around** | `yard_after` + `alter_box` on Lorraine |
+| 422 | 03:12:07 | Lorraine facing front again (nobody has noticed she turned back) | `yard_after` |
+| 423 | 03:12:08 | **Ray lit**, and he stays lit from here on | `yard_after` + `alter_glow` on Ray |
+| 427 | 03:12:15 | As 423 | `yard_after` + `lit=[Ray]` |
+| 428 | 03:12:16 | **Lorraine gone from the porch step** | `yard_gone` (library; made by `ep03_the_goose/make_stills.py`) + `lit=[Ray]` |
+
+Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that changes something else, derive a new still from the latest one with a pixel edit, as Ep. 3 does, and save it in `stills/`, where every episode can replay it. Two separately generated images never match.
 
 ## Episode roadmap
 
 1. **Three Feet** (done). Deb has moved. The witnesses are introduced. Something else moved in frame 418.
 2. **I Was Right Here** (written). Every witness gives the same alibi. The frame-418 replay: Lorraine turned around, and she argues that rotating isn't moving. Mr. Basin represents himself. The wind chime almost talks. New clue: in frame 423, Ray is lit.
-3. **The Goose.** Lorraine swears she wore the bumblebee costume that night. After the next cut she's in an Easter dress. "I don't pick them, detective."
-4. **Only When It's Sunny.** The key witness is Ray, who can only talk after a full day of sun. Pays off Ep. 2's frame 423: he was lit at 3:12, so he saw it. On day 12 he lights up: "I don't remember."
-5. **Saturday.** A tense reenactment of the street's most feared event, The Mower, shown only as a shadow.
+3. **The Goose** (written). Lorraine swears she wore the bumblebee costume that night; after the next cut she's in an Easter dress, and Exhibit A shows her in nothing: "I was between outfits." "I don't pick them, detective." Pays off Ep. 2 (Ray was awake; it's been cloudy for nine days). New clue: in frame 428 the porch step is empty.
+4. **Only When It's Sunny.** The key witness is Ray, who can only talk after a full day of sun. Ep. 3's replay already revealed that he was lit at 3:12 (Ep. 2's frame 423), so he saw it; this episode is his testimony. On day 12 he lights up: "I don't remember."
+5. **Saturday.** A tense reenactment of the street's most feared event, The Mower, shown only as a shadow. Pays off Ep. 3's frame 428: where was Lorraine at 03:12:16? Her story ("I was at a fitting, hon") should connect to who dresses the goose.
 6. **The Inflatable.** The holiday inflatable nobody took down has an airtight alibi ("I was flat from 11 to 6"). Then its timer turns up, set for 3:10 AM.
 7. **Finale.** The original pitch was "Deb has two legs. She has been standing on one since 1994." The current Deb stills show her on two legs, so either rework this reveal or make one-leg Deb stills early and plant them.
 
