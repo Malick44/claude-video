@@ -41,12 +41,11 @@ Append this to every image prompt so new stills match the existing ones:
 
 > Photorealistic, vertical 9:16. The same suburban house: grey vinyl siding, white porch railing and posts, black front door, brass lantern sconce, silver tubular wind chime, hostas and an echinacea flower bed. Dusk, blue hour or night. Shallow depth of field, muted teal-and-amber grade, fine film grain. No people, no text.
 
-The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial` (the cul-de-sac from above, behind every title card), `lorraine` (her interview close-up), `chime`, `basin_counsel` (Mr. Basin with his briefcase), `ray` (under grey skies), and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
+The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial` (the cul-de-sac from above, behind every title card), `lorraine` (her interview close-up), `chime`, `basin_counsel` (Mr. Basin with his briefcase), `ray` (under grey skies), `lorraine_bee` and `lorraine_easter` (the `lorraine` close-up in two of her outfits), `cork` (the evidence board), and the derived doorbell frame `yard_gone` (frame 428 on). Every episode can use it.
 
-Stills still wanted (episodes use crop fallbacks until these exist):
-- **`cork`:** the evidence board's cork background. The user has generated it; it needs to arrive as a file. Until then the board is drawn.
-- Ep. 3 only: **`lorraine_bee`** and **`lorraine_easter`**, the `lorraine` close-up in two outfits (prompts in `episodes/ep03_the_goose/episode.py`). The user has generated both; they need to arrive as files. They're the episode's central sight gag; until then the plain `lorraine` close-up and the name cards carry it.
+Stills still wanted:
 - Ep. 4: a lit, night version of `ray` for his testimony.
+- A new Lorraine outfit is an edit of `lorraine` with only the outfit changed, so every version keeps the same framing and cuts cleanly.
 
 ## Clue ledger (continuity)
 

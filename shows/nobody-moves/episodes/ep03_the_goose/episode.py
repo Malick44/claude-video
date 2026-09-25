@@ -21,8 +21,8 @@ _STYLE = ("Photorealistic, vertical 9:16. The same suburban house: grey vinyl si
           "fine film grain. No people, no text.")
 
 # New stills this episode would like (all optional: every shot falls back to the series library).
-# lorraine_bee + lorraine_easter are the episode's central sight gag -> this episode's stills/.
-# ray is recurring (he testifies in Ep. 4) -> shows/nobody-moves/stills/.
+# All three are in the series library, shows/nobody-moves/stills/: the outfits are a running gag
+# (Ep. 5's "fitting") and Ray testifies in Ep. 4.
 STILLS = {
     "lorraine_bee": ("Close-up portrait of a white ceramic goose statue sitting on the concrete front step of the "
                      "porch, wearing a homemade bumblebee costume: a snug yellow-and-black striped knit sweater, "
