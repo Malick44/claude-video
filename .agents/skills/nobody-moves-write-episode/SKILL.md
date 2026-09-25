@@ -58,7 +58,7 @@ For every new still the episode wants, add an entry to the episode's `STILLS` di
 ## Writing the file
 
 - Copy `references/episode-template.py` to `episodes/<epNN_slug>/episode.py`. Keep the shot ids short and unique; they become the recording names (`<shot>_<n>`).
-- Put spoken numbers and abbreviations in the third argument of `L(...)` for TTS: `L("NARRATOR", "At 3:12 AM", "At three twelve A.M.")`. The caption shows the first text; the voice says the second.
+- Put spoken numbers and abbreviations in the third argument of `L(...)` for TTS: `L("NARRATOR", "At 3:12 AM", "At three twelve AM")`. The caption shows the first text; the voice says the second. Write abbreviations without periods (`AM`, `PM`, `TV`, not `A.M.`): the pronunciation engine reads each period as a sentence break, so "A.M." comes out as two letters with a 0.18 s pause between them, while "AM" is read as one word.
 - **New speaker:** add them to `cast.py` so they keep that voice for the rest of the series. For a one-off voice, add a local `CAST` instead.
   - English Kokoro presets only (`af_`, `am_`, `bf_`, `bm_`). `build_audio.py` phonemizes voices starting with "a" as US English and every other voice as British English, so any other language's preset is mispronounced.
   - Pick a preset, or a `pitch`, clearly different from the rest of the cast, so viewers can tell the characters apart by voice alone.

@@ -186,7 +186,7 @@ SHOTS = [
         "alter_box": (0.7163, 0.2129, 0.7800, 0.2787),
         "items": [
             L("NARRATOR", "At 3:12 AM, the doorbell camera at No. 5 captured this.",
-              "At three twelve A.M., the doorbell camera at number five captured this."),
+              "At three twelve AM, the doorbell camera at number five captured this."),
             P(0.5),
             L("NARRATOR", "Look closer."),
         ],

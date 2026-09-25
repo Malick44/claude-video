@@ -197,7 +197,7 @@ SHOTS = [
         "kb": ((0.5, 0.5, 1.0), (0.5, 0.48, 1.18)),
         "polaroids": BOARD_POLAROIDS,
         "items": [
-            L("NARRATOR", "At 3:12 AM, someone moved Deb.", "At three twelve A.M., someone moved Deb."),
+            L("NARRATOR", "At 3:12 AM, someone moved Deb.", "At three twelve AM, someone moved Deb."),
             P(0.4),
             L("NARRATOR", "And someone keeps changing the goose."),
             P(0.5),
