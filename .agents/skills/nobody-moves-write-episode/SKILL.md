@@ -46,6 +46,9 @@ Reuse before generating. `shows/nobody-moves/stills/` is the series library, ava
 - `holes`: the two holes at dawn.
 - `yard_before` / `yard_after`: the night yard, with Deb in place and moved.
 - `yard_gone`: doorbell frame 428 on, `yard_after` with Lorraine gone from the porch step (derived by `episodes/ep03_the_goose/make_stills.py`). Add Ray's light with `lit=`.
+- `ray_night`: `ray` at night with his solar light on (derived by `episodes/ep04_only_when_its_sunny/make_stills.py`), the stand-in for a generated `ray_lit`.
+
+The library also has `aerial`, `lorraine` (and `lorraine_bee`, `lorraine_easter`), `chime`, `basin_counsel`, `ray` and `cork`; SERIES.md lists every still.
 
 Stills specific to one episode go in `episodes/<ep>/stills/`. A derived clue frame that later episodes replay or build on goes in the library, `stills/`, because a render only looks in its own episode's `stills/` and the library. That's why `yard_gone` is there. A later episode's `make_stills.py` reads the latest frame from `stills/` (per the doorbell table in SERIES.md) and writes its new frame there too. Use numpy and PIL only; SciPy and OpenCV aren't installed.
 

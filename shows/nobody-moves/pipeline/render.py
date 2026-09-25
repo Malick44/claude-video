@@ -500,7 +500,11 @@ def render_title(shot, lt, fi, dur):
     alpha = int(255 * a)
     spaced_text(d, (W / 2, 700), ep.TITLE, font("Oswald", 124, "Bold"), (255, 255, 255, alpha), 10)
     d.rectangle((W / 2 - 170, 900, W / 2 + 170, 904), fill=YELLOW + (alpha,))
-    spaced_text(d, (W / 2, 935), ep.EPISODE, font("Inter", 40, "SemiBold"), (235, 235, 235, alpha), 7)
+    size = 40                                  # shrink a long episode name to end before x 930 (the apps' buttons)
+    while size > 28 and sum(d.textlength(ch, font=font("Inter", size, "SemiBold")) for ch in ep.EPISODE) \
+            + 7 * (len(ep.EPISODE) - 1) > 780:
+        size -= 1
+    spaced_text(d, (W / 2, 935), ep.EPISODE, font("Inter", size, "SemiBold"), (235, 235, 235, alpha), 7)
     frame.alpha_composite(ov)
     return frame
 

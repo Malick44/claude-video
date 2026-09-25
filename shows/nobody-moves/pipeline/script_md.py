@@ -19,7 +19,7 @@ def main():
     ep = load_episode(sys.argv[1])
     with open(os.path.join(ep.BUILD, "timeline.json")) as f:
         tl = json.load(f)
-    title = ep.EPISODE.split(":", 1)[-1].strip().title()
+    title = " ".join(w[:1].upper() + w[1:].lower() for w in ep.EPISODE.split(":", 1)[-1].split())  # "It's", not "It'S"
     out = [
         f"# {ep.TITLE}, {ep.EPISODE.split(':')[0].title()}: \"{title}\"\n",
         f"Runtime: **{tl['total']:.1f}s**, 9:16 vertical, 1080×1920 at 30 fps.\n",
