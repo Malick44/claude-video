@@ -2,11 +2,12 @@
 """/watch entry point: download video, extract frames, parse transcript.
 
 Prints a markdown report to stdout listing frame paths + transcript. Claude
-then Reads each frame path to see the video.
+then Reads each frame path to see the video. Integrations may request JSON.
 """
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -49,6 +50,11 @@ def main() -> int:
     ap.add_argument("--start", type=str, default=None, help="Range start (SS, MM:SS, or HH:MM:SS)")
     ap.add_argument("--end", type=str, default=None, help="Range end (SS, MM:SS, or HH:MM:SS)")
     ap.add_argument("--out-dir", type=str, default=None, help="Working directory (default: tmp)")
+    ap.add_argument(
+        "--json",
+        action="store_true",
+        help="Print one machine-readable JSON object to stdout instead of the markdown report",
+    )
     ap.add_argument(
         "--no-whisper",
         action="store_true",
@@ -266,6 +272,49 @@ def main() -> int:
         print("[watch] no audio stream found — proceeding without transcription", file=sys.stderr)
 
     info = dl.get("info") or {}
+
+    if args.json:
+        report = {
+            "source": args.source,
+            "work_dir": str(work),
+            "video_path": video_path,
+            "duration_seconds": full_duration,
+            "detail": detail,
+            "focus_range": (
+                {"start_seconds": effective_start, "end_seconds": effective_end}
+                if focused else None
+            ),
+            "media": {
+                "title": info.get("title"),
+                "uploader": info.get("uploader"),
+                "width": meta.get("width"),
+                "height": meta.get("height"),
+                "codec": meta.get("codec"),
+                "has_audio": meta.get("has_audio"),
+            },
+            "frames": [
+                {
+                    "timestamp_seconds": frame["timestamp_seconds"],
+                    "path": frame["path"],
+                    "reason": frame.get("reason", "selected"),
+                }
+                for frame in frames
+            ],
+            "frame_metadata": {
+                **frame_meta,
+                "selected_count": len(frames),
+                "target_count": target,
+                "cap": max_frames,
+                "cue_count": len(cue_frames),
+                "dropped_cues_out_of_window": cue_meta.get("dropped_out_of_window", 0),
+            },
+            "transcript": {
+                "source": transcript_source,
+                "segments": transcript_segments,
+            },
+        }
+        print(json.dumps(report, ensure_ascii=False))
+        return 0
 
     print()
     print("# watch: video report")

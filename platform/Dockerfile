@@ -1,5 +1,5 @@
-# The worker needs ffmpeg + yt-dlp on the host, so deploy as a container
-# (Fly, Railway, Render, ECS, Cloud Run...) rather than a serverless function.
+# The worker needs ffmpeg, yt-dlp, and the watch skill. Pass the sibling skill
+# as a named BuildKit context: --build-context watch_skill=../skills/watch.
 FROM node:22-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -18,8 +18,10 @@ RUN apt-get update \
  && chmod +x /usr/local/bin/yt-dlp \
  && apt-get purge -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
+ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 WATCH_SKILL_DIR=/app/skills/watch
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
+COPY --from=watch_skill /scripts/ /app/skills/watch/scripts/
+COPY --from=watch_skill /SKILL.md /app/skills/watch/SKILL.md
 EXPOSE 3000
 CMD ["node", "server.js"]

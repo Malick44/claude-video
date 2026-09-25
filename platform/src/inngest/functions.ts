@@ -23,8 +23,11 @@ export const scheduleIngest = inngest.createFunction(
         ) as { handle: string }[];
         return rows.map((r) => r.handle);
       });
-      for (let i = 0; i < handles.length; i += HANDLES_PER_RUN) {
-        const batch = handles.slice(i, i + HANDLES_PER_RUN);
+      // The long-video actor does not document whether maxResults is per channel,
+      // so run one channel at a time to preserve the requested 30-video baseline.
+      const batchSize = platform === "youtube_long" ? 1 : HANDLES_PER_RUN;
+      for (let i = 0; i < handles.length; i += batchSize) {
+        const batch = handles.slice(i, i + batchSize);
         const { runId } = await step.run(`start-${platform}-${i}`, () => startActorRun(platform, batch));
         runs.push(runId);
       }

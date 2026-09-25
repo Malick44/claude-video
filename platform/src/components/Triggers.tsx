@@ -48,7 +48,7 @@ export function AddCompetitor() {
       className="flex flex-wrap items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-3 text-sm"
     >
       <select value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} className="rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1.5">
-        <option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="youtube">YouTube Shorts</option>
+        <option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option><option value="youtube">YouTube Shorts</option><option value="youtube_long">YouTube Long</option>
       </select>
       <input value={form.handle} onChange={(e) => setForm({ ...form, handle: e.target.value })} placeholder="@handle" required
         className="rounded-md border border-zinc-700 bg-zinc-950 px-3 py-1.5" />

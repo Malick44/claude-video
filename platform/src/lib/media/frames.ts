@@ -54,7 +54,7 @@ export async function extractKeyframes(
   // Scene detection pass (timestamps only), then grab the chosen cuts.
   const { stderr } = await run("ffmpeg", [
     "-v", "info", "-i", file, "-vf", `select='gt(scene,${SCENE_THRESHOLD})',showinfo`, "-an", "-f", "null", "-",
-  ]);
+  ], duration !== null && duration > 600 ? 900_000 : 180_000);
   const sceneCutTimes = parseShowinfoTimes(stderr);
   for (const t of pickSceneCuts(sceneCutTimes)) {
     const path = join(dir, `scene_${t.toFixed(2)}.jpg`);
@@ -66,10 +66,10 @@ export async function extractKeyframes(
   return { frames: frames.filter((f) => written.has(f.path.split("/").pop()!)), sceneCutTimes };
 }
 
-export async function extractAudio(file: string, dir: string): Promise<string | null> {
+export async function extractAudio(file: string, dir: string, duration: number | null = null): Promise<string | null> {
   const out = join(dir, "audio.m4a");
   try {
-    await run("ffmpeg", ["-v", "error", "-i", file, "-vn", "-ac", "1", "-c:a", "aac", "-b:a", "64k", "-y", out]);
+    await run("ffmpeg", ["-v", "error", "-i", file, "-vn", "-ac", "1", "-c:a", "aac", "-b:a", "64k", "-y", out], duration !== null && duration > 600 ? 900_000 : 180_000);
     return out;
   } catch {
     return null; // silent video

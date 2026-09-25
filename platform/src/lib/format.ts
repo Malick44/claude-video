@@ -1,7 +1,8 @@
 export const compact = (n: number | null | undefined) =>
   n == null ? "—" : new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
-export const multiplier = (n: number | null | undefined) => (n == null ? "—" : `${Number(n).toFixed(1)}×`);
+export const multiplier = (n: number | null | undefined) =>
+  n == null ? "—" : `${Number(n).toFixed(n < 0.1 ? 2 : 1)}×`;
 
 export const pct = (n: number | null | undefined) => (n == null ? "—" : `${Number(n).toFixed(1)}%`);
 
@@ -17,4 +18,9 @@ export function omTone(n: number | null | undefined): string {
   return "bg-zinc-800 text-zinc-400";
 }
 
-export const PLATFORM_LABEL: Record<string, string> = { tiktok: "TikTok", instagram: "Reels", youtube: "Shorts" };
+export const PLATFORM_LABEL: Record<string, string> = {
+  tiktok: "TikTok",
+  instagram: "Instagram Reels",
+  youtube: "YouTube Shorts",
+  youtube_long: "YouTube Long",
+};

@@ -10,7 +10,7 @@ interface Cell {
 }
 
 const WINDOWS = { "7": "This week", "30": "30 days", "90": "90 days" } as const;
-const PLATFORMS = ["tiktok", "instagram", "youtube"];
+const PLATFORMS = ["tiktok", "instagram", "youtube", "youtube_long"];
 
 /** Sequential shading by median multiplier: 1× = neutral, ≥4× = full. */
 function shade(m: number | null): string {
@@ -96,7 +96,7 @@ export default async function MatrixPage({ searchParams }: { searchParams: Promi
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={7} className="px-3 py-10 text-center text-zinc-500">No analyzed videos in this window yet.</td></tr>
+              <tr><td colSpan={PLATFORMS.length + 4} className="px-3 py-10 text-center text-zinc-500">No analyzed videos in this window yet.</td></tr>
             )}
           </tbody>
         </table>

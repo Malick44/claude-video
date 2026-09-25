@@ -2,12 +2,13 @@
 // normalization of each actor's item shape into one VideoRecord.
 import { env } from "./env";
 
-export type Platform = "tiktok" | "instagram" | "youtube";
+export type Platform = "tiktok" | "instagram" | "youtube" | "youtube_long";
 
 export const ACTORS: Record<Platform, string> = {
   tiktok: process.env.APIFY_TIKTOK_ACTOR ?? "clockworks~tiktok-scraper",
   instagram: process.env.APIFY_INSTAGRAM_ACTOR ?? "apify~instagram-reel-scraper",
   youtube: process.env.APIFY_YOUTUBE_ACTOR ?? "streamers~youtube-shorts-scraper",
+  youtube_long: process.env.APIFY_YOUTUBE_LONG_ACTOR ?? "grow_media~youtube-channel-video-scraper",
 };
 
 export interface VideoRecord {
@@ -44,6 +45,13 @@ export function actorInput(platform: Platform, handles: string[], perProfile = 3
       return { username: handles, resultsLimit: perProfile, proxyConfiguration: { useApifyProxy: true } };
     case "youtube":
       return { channels: handles.map((h) => (h.startsWith("@") ? h : `@${h}`)), maxResultsShorts: perProfile };
+    case "youtube_long":
+      return {
+        channelUrls: handles.map((h) => `https://www.youtube.com/@${h.replace(/^@/, "")}`),
+        maxResults: perProfile,
+        videoType: "long",
+        sortOrder: "latest",
+      };
   }
 }
 
@@ -192,7 +200,22 @@ export function normalizeYouTube(it: Item): VideoRecord | null {
   };
 }
 
+/** The long-video actor returns video rows alongside occasional error/channel rows. */
+export function normalizeYouTubeLong(it: Item): VideoRecord | null {
+  if (it.error || (it.type && it.type !== "video") || (it.scrapeVideoType && it.scrapeVideoType !== "long")) return null;
+  const url = str(it.url);
+  if (url?.includes("/shorts/")) return null;
+  const video = normalizeYouTube(it);
+  if (!video) return null;
+  return {
+    ...video,
+    platform: "youtube_long",
+    videoUrl: url ?? `https://www.youtube.com/watch?v=${video.externalId}`,
+    durationSeconds: parseDuration(it.durationSeconds ?? it.duration),
+  };
+}
+
 export function normalize(platform: Platform, items: unknown[]): VideoRecord[] {
-  const fn = { tiktok: normalizeTikTok, instagram: normalizeInstagram, youtube: normalizeYouTube }[platform];
+  const fn = { tiktok: normalizeTikTok, instagram: normalizeInstagram, youtube: normalizeYouTube, youtube_long: normalizeYouTubeLong }[platform];
   return items.map((i) => fn(i as Item)).filter((r): r is VideoRecord => r !== null);
 }

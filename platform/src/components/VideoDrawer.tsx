@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { compact, multiplier, omTone, pct, PLATFORM_LABEL, shortDate } from "@/lib/format";
 import { fmtTs, parseRange } from "@/lib/pacing";
 import type { VideoIntelligence } from "@/lib/schema";
+import { FrameSceneNavigator } from "./FrameSceneNavigator";
 
 interface Detail {
   video: {
@@ -20,6 +21,8 @@ interface Detail {
   similar: { video_id: string; hook_text: string; hook_archetype: string; similarity: number }[];
 }
 
+type DrawerTab = "breakdown" | "frame";
+
 const BEAT_TONE: Record<string, string> = {
   Hook: "border-fuchsia-500",
   "Agitation & Proof": "border-amber-500",
@@ -34,11 +37,16 @@ export function VideoDrawer({ videoId, onClose }: { videoId: string | null; onCl
   const [error, setError] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [videoFailed, setVideoFailed] = useState(false);
+  const [activeTab, setActiveTab] = useState<DrawerTab>("breakdown");
+  const asideRef = useRef<HTMLElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const breakdownTabRef = useRef<HTMLButtonElement>(null);
+  const frameTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!videoId) return;
-    setDetail(null); setError(null); setTime(0); setVideoFailed(false);
+    setDetail(null); setError(null); setTime(0); setVideoFailed(false); setActiveTab("breakdown");
     fetch(`/api/videos/${videoId}`)
       .then((r) => (r.ok ? r.json() : r.json().then((j) => Promise.reject(new Error(j.error)))))
       .then(setDetail)
@@ -53,38 +61,83 @@ export function VideoDrawer({ videoId, onClose }: { videoId: string | null; onCl
 
   if (!videoId) return null;
   const seek = (t: number) => {
-    if (videoRef.current) { videoRef.current.currentTime = t; void videoRef.current.play(); }
+    if (videoRef.current) {
+      videoRef.current.currentTime = t;
+      void videoRef.current.play();
+      if (window.matchMedia("(max-width: 767px)").matches) {
+        mediaRef.current?.scrollIntoView({ block: "start", behavior: "auto" });
+      }
+    }
   };
 
   const a = detail?.intelligence?.analysis_json;
   const v = detail?.video;
+  const frameScenes = a?.frame_analysis ?? [];
+  const switchTab = (next: DrawerTab) => {
+    setActiveTab(next);
+    asideRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  };
+  const onTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    let next: DrawerTab | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") next = activeTab === "breakdown" ? "frame" : "breakdown";
+    if (event.key === "Home") next = "breakdown";
+    if (event.key === "End") next = "frame";
+    if (!next) return;
+    event.preventDefault();
+    switchTab(next);
+    (next === "breakdown" ? breakdownTabRef : frameTabRef).current?.focus();
+  };
 
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-black/60" onClick={onClose}>
-      <aside onClick={(e) => e.stopPropagation()} className="h-full w-full max-w-5xl overflow-y-auto border-l border-zinc-800 bg-zinc-950 shadow-2xl">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/95 px-5 py-3">
-          <div className="text-sm">
-            {v ? (<><span className="font-semibold">@{v.competitors.handle}</span> <span className="text-zinc-500">· {PLATFORM_LABEL[v.platform]} · {shortDate(v.published_at)}</span></>) : "Loading…"}
+      <aside ref={asideRef} role="dialog" aria-modal="true" aria-label="Video analysis" onClick={(e) => e.stopPropagation()} className="h-full w-full max-w-5xl overflow-y-auto border-l border-zinc-800 bg-zinc-950 shadow-2xl">
+        <div className="sticky top-0 z-30 border-b border-zinc-800 bg-zinc-950/95 shadow-lg shadow-black/20 backdrop-blur">
+          <div className="flex min-h-16 items-center gap-3 px-4 py-2 sm:px-5">
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold text-zinc-100">{v ? (v.caption?.split("#")[0]?.trim() || `@${v.competitors.handle}`) : "Loading video…"}</div>
+              {v && <div className="mt-0.5 truncate text-xs text-zinc-400">@{v.competitors.handle} <span aria-hidden="true">·</span> {PLATFORM_LABEL[v.platform]} <span aria-hidden="true">·</span> {shortDate(v.published_at)}</div>}
+            </div>
+            {v && <button type="button" onClick={() => mediaRef.current?.scrollIntoView({ block: "start", behavior: "auto" })} className="rounded-md border border-zinc-700 px-2.5 py-1.5 text-xs font-medium text-zinc-200 hover:border-zinc-500 hover:bg-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400 md:hidden">Video</button>}
+            {v && <a href={v.video_url} target="_blank" rel="noreferrer" className="hidden rounded-md px-3 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800 sm:inline-flex">Open original ↗</a>}
+            {a && <Link href={`/remix?video=${videoId}`} className="hidden rounded-md bg-fuchsia-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-fuchsia-500 sm:inline-flex">Remix for my brand</Link>}
+            <button type="button" onClick={onClose} className="flex h-9 w-9 flex-none items-center justify-center rounded-md text-zinc-300 hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400" aria-label="Close video analysis">✕</button>
           </div>
-          <div className="flex items-center gap-2">
-            {v && <a href={v.video_url} target="_blank" rel="noreferrer" className="rounded-md px-3 py-1.5 text-sm text-zinc-400 hover:bg-zinc-800">Open original ↗</a>}
-            {a && <Link href={`/remix?video=${videoId}`} className="rounded-md bg-fuchsia-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-fuchsia-500">Remix for my brand</Link>}
-            <button onClick={onClose} className="rounded-md px-2 py-1 text-zinc-400 hover:bg-zinc-800" aria-label="Close">✕</button>
-          </div>
+          {a && <div role="tablist" aria-label="Video analysis views" className="flex items-center gap-1 border-t border-zinc-800/80 px-4 sm:px-5">
+            <button ref={breakdownTabRef} id="drawer-breakdown-tab" role="tab" type="button"
+              aria-selected={activeTab === "breakdown"} aria-controls="drawer-breakdown-panel" tabIndex={activeTab === "breakdown" ? 0 : -1}
+              onClick={() => switchTab("breakdown")} onKeyDown={onTabKeyDown}
+              className={`border-b-2 px-3 py-2.5 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400 ${activeTab === "breakdown" ? "border-fuchsia-400 text-white" : "border-transparent text-zinc-400 hover:text-zinc-200"}`}>
+              Breakdown
+            </button>
+            <button ref={frameTabRef} id="drawer-frame-tab" role="tab" type="button"
+              aria-selected={activeTab === "frame"} aria-controls="drawer-frame-panel" tabIndex={activeTab === "frame" ? 0 : -1}
+              onClick={() => switchTab("frame")} onKeyDown={onTabKeyDown}
+              className={`border-b-2 px-3 py-2.5 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400 ${activeTab === "frame" ? "border-fuchsia-400 text-white" : "border-transparent text-zinc-400 hover:text-zinc-200"}`}>
+              FRAME
+            </button>
+            {frameScenes.length > 0 && <span className="ml-auto whitespace-nowrap font-mono text-[11px] text-zinc-500">{frameScenes.length} scenes</span>}
+          </div>}
         </div>
 
         {error && <p className="p-5 text-red-400">{error}</p>}
         {v && (
-          <div className="grid gap-6 p-5 md:grid-cols-[300px_1fr]">
-            {/* Left: player + stats */}
-            <div className="space-y-4">
-              <div className="aspect-[9/16] overflow-hidden rounded-lg bg-black md:sticky md:top-20">
+          <div className="grid gap-6 p-4 md:grid-cols-[300px_minmax(0,1fr)] md:p-5">
+            {/* Video follows the analysis on small screens so navigation stays above the fold. */}
+            <div ref={mediaRef} className="order-2 min-w-0 scroll-mt-32 space-y-4 md:order-1">
+              <div className="flex items-center justify-between gap-3 border-t border-zinc-800 pt-4 md:hidden">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Video &amp; performance</h2>
+                <div className="flex items-center gap-3 text-xs">
+                  <a href={v.video_url} target="_blank" rel="noreferrer" className="text-zinc-300 underline decoration-zinc-600 underline-offset-4">Original ↗</a>
+                  {a && <Link href={`/remix?video=${videoId}`} className="text-fuchsia-300 underline decoration-fuchsia-700 underline-offset-4">Remix</Link>}
+                </div>
+              </div>
+              <div className={`${v.platform === "youtube_long" ? "aspect-video" : "aspect-[9/16]"} overflow-hidden rounded-lg bg-black md:sticky md:top-32`}>
                 {v.media_url && !videoFailed ? (
                   <video ref={videoRef} src={v.media_url} poster={v.thumbnail_url ?? undefined} controls playsInline className="h-full w-full"
                     onTimeUpdate={(e) => setTime(e.currentTarget.currentTime)} onError={() => setVideoFailed(true)} />
                 ) : (
                   <a href={v.video_url} target="_blank" rel="noreferrer" className="relative block h-full">
-                    {v.thumbnail_url && <img src={v.thumbnail_url} alt="" className="h-full w-full object-cover opacity-70" />}
+                    {v.thumbnail_url && <img src={v.thumbnail_url} alt="" className={`h-full w-full opacity-70 ${v.platform === "youtube_long" ? "object-contain" : "object-cover"}`} />}
                     <span className="absolute inset-0 flex items-center justify-center text-sm text-white">{v.media_url ? "CDN link expired — " : ""}Watch on {PLATFORM_LABEL[v.platform]} ↗</span>
                   </a>
                 )}
@@ -102,8 +155,8 @@ export function VideoDrawer({ videoId, onClose }: { videoId: string | null; onCl
               {detail.snapshots.length > 1 && <Trajectory snapshots={detail.snapshots} />}
             </div>
 
-            {/* Right: breakdown */}
-            <div className="space-y-6">
+            {/* Analysis leads on mobile and sits beside the video on desktop. */}
+            <div className="order-1 min-w-0 space-y-6 md:order-2">
               {!a ? (
                 <div className="rounded-lg border border-zinc-800 p-4 text-sm text-zinc-400">
                   Not analyzed yet ({v.processing_status}). {v.processing_error && <span className="text-red-400">{v.processing_error}</span>}
@@ -113,49 +166,55 @@ export function VideoDrawer({ videoId, onClose }: { videoId: string | null; onCl
                 </div>
               ) : (
                 <>
-                  <section className="rounded-lg border border-fuchsia-900/60 bg-fuchsia-950/20 p-4">
-                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                      <span className="rounded-full bg-fuchsia-500/20 px-2 py-0.5 font-medium text-fuchsia-300">{a.hook_analysis.hook_archetype}</span>
-                      <span className="text-zinc-400">Trigger: {a.hook_analysis.retention_trigger}</span>
-                    </div>
-                    <p className="text-lg font-medium leading-snug">“{a.hook_analysis.verbal_hook || "(no spoken hook)"}”</p>
-                    {a.hook_analysis.on_screen_text_hook && <p className="mt-2 text-sm"><span className="text-zinc-500">On-screen:</span> {a.hook_analysis.on_screen_text_hook}</p>}
-                    <p className="mt-2 text-sm text-zinc-300"><span className="text-zinc-500">Visual:</span> {a.hook_analysis.visual_hook_description}</p>
-                  </section>
+                  <div id="drawer-breakdown-panel" role="tabpanel" aria-labelledby="drawer-breakdown-tab" tabIndex={activeTab === "breakdown" ? 0 : -1} hidden={activeTab !== "breakdown"} className="space-y-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-fuchsia-400">
+                      <section className="rounded-lg border border-fuchsia-900/60 bg-fuchsia-950/20 p-4">
+                        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+                          <span className="rounded-full bg-fuchsia-500/20 px-2 py-0.5 font-medium text-fuchsia-300">{a.hook_analysis.hook_archetype}</span>
+                          {detail.intelligence?.model === "manual-review" && <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-zinc-300">Manual review</span>}
+                          <span className="text-zinc-400">Trigger: {a.hook_analysis.retention_trigger}</span>
+                        </div>
+                        <p className="text-lg font-medium leading-snug">“{a.hook_analysis.verbal_hook || "(no spoken hook)"}”</p>
+                        {a.hook_analysis.on_screen_text_hook && <p className="mt-2 text-sm"><span className="text-zinc-500">On-screen:</span> {a.hook_analysis.on_screen_text_hook}</p>}
+                        <p className="mt-2 text-sm text-zinc-300"><span className="text-zinc-500">Visual:</span> {a.hook_analysis.visual_hook_description}</p>
+                      </section>
 
-                  <section>
-                    <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">Beat timeline</h3>
-                    <ol className="space-y-2">
-                      {a.narrative_beats.map((b, i) => {
-                        const r = parseRange(b.timestamp_range);
-                        const active = r ? time >= r[0] && time < r[1] : false;
-                        return (
-                          <li key={i}>
-                            <button onClick={() => r && seek(r[0])}
-                              className={`w-full rounded-r-md border-l-4 px-3 py-2 text-left text-sm transition ${BEAT_TONE[b.beat_type] ?? "border-zinc-600"} ${active ? "bg-zinc-800" : "bg-zinc-900 hover:bg-zinc-800/70"}`}>
-                              <div className="flex items-center gap-2 text-xs text-zinc-400">
-                                <span className="font-mono">{b.timestamp_range}</span><span className="font-semibold text-zinc-200">{b.beat_type}</span>
-                              </div>
-                              <div className="mt-1">{b.summary}</div>
-                              {b.on_screen_text && <div className="mt-1 text-xs text-amber-300/90">▣ {b.on_screen_text}</div>}
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  </section>
+                      <section>
+                        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">Beat timeline</h3>
+                        <ol className="space-y-2">
+                          {a.narrative_beats.map((b, i) => {
+                            const r = parseRange(b.timestamp_range);
+                            const active = r ? time >= r[0] && time < r[1] : false;
+                            return (
+                              <li key={i}>
+                                <button onClick={() => r && seek(r[0])}
+                                  className={`w-full rounded-r-md border-l-4 px-3 py-2 text-left text-sm transition ${BEAT_TONE[b.beat_type] ?? "border-zinc-600"} ${active ? "bg-zinc-800" : "bg-zinc-900 hover:bg-zinc-800/70"}`}>
+                                  <div className="flex items-center gap-2 text-xs text-zinc-400">
+                                    <span className="font-mono">{b.timestamp_range}</span><span className="font-semibold text-zinc-200">{b.beat_type}</span>
+                                  </div>
+                                  <div className="mt-1">{b.summary}</div>
+                                  {b.on_screen_text && <div className="mt-1 text-xs text-amber-300/90">▣ {b.on_screen_text}</div>}
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      </section>
 
-                  <section className="grid gap-3 text-sm sm:grid-cols-2">
-                    <Card title="CTA">{a.structural_metrics.cta_type}{a.structural_metrics.cta_text && <> — <i>{a.structural_metrics.cta_text}</i></>}</Card>
-                    <Card title="Loop mechanic">{a.structural_metrics.loop_mechanic}</Card>
-                    <Card title="Topic cluster">{a.primary_topic_cluster}</Card>
-                    <Card title="Pattern interrupts">{a.structural_metrics.pattern_interrupts.join(" · ") || "—"}</Card>
-                  </section>
+                      <section className="grid gap-3 text-sm sm:grid-cols-2">
+                        <Card title="CTA">{a.structural_metrics.cta_type}{a.structural_metrics.cta_text && <> — <i>{a.structural_metrics.cta_text}</i></>}</Card>
+                        <Card title="Loop mechanic">{a.structural_metrics.loop_mechanic}</Card>
+                        <Card title="Topic cluster">{a.primary_topic_cluster}</Card>
+                        <Card title="Pattern interrupts">{a.structural_metrics.pattern_interrupts.join(" · ") || "—"}</Card>
+                      </section>
 
-                  <section>
-                    <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">Takeaways for remixing</h3>
-                    <ul className="list-disc space-y-1 pl-5 text-sm">{a.takeaways_for_remixing.map((t, i) => <li key={i}>{t}</li>)}</ul>
-                  </section>
+                      <section>
+                        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">Takeaways for remixing</h3>
+                        <ul className="list-disc space-y-1 pl-5 text-sm">{a.takeaways_for_remixing.map((t, i) => <li key={i}>{t}</li>)}</ul>
+                      </section>
+                  </div>
+                  <div id="drawer-frame-panel" role="tabpanel" aria-labelledby="drawer-frame-tab" tabIndex={activeTab === "frame" ? 0 : -1} hidden={activeTab !== "frame"}>
+                    <FrameSceneNavigator scenes={frameScenes} meta={a.frame_analysis_meta} time={time} canSeek={Boolean(v.media_url && !videoFailed)} onSeek={seek} />
+                  </div>
                 </>
               )}
 

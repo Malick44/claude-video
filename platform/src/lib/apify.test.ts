@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { normalize, parseDuration } from "./apify";
+import { actorInput, normalize, parseDuration } from "./apify";
 
 describe("normalize", () => {
   it("maps clockworks/tiktok-scraper items", () => {
@@ -37,6 +37,39 @@ describe("normalize", () => {
 
   it("drops items without an id or author", () => {
     expect(normalize("tiktok", [{ text: "x" }])).toEqual([]);
+  });
+
+  it("maps long-form YouTube videos and ignores non-video actor rows", () => {
+    const records = normalize("youtube_long", [
+      {
+        type: "video", scrapeVideoType: "long", id: "long123", title: "An investigation",
+        channelUsername: "@fern-tv", numberOfSubscribers: 5_520_000,
+        viewCount: 4_000_000, likes: 75_000, commentsCount: 4_500,
+        durationSeconds: 1_691, date: "2026-09-02T17:00:00Z",
+      },
+      { input: "@missing", error: "NO_VIDEOS" },
+      { type: "video", scrapeVideoType: "short", id: "short123", channelUsername: "@fern-tv" },
+      { type: "video", id: "short456", url: "https://www.youtube.com/shorts/short456", channelUsername: "@fern-tv" },
+    ]);
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({
+      platform: "youtube_long", handle: "fern-tv", externalId: "long123",
+      videoUrl: "https://www.youtube.com/watch?v=long123", followerCount: 5_520_000,
+      views: 4_000_000, likes: 75_000, comments: 4_500,
+      durationSeconds: 1_691, publishedAt: "2026-09-02T17:00:00.000Z",
+    });
+  });
+});
+
+describe("actorInput", () => {
+  it("requests recent regular YouTube uploads separately from Shorts", () => {
+    expect(actorInput("youtube_long", ["fern-tv", "@another"], 30)).toEqual({
+      channelUrls: ["https://www.youtube.com/@fern-tv", "https://www.youtube.com/@another"],
+      maxResults: 30,
+      videoType: "long",
+      sortOrder: "latest",
+    });
+    expect(actorInput("youtube", ["fern-tv"], 30)).toMatchObject({ maxResultsShorts: 30 });
   });
 });
 

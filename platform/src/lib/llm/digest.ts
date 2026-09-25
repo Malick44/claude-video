@@ -7,7 +7,7 @@ export async function weeklyDigest(input: { weekStart: string; outliers: unknown
   const response = await anthropic().beta.messages.parse({
     ...baseParams(),
     max_tokens: 16000,
-    system: "You are a content-intelligence analyst writing a weekly brief for a short-form content team. Be specific and cite video ids as evidence.",
+    system: "You are a content-intelligence analyst writing a weekly brief for a video content team. Be specific and cite video ids as evidence.",
     messages: [
       {
         role: "user",

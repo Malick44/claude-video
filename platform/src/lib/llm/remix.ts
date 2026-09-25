@@ -43,7 +43,7 @@ Make the three variants genuinely different angles. Only use claims supported by
   const stream = anthropic().beta.messages.stream({
     ...baseParams(),
     max_tokens: 32000,
-    system: "You are a senior short-form scriptwriter. You adapt proven formats to new brands without plagiarising them.",
+    system: "You are a senior video scriptwriter. You adapt proven formats to new brands without plagiarising them.",
     messages: [{ role: "user", content: prompt }],
     output_config: { format: betaZodOutputFormat(RemixSchema) },
   });

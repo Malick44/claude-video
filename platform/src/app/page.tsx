@@ -8,7 +8,7 @@ const WINDOWS: Record<string, number | null> = { "7d": 7, "30d": 30, "90d": 90, 
 
 export default async function FeedPage({ searchParams }: { searchParams: Promise<{ window?: string }> }) {
   const { window = "30d" } = await searchParams;
-  const days = WINDOWS[window] ?? 30;
+  const days = Object.prototype.hasOwnProperty.call(WINDOWS, window) ? WINDOWS[window] : WINDOWS["30d"];
   let q = db().from("outlier_feed").select("*").order("outlier_multiplier", { ascending: false, nullsFirst: false }).limit(1000);
   if (days) q = q.gte("published_at", new Date(Date.now() - days * 86_400_000).toISOString());
   const { data, error } = await q;

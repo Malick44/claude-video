@@ -36,7 +36,7 @@ export function OutlierFeed({ rows, window, windows }: { rows: FeedRow[]; window
       col.accessor("thumbnail_url", {
         header: "",
         enableSorting: false,
-        cell: (c) => (c.getValue() ? <img src={c.getValue()!} alt="" className="h-16 w-9 rounded object-cover" /> : <div className="h-16 w-9 rounded bg-zinc-800" />),
+        cell: (c) => (c.getValue() ? <img src={c.getValue()!} alt="" className={`h-16 rounded bg-black ${c.row.original.platform === "youtube_long" ? "w-28 object-contain" : "w-9 object-cover"}`} /> : <div className={`h-16 rounded bg-zinc-800 ${c.row.original.platform === "youtube_long" ? "w-28" : "w-9"}`} />),
       }),
       col.accessor("handle", { header: "Creator", filterFn: "equalsString", cell: (c) => <span className="font-medium">@{c.getValue()}</span> }),
       col.accessor("platform", { header: "Platform", filterFn: "equalsString", cell: (c) => PLATFORM_LABEL[c.getValue()] ?? c.getValue() }),
@@ -117,8 +117,8 @@ export function OutlierFeed({ rows, window, windows }: { rows: FeedRow[]; window
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {visible.map(({ original: r }) => (
             <button key={r.id} onClick={() => setOpenId(r.id)} className="group flex flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900 text-left transition hover:border-zinc-600">
-              <div className="relative aspect-[9/16] bg-zinc-800">
-                {r.thumbnail_url && <img src={r.thumbnail_url} alt="" className="h-full w-full object-cover" loading="lazy" />}
+              <div className={`relative bg-zinc-800 ${r.platform === "youtube_long" ? "aspect-video" : "aspect-[9/16]"}`}>
+                {r.thumbnail_url && <img src={r.thumbnail_url} alt="" className={`h-full w-full ${r.platform === "youtube_long" ? "object-contain" : "object-cover"}`} loading="lazy" />}
                 <span className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-sm font-bold tabular-nums backdrop-blur ${omTone(r.outlier_multiplier)}`}>
                   {multiplier(r.outlier_multiplier)}
                 </span>
@@ -189,6 +189,6 @@ function Select({ label, options, onChange }: { label: string; options: [string,
 }
 
 function Status({ s }: { s: string }) {
-  const label = { pending: "Queued", processing: "Analyzing…", failed: "Analysis failed", skipped: "Below analysis bar", done: "—" }[s] ?? s;
+  const label = { pending: "Queued", processing: "Analyzing…", failed: "Analysis failed", skipped: "Not analyzed", done: "—" }[s] ?? s;
   return <span className="italic text-zinc-500">{label}</span>;
 }

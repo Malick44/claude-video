@@ -16,6 +16,7 @@ services:
     volumes:
       - ./local/00-roles.sql:/docker-entrypoint-initdb.d/00-roles.sql:ro
       - ./supabase/migrations/0001_init.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+      - ./supabase/migrations/0002_youtube_long.sql:/docker-entrypoint-initdb.d/11-youtube-long.sql:ro
       - ./supabase/seed.sql:/docker-entrypoint-initdb.d/20-seed.sql:ro
       - ./local/30-grants.sql:/docker-entrypoint-initdb.d/30-grants.sql:ro
       - db-data:/var/lib/postgresql/data
@@ -47,7 +48,11 @@ services:
     ports: ["8288:8288"]
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      additional_contexts:
+        watch_skill: ../skills/watch
     env_file:
       - path: .env
         required: false
@@ -58,6 +63,7 @@ services:
       INNGEST_BASE_URL: http://inngest:8288
       APIFY_WEBHOOK_SECRET: ${APIFY_WEBHOOK_SECRET:-local-webhook-secret}
       APP_URL: ${APP_URL:-http://localhost:3000}
+      WATCH_SKILL_DIR: /app/skills/watch
     ports: ["3000:3000"]
     depends_on:
       db: { condition: service_healthy }

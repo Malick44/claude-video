@@ -1,5 +1,5 @@
-// Multimodal decomposition: transcript (with timestamps) + hook frames + scene
-// frames -> strict JSON via structured outputs.
+// Story and retention decomposition from hook frames, selected cuts, and speech.
+// The finer FRAME timeline is generated separately from watch skill frames.
 import { readFile } from "node:fs/promises";
 import type Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
@@ -9,11 +9,13 @@ import { fmtTs, timestampedLines } from "../pacing";
 import { VideoIntelligenceSchema, type VideoIntelligence } from "../schema";
 import { anthropic, baseParams } from "./client";
 
-const SYSTEM = `You are a short-form video strategist decomposing competitor TikToks, Reels and Shorts.
-Short-form retention is driven as much by what is on screen (text overlays, b-roll, cuts, gestures) as by what is said, so read the frames as carefully as the transcript.
+const VideoIntelligenceOutputSchema = VideoIntelligenceSchema.omit({ frame_analysis: true, frame_analysis_meta: true });
+
+const SYSTEM = `You are a video strategist decomposing competitor TikToks, Reels, YouTube Shorts, and long-form YouTube videos.
+Retention is driven as much by what is on screen (text overlays, b-roll, cuts, gestures) as by what is said, so read the frames as carefully as the transcript.
 Rules:
 - Quote hooks and overlay text verbatim. Never invent speech that is not in the transcript; if there is no speech, say so and rely on the frames.
-- Beats must tile the whole video in order, using the transcript timestamps.
+- Beats must tile the whole video in order, using the transcript timestamps. For long videos, group the story into meaningful chapters rather than every individual cut.
 - Pick the single closest archetype / beat type / CTA type from the allowed values.
 - Use the provided measured pacing for pacing_words_per_minute.
 - Remix takeaways must be transferable mechanisms, not topic copies.`;
@@ -63,7 +65,7 @@ export async function analyzeVideo(input: AnalyzeInput): Promise<{ analysis: Vid
     max_tokens: 16000,
     system: SYSTEM,
     messages: [{ role: "user", content }],
-    output_config: { format: betaZodOutputFormat(VideoIntelligenceSchema) },
+    output_config: { format: betaZodOutputFormat(VideoIntelligenceOutputSchema) },
   });
 
   if (response.stop_reason === "refusal") throw new Error("Analysis declined by model");

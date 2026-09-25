@@ -1,0 +1,196 @@
+{
+  "source": {
+    "video_url": "https://www.tiktok.com/@enthyme/video/7523382641588964663",
+    "method": "Direct watch skill review of downloaded public video, sampled frames and native caption transcript",
+    "watch_duration_seconds": 90.005351,
+    "watch_frame_count": 78,
+    "watch_frame_engine": "60 uniform frames after scene-aware extraction fell back, plus 18 pinned five-second midpoint frames",
+    "transcript_source": "captions (native TikTok eng-US)",
+    "transcript_segment_count": 36,
+    "transcript_last_end_seconds": 84.2,
+    "scene_window_seconds": 5,
+    "limitations": "Frames are sampled, so subtle camera motion and exact cut times cannot always be established. Native captions stop at about 1:24, before the final reveal. Music, sound effects and uncaptained speech were not evaluated. Time of day and original character prompt are unavailable. Character blocks are analyst-observed descriptions, not creator-provided specifications."
+  },
+  "frame_analysis": [
+    {
+      "timestamp_range": "0:00 - 0:05",
+      "figure": "The young couple enters the corridor from the far doorway; the shorter figure carries a bag and the taller figure has dark shoulder straps.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.",
+      "room": "A narrow budget-motel corridor with patterned red carpet, beige walls, room doors, a green exit sign, and rectangular ceiling lights. Artificial ceiling light and a red grade dominate; no exterior cue establishes the time of day.",
+      "action": "They begin walking from the distant doorway toward the viewer at an even pace.",
+      "movement": "A frontal vertical wide shot holds the hallway as a symmetrical depth cue while the pair grows larger in frame. Their approach is visible; independent camera travel is not established by the samples.",
+      "extras": "Third-person voiceover, confirmed by native captions, dates the story to 2010 and names the Budget Lodge near Memphis. Small yellow outlined subtitles appear near the lower third. Music and effects were not evaluated.",
+      "dont_line": "Keep the same red, faceless pair and ordinary corridor; do not introduce the odor or its source yet."
+    },
+    {
+      "timestamp_range": "0:05 - 0:10",
+      "figure": "The same red couple now fills more of the corridor view, still walking side by side toward the camera.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.",
+      "room": "The motel hall continues with repeating doors, carpet, warm ceiling fixtures and the red cast. The setting gives no reliable daylight or nighttime clue.",
+      "action": "Their steady walk carries them from mid-hall to the near foreground before the room cut.",
+      "movement": "Frontal full-body framing tightens as the people approach; the corridor remains centered. A deliberate pan or dolly move is not verifiable from the sampled frames.",
+      "extras": "Captioned voiceover calls the motel modest but its neighborhood quiet enough to stay. Yellow subtitles continue; other audio was not assessed.",
+      "dont_line": "Maintain the couple's silhouettes and unhurried arrival; avoid adding a threat in the hallway."
+    },
+    {
+      "timestamp_range": "0:10 - 0:15",
+      "figure": "The couple is visible through open room door 2805, one near the bed and the other turning into the room.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.",
+      "room": "View from the hall into a compact motel bedroom: bed, dark curtains, bedside furniture and round wall lights. Warm practical lights glow beneath the heavy red tint; time of day remains unknown.",
+      "action": "Their unpacking stalls as they notice a sour smell in the air.",
+      "movement": "The doorway frames a medium-wide interior; the room occupies more of the image across the samples, but a specific camera mechanism is not clear.",
+      "extras": "Native captions say the couple is unpacking and first notices the smell. The red reenactment and yellow subtitles continue; no visible source of the smell appears.",
+      "dont_line": "Keep the odor invisible and the reaction small; do not expose anything beneath the bed."
+    },
+    {
+      "timestamp_range": "0:15 - 0:20",
+      "figure": "The couple pauses in the bedroom; a cut near 0:18 shows them facing a red figure at reception.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.\nMotel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "The first view shows the bed, dark curtains, television and warm wall lamps; the second opens into a small lobby with a curved counter, shelves and ceiling fan. Both interiors have artificial warm light and a red cast, with no time-of-day cue.",
+      "action": "A brief hesitation over the odor turns into a complaint at the front desk.",
+      "movement": "The room holds a medium-wide composition, then cuts to a wider counter view; this is an edit between spaces rather than a verified continuous camera move.",
+      "extras": "The captioned narrator says the smell makes them pause, then says they report it. Yellow outlined subtitles remain; other audio was not evaluated.",
+      "dont_line": "Preserve the order: smell first, complaint second. Do not imply the manager already knows its cause."
+    },
+    {
+      "timestamp_range": "0:20 - 0:25",
+      "figure": "The taller member of the couple gestures toward the manager while the shorter figure stands close behind at reception.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.\nMotel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "Motel lobby with a curved front desk in the foreground, shelving, framed art, a ceiling fan and warm sconces under the red grade. No exterior light establishes time of day.",
+      "action": "The couple presses its complaint; the manager begins a restrained reply.",
+      "movement": "A medium-wide side angle keeps all three red figures in a triangular arrangement around the desk. Small changes in their gestures are visible; camera travel is not established.",
+      "extras": "Native captions say they demand the manager and that he offers a half-hearted apology. Speech is conveyed by third-person voiceover and yellow subtitles; independent character dialogue is not verified.",
+      "dont_line": "Keep the interaction an ordinary service complaint; do not turn it into a confrontation about the hidden object."
+    },
+    {
+      "timestamp_range": "0:25 - 0:30",
+      "figure": "The manager faces the couple at the desk, then the edit introduces one red housekeeping figure and a cleaning cart inside the room.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.\nMotel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.\nHousekeeping staff (analyst-observed): multiple adult-presenting, faceless fluorescent-red 3D figures with varied height and hair silhouettes. Uniform and facial details are not readable.",
+      "room": "The lobby counter and fan give way to room 2805, where the bed, entry and wheeled cleaning cart are visible. Both spaces use warm practical light with red shading; no time-of-day cue is present.",
+      "action": "The manager asks them to wait while staff returns to clean the room; the cleaner begins the task.",
+      "movement": "The lobby holds a medium view across the desk before a hard cut to a wider bedroom doorway view. No continuous move connects the spaces.",
+      "extras": "Captioned narration specifies a 30-minute wait and says the room is cleaned again. Yellow outlined subtitles continue; cleaning sounds and music were not assessed.",
+      "dont_line": "Keep the cleaning as the manager's proposed remedy, without showing the odor's source."
+    },
+    {
+      "timestamp_range": "0:30 - 0:35",
+      "figure": "A red housekeeping figure works beside the bed and cart; by the end the couple is shown in the room again.",
+      "character_block": "Housekeeping staff (analyst-observed): multiple adult-presenting, faceless fluorescent-red 3D figures with varied height and hair silhouettes. Uniform and facial details are not readable.\nYoung couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.",
+      "room": "The compact bedroom has a made bed, warm wall lights, shelving, a bathroom doorway and cleaning supplies; a later angle reveals the television and chair. The red grade remains strong and time of day is not visible.",
+      "action": "Fresh linens and air freshener fail to remove the smell; the couple elects to remain.",
+      "movement": "A wide bed-side cleaning view cuts to a new room angle with the couple; the visual change is editorial rather than a confirmed camera move.",
+      "extras": "The narrator's caption track describes fresh linens, a large amount of air freshener and the odor remaining. Yellow subtitles carry the explanation; effects and music were not evaluated.",
+      "dont_line": "Do not make this first cleaning successful or reveal a cause."
+    },
+    {
+      "timestamp_range": "0:35 - 0:40",
+      "figure": "One member of the red couple sits near the far wall while the other is partly visible on the bed; a later frame begins the guest-turnover montage.",
+      "character_block": "Young couple (analyst-observed): two adult-presenting, faceless fluorescent-red 3D figures. One is shorter and slim with a shoulder-length hair silhouette; the other is taller with a short-hair silhouette and dark shoulder straps. Facial features and precise clothing details are not readable.",
+      "room": "The same red-lit bedroom shows dark curtains, a chair, small table, television, lamp and bed. A six-week time jump is narrated, not established by changing daylight.",
+      "action": "They settle in for the low price, and the video starts moving ahead to later rentals.",
+      "movement": "A wide room view looks past the bed toward the seated figure, then shifts by cut toward a similar composition for the time jump. Camera travel cannot be verified.",
+      "extras": "Captions explain the couple stays because of the price and introduce the next six weeks. Yellow outlined subtitles remain; non-speech audio was not assessed.",
+      "dont_line": "Keep the room recognizable across the time jump; do not imply the first couple is present for all six weeks."
+    },
+    {
+      "timestamp_range": "0:40 - 0:45",
+      "figure": "New red-rendered guests with luggage occupy the room; one reacts near the bed as the odor is described as worse.",
+      "character_block": "Later motel guests (analyst-observed): adult-presenting, faceless fluorescent-red 3D figures. Individual identities and precise clothing details are not established by the images.",
+      "room": "The same bed, dark curtains, chair and warm round wall lights establish the bedroom. The red cast hides natural light, so time of day is unknown.",
+      "action": "The room turns over to later guests, whose discomfort signals the smell's escalation.",
+      "movement": "A wider bedroom view replaces the earlier couple composition; figures and luggage shift across the room. The change in guests is shown through cuts, not a continuous camera passage.",
+      "extras": "Native captions say the room is rented repeatedly and the smell becomes outright foul. Yellow subtitles continue; no visible substance depicts the odor.",
+      "dont_line": "Show new guests rather than the original couple, and keep the odor unexplained."
+    },
+    {
+      "timestamp_range": "0:45 - 0:50",
+      "figure": "A later red guest approaches or stands before the manager at the front desk after a brief room view.",
+      "character_block": "Later motel guests (analyst-observed): adult-presenting, faceless fluorescent-red 3D figures. Individual identities and precise clothing details are not established by the images.\nMotel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "The bedroom cuts to the motel lobby: curved reception counter, bulletin board and ceiling fan under warm red lighting. Neither view establishes time of day.",
+      "action": "Repeated guest complaints move from the room to reception and demand the manager's attention.",
+      "movement": "A wide room shot cuts to a lobby view across the counter. The guest advances within the lobby frame; specific camera travel is not clear.",
+      "extras": "Captioned narration says four different guests reported the same issue. Yellow outlined subtitles are visible; music and direct exchange audio were not evaluated.",
+      "dont_line": "Preserve multiple later complaints without inventing a new explanation for the smell."
+    },
+    {
+      "timestamp_range": "0:50 - 0:55",
+      "figure": "A red guest confronts the manager across reception; at the end, a group of red housekeeping figures enters the room area.",
+      "character_block": "Later motel guests (analyst-observed): adult-presenting, faceless fluorescent-red 3D figures. Individual identities and precise clothing details are not established by the images.\nMotel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.\nHousekeeping staff (analyst-observed): multiple adult-presenting, faceless fluorescent-red 3D figures with varied height and hair silhouettes. Uniform and facial details are not readable.",
+      "room": "The lobby counter and bulletin board fill most of the window before a cut to the room doorway and motel corridor. Artificial light and the red grade persist; time of day is not shown.",
+      "action": "The latest complaint peaks in a refund demand, prompting the manager to order a deep clean.",
+      "movement": "A medium-wide view across the desk holds through several gestures, then cuts to the moving staff group by the door.",
+      "extras": "Large white italic on-screen text reads “Give me a refund!” above the ordinary yellow subtitles. Native captions say the manager is fed up and orders a thorough clean; direct dialogue audio was not assessed.",
+      "dont_line": "Treat the refund line as a graphic of the complaint, not proof that the mystery is solved."
+    },
+    {
+      "timestamp_range": "0:55 - 1:00",
+      "figure": "Multiple red housekeeping figures walk together down the hall and through the open room door.",
+      "character_block": "Housekeeping staff (analyst-observed): multiple adult-presenting, faceless fluorescent-red 3D figures with varied height and hair silhouettes. Uniform and facial details are not readable.",
+      "room": "A motel corridor outside room 2805 with beige walls, red patterned carpet, overhead downlights, open white door and cleaning carts or bottles. Lighting is artificial; no time-of-day cue appears.",
+      "action": "The staff converges on the room for the ordered deep clean.",
+      "movement": "A low corridor view lets the group advance deeper toward the room; successive positions convey their walk. Independent camera movement is not certain from the samples.",
+      "extras": "Captioned voiceover calls in every available housekeeper to scrub from top to bottom. Yellow outlined subtitles continue; music and footstep sounds were not checked.",
+      "dont_line": "Keep the group focused on cleaning the same room; do not add a discovery here."
+    },
+    {
+      "timestamp_range": "1:00 - 1:05",
+      "figure": "Red housekeeping figures work near the bedroom floor and in the adjoining bathroom; the last frame cuts to the newly made bed.",
+      "character_block": "Housekeeping staff (analyst-observed): multiple adult-presenting, faceless fluorescent-red 3D figures with varied height and hair silhouettes. Uniform and facial details are not readable.",
+      "room": "Room 2805 and its bathroom: bed, red carpet, pale walls, bathroom tile and warm ceiling or wall lights. The red grade continues and no exterior time cue is shown.",
+      "action": "They scrub the room's surfaces in a quick cleaning montage.",
+      "movement": "The wide bedroom view shows one person bent to the floor and another inside the bathroom, then cuts to a tight front-on bed shot.",
+      "extras": "Native captions list carpets, floors, walls and ceiling. Yellow outlined subtitles sit low in frame; cleaning effects or music were not evaluated.",
+      "dont_line": "Show thorough work without visualizing the odor or exposing the space under the bed."
+    },
+    {
+      "timestamp_range": "1:05 - 1:10",
+      "figure": "No person is clearly visible; the bed and bedding dominate a sequence of close views.",
+      "character_block": "",
+      "room": "The motel bed fills the vertical frame with dark cover, white pillows and linens under warmer, less saturated room light. No window or reliable time-of-day marker is visible.",
+      "action": "The mattress and linens are replaced, then the made bed remains as the smell persists.",
+      "movement": "Successive tight bed compositions and quick cuts make the bedding replacement visual; a continuous lifting action by a person is not shown in the sampled frames.",
+      "extras": "Captions state the mattress is swapped, linens replaced and odor still present. Yellow subtitles remain; non-speech audio was not assessed.",
+      "dont_line": "Do not equate the replaced mattress with the source of the smell or reveal the under-bed object early."
+    },
+    {
+      "timestamp_range": "1:10 - 1:15",
+      "figure": "The made bed briefly fills the frame, then the red motel manager walks along the corridor toward the open room.",
+      "character_block": "Motel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "A close bedroom bed view cuts to a beige motel hall with white doors, red patterned carpet and artificial ceiling light. One sampled door plaque reads 2807 before a later plaque reads 2805; daylight is not visible.",
+      "action": "The failed deep clean leads the manager to decide to inspect the room personally.",
+      "movement": "A static-looking bed close-up cuts to a side-on medium full-body corridor view of the manager walking toward the doorway.",
+      "extras": "Native captions say the odor never fully disappears and the manager chooses to clean every inch himself. Yellow subtitles continue; other audio was not checked.",
+      "dont_line": "Keep the manager's identity stable and the room number consistent when recreating this sequence; avoid a premature reveal."
+    },
+    {
+      "timestamp_range": "1:15 - 1:20",
+      "figure": "The red manager enters room 2805, bends, and begins moving a piece of furniture.",
+      "character_block": "Motel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "Open door 2805 leads into the familiar dim bedroom with bed, patterned carpet, dark curtain and bedside lamp. Warm fixtures and a red cast light the interior; time of day is unknown.",
+      "action": "He shifts from walking into the room to clearing furnishings one item at a time.",
+      "movement": "A rear doorway view follows his path, then cuts wider to show him bending beside the furniture; no continuous camera travel can be confirmed.",
+      "extras": "Captioned voiceover says he will inspect every inch and is moving slowly. Yellow subtitles remain; object-handling sounds and music were not evaluated.",
+      "dont_line": "Make the inspection deliberate and keep the under-bed area hidden until the lift."
+    },
+    {
+      "timestamp_range": "1:20 - 1:25",
+      "figure": "The manager crouches at the bed; by the end, the dark bed frame begins to rise and partly blocks the view.",
+      "character_block": "Motel manager (analyst-observed): adult-presenting, faceless fluorescent-red 3D figure with short hair and an average build. Facial features and precise clothing details are not readable.",
+      "room": "Low view across the same bedroom's patterned red carpet, bed skirt and bathroom doorway. Practical room light leaves the underside of the bed shadowed; time of day is not shown.",
+      "action": "His search reaches the bed and he grips and lifts the frame in a measured, suspenseful motion.",
+      "movement": "A low wide bed-level shot tightens to a near-bed view, then the rising bed occupies most of the frame. The transition uses closer framing; the exact camera move is not established.",
+      "extras": "Native captions end around 1:24 after describing the crouch, grip and lift. Yellow subtitles disappear afterward; other audio was not assessed.",
+      "dont_line": "Keep the object obscured until the bed rises and avoid identifying it from this setup alone."
+    },
+    {
+      "timestamp_range": "1:25 - 1:30",
+      "figure": "A dark, bundled, body-sized shape is visible on the carpet beneath the raised bed; no face or identity can be confirmed.",
+      "character_block": "",
+      "room": "Tight, low under-bed view of the patterned motel carpet, wall baseboard, bed underside and shadowed bundle. Red room light catches the floor and fabric edges; no time-of-day cue appears.",
+      "action": "As the bed lifts out of the way, the hidden bundle is exposed and held as the final visual clue.",
+      "movement": "Low close framing stays under the bed while the raised frame reveals more of the bundle. The sampled images show the reveal but do not prove a separate camera move.",
+      "extras": "The native captions have already ended, so these seconds are supported by frames only. No final speech, musical cue or effect was verified.",
+      "dont_line": "Do not label the bundle as a particular person, identify a cause of death or invent a spoken explanation absent from the available evidence."
+    }
+  ]
+}

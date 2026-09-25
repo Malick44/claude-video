@@ -147,6 +147,7 @@ Optional flags:
 - `--resolution W` — change frame width in px (default 512; bump to 1024 only if the user needs to read on-screen text)
 - `--fps F` — override auto-fps (clamped to 2 fps max)
 - `--out-dir DIR` — keep working files somewhere specific (default: an auto-generated tmp dir)
+- `--json` — print one machine-readable JSON object on stdout instead of the Markdown report; progress and errors remain on stderr. For integrations, the object includes `source`, `work_dir`, `video_path`, `duration_seconds`, `detail`, optional `focus_range`, `media`, `frames`, `frame_metadata`, and `transcript`. Each `frames` entry has `timestamp_seconds`, absolute `path`, and selection `reason`; `transcript` has `source` (or `null`) and timestamped `segments` (`start`, `end`, `text`). The default Markdown output is unchanged.
 - `--whisper groq|openai` — force a specific Whisper backend (default: prefer Groq if both keys exist)
 - `--no-whisper` — disable the Whisper fallback entirely (frames-only if no captions)
 - `--no-dedup` — keep near-duplicate frames. By default a frame-delta pass drops frames that are visually near-identical to the previous kept one (held slides, static screen recordings, paused video) so the frame budget goes to distinct content; the report's **Frames** line notes how many were dropped. Pass this only if the user needs every sampled frame (e.g. judging subtle frame-to-frame motion).

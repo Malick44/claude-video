@@ -4,10 +4,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { db, must } from "../db";
 import { embed, toVector } from "../embeddings";
+import { assertFrameSceneWindows, FRAME_SCENE_MAX_SECONDS } from "../frame-windows";
 import { analyzeVideo } from "../llm/analyze";
+import { analyzeFrameScenes } from "../llm/frame";
 import { downloadVideo } from "../media/download";
 import { extractAudio, extractKeyframes, probeDuration, type Keyframe } from "../media/frames";
 import { transcribe, type Transcript } from "../media/transcribe";
+import { extractWatchFrames } from "../media/watch";
 import { cutsPerMinute, wordsPerMinute } from "../pacing";
 import type { VideoIntelligence } from "../schema";
 
@@ -49,10 +52,11 @@ export async function setStatus(id: string, status: string, error?: string) {
 export async function enrichVideo(video: VideoRow): Promise<{ analysis: VideoIntelligence; model: string; transcript: Transcript }> {
   const dir = await mkdtemp(join(tmpdir(), `vid-${video.id}-`));
   try {
-    const file = await downloadVideo({ mediaUrl: video.media_url, videoUrl: video.video_url, dir });
+    const file = await downloadVideo({ mediaUrl: video.media_url, videoUrl: video.video_url, dir, platform: video.platform });
     const duration = (await probeDuration(file)) ?? video.duration_seconds;
+    if (!duration || duration <= 0) throw new Error("Cannot build five-second FRAME scenes without a video duration");
 
-    const [{ frames, sceneCutTimes }, audio] = await Promise.all([extractKeyframes(file, dir, duration), extractAudio(file, dir)]);
+    const [{ frames, sceneCutTimes }, audio] = await Promise.all([extractKeyframes(file, dir, duration), extractAudio(file, dir, duration)]);
     const transcript: Transcript = audio ? await transcribe(audio) : { text: "", words: [], sentimentSegments: [] };
 
     const keyframes = await uploadFrames(video.id, frames);
@@ -72,17 +76,31 @@ export async function enrichVideo(video: VideoRow): Promise<{ analysis: VideoInt
       "store media",
     );
 
-    // Hook frames first (the spec's "first 3 frames"), then scene cuts for pacing/overlays.
-    const { analysis, model } = await analyzeVideo({
-      platform: video.platform,
-      handle: video.competitors.handle,
-      caption: video.caption,
-      durationSeconds: duration,
-      metrics: { views: video.views, outlierMultiplier: video.outlier_multiplier, engagementRate: video.engagement_rate },
-      transcript,
-      frames,
-      measured: { wpm, cutsPerMinute: cpm, sceneCuts: sceneCutTimes.length },
-    });
+    // watch supplies dense, timestamped scene evidence. The existing hook/cut
+    // extractor continues to serve pacing metrics and the overview breakdown.
+    const watch = await extractWatchFrames(file, dir, duration);
+    const [{ analysis, model }, frame] = await Promise.all([
+      analyzeVideo({
+        platform: video.platform,
+        handle: video.competitors.handle,
+        caption: video.caption,
+        durationSeconds: duration,
+        metrics: { views: video.views, outlierMultiplier: video.outlier_multiplier, engagementRate: video.engagement_rate },
+        transcript,
+        frames,
+        measured: { wpm, cutsPerMinute: cpm, sceneCuts: sceneCutTimes.length },
+      }),
+      analyzeFrameScenes({ durationSeconds: duration, frames: watch.frames, transcript }),
+    ]);
+    assertFrameSceneWindows(frame.scenes, duration);
+    analysis.frame_analysis = frame.scenes;
+    analysis.frame_analysis_meta = {
+      source: "watch",
+      detail: "balanced",
+      evidence_frames: watch.frames.length,
+      max_scene_seconds: FRAME_SCENE_MAX_SECONDS,
+      model: frame.model,
+    };
     return { analysis, model, transcript };
   } finally {
     await rm(dir, { recursive: true, force: true });

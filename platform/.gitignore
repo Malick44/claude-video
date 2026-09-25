@@ -4,3 +4,5 @@ next-env.d.ts
 *.tsbuildinfo
 .env
 .env.local
+supabase/.branches/
+supabase/.temp/

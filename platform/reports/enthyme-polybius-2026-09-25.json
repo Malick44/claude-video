@@ -1,0 +1,179 @@
+{
+  "source": {
+    "video_url": "https://www.tiktok.com/@enthyme/video/7678180276849134862",
+    "captured_at": "2026-09-25",
+    "method": "Manual review of the full public video using watch skill frames and native TikTok captions",
+    "duration_seconds": 87.765,
+    "caption_coverage_seconds": 76.281,
+    "pacing_basis": "242 caption words / 76.281 seconds; approximately 190 words per minute",
+    "limitations": "Native captions stop before the final 11.5 seconds; final beat is described from frames. No retention analytics or causal performance data were available. The original creator character prompt is unavailable; FRAME character blocks are analyst-observed. Music, sound effects, and continuous camera travel were not assessed from sampled frames and captions."
+  },
+  "analysis": {
+    "hook_analysis": {
+      "verbal_hook": "In 1981, a teenage boy visits a worn down arcade in his hometown of Portland, Oregon.",
+      "on_screen_text_hook": "In 1981,",
+      "visual_hook_description": "A dark exterior of Furby's Arcade with MISSING posters already visible on the storefront and mailbox; the story's apparent consequence is planted before the boy enters.",
+      "hook_archetype": "Curiosity Gap",
+      "retention_trigger": "The unexplained missing-person posters and an unmarked arcade cabinet suggest that the ordinary arcade conceals a threat."
+    },
+    "narrative_beats": [
+      {
+        "timestamp_range": "0:00 - 0:08",
+        "beat_type": "Hook",
+        "summary": "Places a teenage boy at a Portland arcade in 1981. Missing posters appear in the exterior shot before the narrator calls attention to them.",
+        "on_screen_text": "In 1981,"
+      },
+      {
+        "timestamp_range": "0:08 - 0:25",
+        "beat_type": "Context / Setup",
+        "summary": "The boy notices the black Polybius cabinet, which lacks a maker, serial number, and service details. The owner dismisses his question.",
+        "on_screen_text": "POLYBIUS"
+      },
+      {
+        "timestamp_range": "0:25 - 0:44",
+        "beat_type": "Story",
+        "summary": "Playing the game brings euphoria. He returns daily, while surreal orange duplicates and missing time show its grip on him.",
+        "on_screen_text": ""
+      },
+      {
+        "timestamp_range": "0:44 - 1:00",
+        "beat_type": "Agitation & Proof",
+        "summary": "He pulls away, finds missing-person posters bearing his own face, and discovers the exits are locked. A control monitor hints at a recognition and erasure test.",
+        "on_screen_text": "SELF-RECOGNITION TEST IN PROGRESS; ERASURE FAILURE!"
+      },
+      {
+        "timestamp_range": "1:00 - 1:16",
+        "beat_type": "Story",
+        "summary": "He forces open a staff door and finds a dark room of identical Polybius cabinets. While running through them, he knocks one down.",
+        "on_screen_text": "STAFF ONLY; GAME OVER"
+      },
+      {
+        "timestamp_range": "1:16 - 1:28",
+        "beat_type": "Payoff / Reveal",
+        "summary": "He lies on the floor; another figure is visible in the shadows. A suited man emerges from a bright server room with a glowing device. The video ends before explaining the device or the boy's fate.",
+        "on_screen_text": ""
+      }
+    ],
+    "structural_metrics": {
+      "pacing_words_per_minute": 190,
+      "cta_type": "None",
+      "cta_text": "",
+      "loop_mechanic": "None",
+      "pattern_interrupts": [
+        "Around 0:25, the ordinary arcade gives way to surreal floating orange duplicates.",
+        "Around 0:51, missing posters reveal the boy's face.",
+        "Around 1:00, the setting shifts behind a STAFF ONLY door into a room of identical cabinets.",
+        "Around 1:22, a brightly lit server room contrasts with the dark arcade as a suited man appears."
+      ]
+    },
+    "primary_topic_cluster": "Urban legend / arcade horror",
+    "takeaways_for_remixing": [
+      "Plant a consequence in the opening background, then make the protagonist discover its personal meaning later.",
+      "Introduce one concrete, anomalous object early; add a new clue or visual state as the character interacts with it.",
+      "Use a mid-story self-recognition turn to convert general danger into danger aimed at the protagonist.",
+      "If ending on a cliffhanger, make the final image pose a specific unresolved question. Test completion and rewatches before assuming that ambiguity helps reach."
+    ],
+    "frame_analysis": [
+      {
+        "timestamp_range": "0:00 - 0:08",
+        "figure": "No living person is identifiable in the sampled storefront views. Dark missing-person silhouettes appear on posters; the narrated boy is not yet visible in these sampled frames.",
+        "character_block": "",
+        "room": "Furby's Arcade exterior: green-and-white striped awning, pink neon sign, benches, street furniture, a parked red car, and several MISSING posters. Overcast daylight gives the street flat, cool light; the 1981 date comes from narration.",
+        "action": "The storefront is introduced with missing posters already in view before their significance is explained. This is a quick eight-second setup.",
+        "movement": "Vertical, street-level wide views of the facade. The sampled viewpoint shifts across the frontage; a continuous pan or dolly cannot be confirmed from extracted frames.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions place the story in Portland, Oregon, in 1981 and introduce a teenage visitor; no character dialogue is captioned.\nStyle: Stylized 3D exterior, pink neon against a gray sky, planted MISSING imagery, and bold yellow subtitles.",
+        "dont_line": "Keep the posters visible but unexplained at the opening; do not present the narrated urban-legend setup as verified history."
+      },
+      {
+        "timestamp_range": "0:08 - 0:18",
+        "figure": "The orange teenage boy approaches a simple black arcade cabinet with a bright POLYBIUS marquee and INSERT COIN screen. Other cabinets frame the aisle.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "Main arcade floor with dense patterned carpet, rows of colorful machines, square fluorescent ceiling panels, and purple-red cabinet spill. Indoor time of day is indeterminate.",
+        "action": "The boy moves from the ordinary game aisle toward the unmarked black Polybius cabinet; its marquee becomes the focus. The reveal takes about ten seconds.",
+        "movement": "Low-to-medium-wide vertical framing places the cabinet left and boy right, then uses closer cabinet views. No continuous camera travel is verifiable from sampled frames.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions name Polybius and say the cabinet lacks a maker, serial number, and service dates.\nStyle: The boy's intense orange treatment isolates him from the darker arcade; the cabinet's white lettering and cyan screen marks pull attention. Yellow subtitles remain on screen.",
+        "dont_line": "Keep the cabinet plain black and its provenance unexplained; avoid adding manufacturer marks that the narration says are absent."
+      },
+      {
+        "timestamp_range": "0:18 - 0:25",
+        "figure": "The orange boy gestures from across the counter toward an adult arcade owner seen from behind, with short hair and a dark gray-and-red polo. A newspaper lies on the wooden counter.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.\nArcade owner (analyst-observed): adult man with short dark hair, shown largely from behind in a dark gray shirt with red trim. His facial details are not distinguishable in the sampled frames.",
+        "room": "Dim counter area of the same arcade; basketball and soccer machines sit behind the boy, with patterned carpet and sparse overhead fluorescent light. Time of day is not established indoors.",
+        "action": "The boy asks about the cabinet and receives only a shrug; the brief exchange ends with the owner returning to his newspaper.",
+        "movement": "An over-the-owner's-shoulder medium-wide composition holds the boy across the counter. The sampled views do not establish a camera move.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions report the question and the shrug; they do not supply quoted dialogue from either character.\nStyle: The orange silhouette contrasts with the more naturally rendered owner; yellow narration subtitles carry the exchange.",
+        "dont_line": "Keep the owner's response dismissive and wordless; do not invent an explanation of the machine."
+      },
+      {
+        "timestamp_range": "0:25 - 0:35",
+        "figure": "The orange boy plays Polybius, then multiple orange versions of his figure appear suspended or upside down around the arcade as a subjective visual effect.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "The same arcade gives way to a more abstract presentation: central black cabinet, stretched multicolor floor, bright white overhead strips, and deep perspective. The visualized space has no reliable time-of-day cue.",
+        "action": "Starting the game shifts the boy from an ordinary standing player into a euphoric, disorienting visual state. The change is abrupt within roughly ten seconds.",
+        "movement": "A frontal wide view of the cabinet gives way to much broader, symmetrical views with floating figures at different depths. Cuts are visible in the sampled sequence; a continuous camera move is unverified.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions say he starts playing and feels an unusual euphoria despite simple gameplay.\nStyle: Surreal multiplication, impossible body orientation, streaked floor perspective, bright cabinet graphics, and yellow subtitles mark the subjective turn.",
+        "dont_line": "Treat the floating duplicates as a visual expression of his experience, not as proven separate characters in the arcade."
+      },
+      {
+        "timestamp_range": "0:35 - 0:45",
+        "figure": "The orange boy is shown at Polybius again, with the same T-shirt, shorts, and shoes. A repeated exterior view of the arcade marks passing days.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "The arcade facade recurs under gray daylight, then the fluorescent-lit interior returns with its saturated patterned carpet and black cabinet. Interior time of day is not directly visible.",
+        "action": "The boy repeatedly returns to the game until separate visits blur together; the montage compresses about a week into ten seconds.",
+        "movement": "Wide exterior reprise cuts to a side medium-wide view of the boy at the cabinet. The passage of time is conveyed by editing rather than verified camera travel.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions say he returns every morning, plays until closing, and develops gaps in his memory.\nStyle: Repeated location and wardrobe, glowing orange player against dark machines, and bold yellow subtitles create a visual loop.",
+        "dont_line": "Preserve the same boy, cabinet, and arcade geography across the repeated visits; avoid implying a specific missing event the video never shows."
+      },
+      {
+        "timestamp_range": "0:45 - 0:52",
+        "figure": "The orange boy stands between Polybius and the arcade counter, turning away from the cabinet. A pale mannequin-like figure is visible near the counter in a sampled view.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "Dim main arcade with neon wall sign, rows of machines, patterned carpet, and a counter; ceiling panels and cabinet light provide the visible illumination. Time of day is indeterminate.",
+        "action": "The boy pries himself away from the machine and puts distance between himself and it. The short beat slows into a moment of resistance.",
+        "movement": "Rear three-quarter medium-wide view keeps Polybius at frame left and the counter behind the boy. Camera travel is not established in sampled frames.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions say he senses something is wrong and uses willpower to leave the machine.\nStyle: His bright orange shape remains the focal point against the dark carpet and neon; yellow narration subtitles continue.",
+        "dont_line": "Keep the break from the game difficult and deliberate; do not add a new external rescuer or spoken warning."
+      },
+      {
+        "timestamp_range": "0:52 - 0:58",
+        "figure": "A MISSING poster displays a human headshot that the narration identifies as the boy. A pale, faceless mannequin-like figure stands beside a nearby game in the sampled insert.",
+        "character_block": "",
+        "room": "Arcade wall and counter area with multiple MISSING posters, a bowling game, colorful floor, and low fluorescent/cabinet illumination. Indoor time of day remains indeterminate.",
+        "action": "The formerly anonymous poster becomes a reveal about the protagonist: the missing person's face is his. The clue lands quickly, over about six seconds.",
+        "movement": "Tighter poster insert replaces wider arcade coverage. The sampled stills do not support a specific pan, zoom, or track.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions say the posters throughout the arcade depict him.\nStyle: MISSING / HAVE YOU SEEN ME? print, pale faceless display figure, dim arcade color, and yellow subtitles sharpen the self-recognition reveal.",
+        "dont_line": "Let the poster reveal remain the discovery; avoid showing a different named missing person as the answer."
+      },
+      {
+        "timestamp_range": "0:58 - 1:06",
+        "figure": "The orange boy is seen within the arcade and then side-on as he kicks a door marked STAFF ONLY. Pale mannequin-like figures appear in the surveillance-screen arcade view.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "Public arcade exit and counter-side staff door; a separate control monitor shows the arcade and the warning SELF-RECOGNITION TEST IN PROGRESS / ERASURE FAILURE. The staff doorway glows red against a dark wall. Time of day is not visible indoors.",
+        "action": "After the public doors will not open, the boy redirects his escape attempt and forces the staff door. The pacing accelerates into a quick kick.",
+        "movement": "A distant fixed-looking surveillance display is followed by a medium side view of the boy at the STAFF ONLY door. The transition is an edit; continuous camera travel is unverified.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions say the doors will not budge and he forces open a door behind the counter.\nStyle: Surveillance-screen insert, red warning typography, STAFF ONLY sign, red doorway light, and yellow subtitles add a systems-horror layer.",
+        "dont_line": "Keep the control-screen warning as an unresolved clue; do not add an explanatory operator or claim the test's outcome beyond its displayed text."
+      },
+      {
+        "timestamp_range": "1:06 - 1:16",
+        "figure": "The orange boy runs among repeated black Polybius cabinets, each with a bright marquee and GAME OVER screen; he collides with one cabinet near the end.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.",
+        "room": "Cramped back room with dark corrugated walls, diamond-plate floor, and rows of nearly identical cabinets extending into shadow. Teal cabinet glow and red spill are the main visible light; time of day is indeterminate.",
+        "action": "He races down the cabinet aisle and strikes one, sending it toward the floor. The ten-second run ends in a sudden impact.",
+        "movement": "Rear view down the aisle gives way to an oblique side angle at the collision. Motion is clear in the boy and cabinet; camera tracking is not independently confirmed by sampled frames.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions describe identical cabinets, his dash through the maze, and the collision; caption coverage ends at 1:16.281.\nStyle: Repeated glowing POLYBIUS marquees, GAME OVER screens, hard green/red contrast, and yellow subtitles intensify the maze.",
+        "dont_line": "Maintain the room as a maze of identical Polybius cabinets; do not turn the collision into an escape or show consequences not visible."
+      },
+      {
+        "timestamp_range": "1:16 - 1:28",
+        "figure": "The orange boy lies curled on the metal floor. Another person lies in a dark recess, identity unclear. A dark-haired man in a black suit, white shirt, and dark glasses comes out of a brightly lit server room carrying a small blue-glowing cylindrical device.",
+        "character_block": "Analyst-observed character block: Teenage boy rendered as a luminous orange-red 3D silhouette, with short tousled hair, a loose short-sleeve T-shirt, knee-length shorts, and low-top sneakers; facial details are indistinct.\nSuited man (analyst-observed): adult man with dark hair, black suit, white shirt, and dark glasses, shown against the bright server room. Detailed facial features are not distinguishable.",
+        "room": "Dark industrial back room opens onto a clean, white server room lined with equipment racks and regular bright ceiling lights. The suited man is mostly silhouetted by this cool backlight; the surrounding room remains nearly black. Time of day is not established.",
+        "action": "With the boy prone, the suited man walks toward the foreground and lifts the glowing device. The reveal builds over the final twelve seconds and cuts off without resolution.",
+        "movement": "Low close views of the fallen boy cut to the shadowed person, then to a frontal doorway composition; the man grows larger as he walks toward a seemingly fixed camera. No separate camera move is confirmed.",
+        "extras": "Sound: Music and sound effects were not assessed from the frame-and-caption extraction.\nSpeech: Native captions stop at 1:16.281, so spoken content in this ending is unverified.\nStyle: Strong dark-to-white lighting contrast, server racks, opaque black suit, small cyan glow, and an unexplained cliffhanger replace the earlier arcade palette.",
+        "dont_line": "Keep the shadowed person's identity, the device's function, and the boy's fate unresolved; do not invent dialogue or a completed experiment."
+      }
+    ]
+  }
+}

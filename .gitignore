@@ -8,9 +8,15 @@ __pycache__/
 htmlcov/
 .idea/
 .vscode/
+# local environment variables
+.env.local
 
 # build artifact from scripts/build-skill.sh
 /dist/
 
 # local Claude Code settings
 .claude/settings.local.json
+
+# generated media from skill runs (large; keep out of history)
+skills/outputs/
+/shows/nobody-moves/episodes/ep01_three_feet/output/ep01_clean_for_capcut.mp4

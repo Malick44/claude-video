@@ -56,10 +56,10 @@ export default function SearchPage() {
           {shown.map((r) => (
             <li key={r.id}>
               <button onClick={() => setOpenId(r.id)} className="flex w-full items-center gap-4 p-3 text-left hover:bg-zinc-900">
-                {r.thumbnail_url ? <img src={r.thumbnail_url} alt="" className="h-20 w-12 rounded object-cover" /> : <div className="h-20 w-12 rounded bg-zinc-800" />}
+                {r.thumbnail_url ? <img src={r.thumbnail_url} alt="" className={`h-20 rounded bg-black ${r.platform === "youtube_long" ? "w-36 object-contain" : "w-12 object-cover"}`} /> : <div className={`h-20 rounded bg-zinc-800 ${r.platform === "youtube_long" ? "w-36" : "w-12"}`} />}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 text-xs text-zinc-400">
-                    <span className="font-medium text-zinc-200">@{r.handle}</span>{PLATFORM_LABEL[r.platform]} · {r.hook_archetype}
+                    <span className="font-medium text-zinc-200">@{r.handle}</span> · {PLATFORM_LABEL[r.platform]} · {r.hook_archetype}
                   </div>
                   <div className="mt-1 line-clamp-2 text-sm">{r.hook_text ?? r.caption}</div>
                   <div className="mt-1 text-xs tabular-nums text-zinc-500">{compact(r.views)} views · {compact(r.saves)} saves · {r.primary_topic_cluster}</div>

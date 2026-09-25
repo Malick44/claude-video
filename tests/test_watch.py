@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -83,3 +84,38 @@ def test_no_dedup_preserves_static_frames(static_clip: Path):
     out = _run(static_clip, "--no-dedup")
     assert "near-duplicate" not in out
     assert _frame_lines(out) > 1
+
+
+def test_json_mode_reports_scene_frames_and_metadata(cut_clip: Path, tmp_path: Path):
+    work = tmp_path / "watch-output"
+    report = json.loads(_run(cut_clip, "--detail", "balanced", "--json", "--out-dir", str(work)))
+
+    assert report["source"] == str(cut_clip)
+    assert report["work_dir"] == str(work)
+    assert report["video_path"] == str(cut_clip.resolve())
+    assert report["detail"] == "balanced"
+    assert report["duration_seconds"] > 5
+    assert report["focus_range"] is None
+    assert report["frame_metadata"]["engine"] == "scene"
+    assert report["frame_metadata"]["selected_count"] == len(report["frames"])
+    assert report["transcript"] == {"source": None, "segments": []}
+    assert len(report["frames"]) > 1
+    assert [f["timestamp_seconds"] for f in report["frames"]] == sorted(
+        f["timestamp_seconds"] for f in report["frames"]
+    )
+    assert {"timestamp_seconds", "path", "reason"} == set(report["frames"][0])
+    assert all(Path(f["path"]).is_file() for f in report["frames"])
+
+
+def test_json_mode_preserves_focused_cue_timestamps(cut_clip: Path, tmp_path: Path):
+    report = json.loads(_run(
+        cut_clip, "--detail", "transcript", "--json", "--out-dir", str(tmp_path / "watch-output"),
+        "--start", "1", "--end", "3", "--timestamps", "1.5,4",
+    ))
+
+    assert report["focus_range"] == {"start_seconds": 1.0, "end_seconds": 3.0}
+    assert report["frame_metadata"]["cue_count"] == 1
+    assert report["frame_metadata"]["dropped_cues_out_of_window"] == 1
+    assert len(report["frames"]) == 1
+    assert report["frames"][0]["timestamp_seconds"] == 1.5
+    assert report["frames"][0]["reason"] == "transcript-cue"

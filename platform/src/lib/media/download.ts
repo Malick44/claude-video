@@ -11,7 +11,7 @@ import { run } from "./exec";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128 Safari/537.36";
 
-export async function downloadVideo(opts: { mediaUrl: string | null; videoUrl: string; dir: string }): Promise<string> {
+export async function downloadVideo(opts: { mediaUrl: string | null; videoUrl: string; dir: string; platform?: string }): Promise<string> {
   const out = join(opts.dir, "video.mp4");
   if (opts.mediaUrl) {
     try {
@@ -24,6 +24,8 @@ export async function downloadVideo(opts: { mediaUrl: string | null; videoUrl: s
       // fall through to yt-dlp
     }
   }
-  await run("yt-dlp", ["-f", "mp4/bestvideo[height<=1080]+bestaudio/best", "--merge-output-format", "mp4", "-o", out, "--no-playlist", "--quiet", opts.videoUrl], 300_000);
+  const longForm = opts.platform === "youtube_long";
+  const format = longForm ? "best[height<=720]/bestvideo[height<=720]+bestaudio/best" : "mp4/bestvideo[height<=1080]+bestaudio/best";
+  await run("yt-dlp", ["-f", format, "--merge-output-format", "mp4", "-o", out, "--no-playlist", "--quiet", opts.videoUrl], longForm ? 900_000 : 300_000);
   return out;
 }

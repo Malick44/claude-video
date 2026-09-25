@@ -41,6 +41,18 @@ export const CTA_TYPES = [
   "None",
 ] as const;
 
+export const FrameSceneSchema = z.object({
+  timestamp_range: z.string().describe("Scene range in M:SS - M:SS format; no longer than five seconds."),
+  figure: z.string().describe("F — observable people, characters, or objects in the shot."),
+  character_block: z.string().describe("F — exact, stable analyst-observed character description repeated verbatim in every scene where that character appears; empty if no character is visible. Do not present it as the creator's original prompt."),
+  room: z.string().describe("R — visible setting, environment, time of day when supported, and lighting; mark unknown details as unknown."),
+  action: z.string().describe("A — one primary change from the beginning to the end of this scene, including its pacing."),
+  movement: z.string().describe("M — camera framing and only camera movement supported by the visual evidence; say unknown if motion cannot be determined."),
+  extras: z.string().describe("E — evidenced sound, speech, and stylistic choices. State when audio is unassessed; do not invent sounds."),
+  dont_line: z.string().describe("E — an analyst continuity or avoidance rule for recreating this scene, clearly a recommendation rather than observed fact."),
+});
+export type FrameScene = z.infer<typeof FrameSceneSchema>;
+
 export const VideoIntelligenceSchema = z.object({
   hook_analysis: z.object({
     verbal_hook: z.string().describe("First spoken sentence(s), verbatim. Empty string if no speech."),
@@ -57,6 +69,14 @@ export const VideoIntelligenceSchema = z.object({
       on_screen_text: z.string().describe("Overlay text during this beat, empty if none."),
     }),
   ),
+  frame_analysis: z.array(FrameSceneSchema).optional(),
+  frame_analysis_meta: z.object({
+    source: z.literal("watch"),
+    detail: z.literal("balanced"),
+    evidence_frames: z.number().int().nonnegative(),
+    max_scene_seconds: z.literal(5),
+    model: z.string(),
+  }).optional(),
   structural_metrics: z.object({
     pacing_words_per_minute: z.number(),
     cta_type: z.enum(CTA_TYPES),
