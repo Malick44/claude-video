@@ -22,6 +22,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -44,11 +45,22 @@ BUILD = CACHE = None
 FFMPEG = None
 
 
+def has_filter(exe, name):
+    out = subprocess.run([exe, "-hide_banner", "-filters"], capture_output=True, text=True).stdout
+    return re.search(rf"^\s*\S+\s+{name}\s", out, re.M) is not None
+
+
 def ffmpeg():
+    # The bundled imageio-ffmpeg build has no rubberband, which the pitched voices need, so prefer
+    # a system ffmpeg that does (brew install ffmpeg) and fall back to the bundled one.
     global FFMPEG
     if FFMPEG is None:
         import imageio_ffmpeg
         FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+        if not has_filter(FFMPEG, "rubberband"):
+            system = shutil.which("ffmpeg")
+            if system and has_filter(system, "rubberband"):
+                FFMPEG = system
     return FFMPEG
 
 
