@@ -20,6 +20,7 @@ It's a grey-sided house with a white porch, a black front door, a brass lantern 
 | Porch steps | **Lorraine**, the white porch goose |
 | Beside the front door | **The wind chime**, the anonymous source |
 | Front edge of the lawn | **Ray**, the solar frog (seen in the doorbell cam, not interviewed yet) |
+| Side yard, out of the doorbell cam's view | **Dale**, the inflatable Christmas snowman nobody took down (from Ep. 6) |
 
 ## Cast
 
@@ -34,6 +35,7 @@ The voices are defined in [`cast.py`](cast.py) and shared by every episode.
 | **Mr. Basin** | Declines to comment. Represents himself ("My client has no comment"). Has never lost a case, and has never had one. | `bm_lewis`, pitched down (from Ep. 2) |
 | **The wind chime** | Anonymous source, voice altered. Only talks when it's windy. | `af_nicole`, disguised |
 | **Ray** | Solar frog. Can only talk after a full day of sun, and only remembers back to his last full charge. Cheerful once lit. It was cloudy for eleven days after the interview request; on day 12 he lit up (Ep. 4). | `am_puck`, pitched up (from Ep. 4) |
+| **Dale** | Inflatable Christmas snowman, still up in June. On a timer: up at 5 PM, flat at 11. Slow, deflated, unbothered. Whatever he's accused of, being flat is his answer ("I don't have hands." "I barely have a shape."). | `am_michael`, slow and slightly low (from Ep. 6) |
 
 ## Image style
 
@@ -44,7 +46,7 @@ Append this to every image prompt so new stills match the existing ones:
 The series library lives in `stills/`: `garrison`, `porch`, `holes`, `yard_before`, `yard_after`, `aerial` (the cul-de-sac from above, behind every title card), `lorraine` (her interview close-up), `chime`, `basin_counsel` (Mr. Basin with his briefcase), `ray` (under grey skies), `ray_lit` (Ray at night with his solar light on) and `ray_sun` (Ray in the first sun in twelve days), `lorraine_bee` and `lorraine_easter` (the `lorraine` close-up in two of her outfits), `cork` (the evidence board), and the derived doorbell frames `yard_gone` (frame 428 on), `yard_turned` (frame 431 on, Garrison mirrored) and `yard_back` (frame 436, Lorraine back on the step), both derived by `episodes/ep05_saturday/make_stills.py`. `ray_night` (`ray` relit at night by `episodes/ep04_only_when_its_sunny/make_stills.py`) is kept as the deterministic fallback behind `ray_lit`. Every episode can use all of it.
 
 Stills still wanted:
-- Ep. 5: `mower_shadow`, the Mower seen only as a shadow crossing the lawn in hard Saturday-morning light; and `lorraine_fitting`, the `lorraine` close-up in the outfit she comes back in. The prompts are in the episode's `STILLS`. Until then the reenactment uses a crop of `holes` and the fitting uses `lorraine_easter`.
+- (done) Ep. 6: `snowman_flat`, Dale deflated in a heap on the side-yard grass; and `timer`, the mechanical outdoor timer with one lone pin pushed in. The prompts are in the episode's `STILLS`. Both are generated and in the library (GPT Image 2.5, 2026-09-27).
 - A new Lorraine outfit is an edit of `lorraine` with only the outfit changed, so every version keeps the same framing and cuts cleanly.
 
 ## Clue ledger (continuity)
@@ -70,7 +72,11 @@ Stills still wanted:
 | 5 | **The Mower**, the street's most feared event, comes on Saturdays and is only ever a shadow. June 13th was a Saturday, so it came the morning before Deb moved. Garrison: "Not once have I been put back facing the same way." | open: the Mower means a **person** handles this yard, and puts everything back wrong |
 | 5 | Lorraine on where she went at 03:12:16: "I was at a fitting, hon." It's Saturday. Asked who dresses her: "That's a very personal question, detective." | open: **who dresses the goose?** now tied to Saturdays and to whoever the Mower is |
 | 5 | Mr. Basin is now the goose's attorney too, retained by nobody. He objects; there is still no judge. | running gag |
-| 5 | **Hidden:** in frame 436 (03:12:29), **Lorraine is back on the porch step.** The step is empty in 435, and has been since 428 (03:12:16). She was gone thirteen seconds. Garrison is still turned away in both. | unrevealed; pay off early in Ep. 6 |
+| 5 | **Hidden:** in frame 436 (03:12:29), **Lorraine is back on the porch step.** The step is empty in 435, and has been since 428 (03:12:16). She was gone thirteen seconds. Garrison is still turned away in both. | **paid off in Ep. 6** (replay: "SHE CAME BACK."). Her defense: "They had my size, hon." |
+| 6 | **Dale**, the inflatable snowman in the side yard, nobody took down after Christmas. It's June. Alibi: on a timer, up at 5 PM, flat at 11, so flat at 3:12. "An airtight alibi." "Nothing about me is airtight." | running gag: being flat is his answer to everything |
+| 6 | EXHIBIT C: his mechanical timer has one extra pin pushed in, **3:00 to 3:15 AM**. At 3:12, Dale was eight feet tall, the tallest witness in the yard. He didn't set it: "I don't have hands." | open: **who set the timer?** Somebody was in this yard; ties to the Mower and to whoever dresses the goose. What Dale saw from eight feet up is also open |
+| 6 | Mr. Basin claims Dale as a client. "He isn't your client." "Then he has no counsel. And no comment." | running gag |
+| 6 | **Hidden:** in frame 530 (03:15:00), the moment the timer clicks off, **the window beside the porch of No. 7 lights up.** It's dark in 529 and in every earlier frame. Somebody inside No. 7 is awake. | unrevealed; pay off early in Ep. 7 |
 
 ## Doorbell cam: No. 5, night of June 13–14
 
@@ -88,6 +94,8 @@ Every doorbell shot of that night must agree with this table. Frames tick roughl
 | 431 | 03:12:21 | **Garrison turned around**, facing away from Deb | `yard_gone` + `lit=[Ray]` + `alter_box` on Garrison, `(0.112, 0.486, 0.215, 0.612)` |
 | 435 | 03:12:25–28 | As 431: step still empty, Garrison still turned away | `yard_turned` (library) + `lit=[Ray]` |
 | 436 | 03:12:29 | **Lorraine is back on the porch step**, Garrison still turned away | `yard_back` (library) + `lit=[Ray]` |
+| 529 | 03:14:58 | As 436 | `yard_back` + `lit=[Ray]` |
+| 530 | 03:15:00 | **The window beside the porch of No. 7 is lit** (the snowman's timer has just clicked off) | `yard_back` + `lit=[Ray]` + `alter_glow` on the window, `(0.685, 0.078, 0.022)`. Later frames carry it as `lit` |
 
 Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that changes something else, derive a new still from the latest one with a pixel edit, as Ep. 3 does, and save it in `stills/`, where every episode can replay it. Two separately generated images never match.
 
@@ -98,8 +106,8 @@ Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that ch
 3. **The Goose** (written). Lorraine swears she wore the bumblebee costume that night; after the next cut she's in an Easter dress, and Exhibit A shows her in nothing: "I was between outfits." "I don't pick them, detective." Pays off Ep. 2 (Ray was awake; it's been cloudy for nine days). New clue: in frame 428 the porch step is empty.
 4. **Only When It's Sunny** (written). Pays off Ep. 3 (frame 428: "LORRAINE LEFT."). Ray, the one witness awake at 3:12, can only talk after a full day of sun: day ten, cloudy; day eleven, cloudier. Mr. Basin appoints himself the frog's counsel. On day 12 Ray lights up: "I don't remember." He only remembers back to his last full charge. New clue: in frame 431 Garrison has turned around.
 5. **Saturday** (written). Pays off Ep. 4 (frame 431: "GARRISON TURNED AWAY."), and his defense opens the episode out: he turned toward the street, because June 13th was a Saturday. The Mower is reenacted as a shadow crossing the lawn — eleven minutes, and nobody is put back facing the same way. Lorraine on where she went: "I was at a fitting, hon." It's Saturday. Who dresses her is "a very personal question, detective." New clue: in frame 436 Lorraine is back, after thirteen seconds.
-6. **The Inflatable.** Pays off Ep. 5 (frame 436: Lorraine came back). The holiday inflatable nobody took down has an airtight alibi ("I was flat from 11 to 6"). Then its timer turns up, set for 3:10 AM — which is a Saturday setting, and someone sets it.
-7. **Finale.** The original pitch was "Deb has two legs. She has been standing on one since 1994." The current Deb stills show her on two legs, so either rework this reveal or make one-leg Deb stills early and plant them.
+6. **The Inflatable** (written). Pays off Ep. 5 (frame 436: "SHE CAME BACK." "They had my size, hon."). Dale, the inflatable snowman nobody took down after Christmas, has an airtight alibi: flat from 11 to 5 on his timer. "Nothing about me is airtight." Then his timer turns up with one extra pin, 3:00 to 3:15 AM: at 3:12 he was eight feet tall. He didn't set it; he doesn't have hands. Somebody was in this yard. New clue: in frame 530 the window beside the porch lights up.
+7. **The Finale.** Pay off Ep. 6 first (frame 530: "SOMEBODY WAS AWAKE."): a person inside No. 7 is the thread that ties the Mower, the fittings and the timer together. The original pitch was "Deb has two legs. She has been standing on one since 1994." The current Deb stills show her on two legs, so either rework this reveal or make one-leg Deb stills early and plant them.
 
 Between episodes, post 15–25 second **Confessionals**: one ornament airing one grudge, ending with "Episode 1 is pinned."
 
