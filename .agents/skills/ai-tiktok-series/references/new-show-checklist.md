@@ -28,7 +28,7 @@ These files are show-neutral. Don't touch them unless you have a reason.
 | `requirements.txt` | Pins `kokoro-onnx` and `espeakng-loader`, which shape how every voice sounds. |
 | `tools/common.sh` | `find_python` (3.10–3.13), `download`, sha256-pinned Kokoro model files, `check_espeak_path`. |
 | `tools/install-kokoro.sh`, `tools/kokoro_say.py` | The user-wide `kokoro` command. It is shared by every show, so a user who installed it for NOBODY MOVES already has it. Only the example lines mention Garrison and Lorraine. |
-| `.gitignore`, `.env.example` | Ignore `.venv/`, `assets/`, `episodes/*/build/`, `sound_kit/`, `.env`; list the three stock-API keys. |
+| `.gitignore`, `.env.example` | Ignore `.venv/`, `assets/`, `episodes/*/build/`, `sound_kit/`, `channel/build/`, `.env`; list the three stock-API keys. |
 | `pipeline/deliver.py` | Two-pass H.264 copy under `--max-mb 29` (default). |
 | `pipeline/grid.py` | Coordinate grid overlay: `grid.py <still> -o episodes/<ep>/build/<key>_grid.png [--box x0,y0,x1,y1] [--bright 2.5]`. Without `-o` it writes next to the still, into the library you commit. |
 | `pipeline/safezones.py` | Renders sample moments with and without text and flags any text under TikTok's, Reels' or Shorts' UI (`ZONES`); `review.py` runs it. Writes `build/review/zones.png`. |

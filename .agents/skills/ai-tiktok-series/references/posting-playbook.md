@@ -3,6 +3,7 @@
 ## Contents
 - Delivery specs
 - Reels and Shorts
+- Channel setup
 - Labeling and disclosure
 - Licensing
 - Launch plan
@@ -41,11 +42,28 @@ The same upload copy works as an Instagram Reel and a YouTube Short: the same fr
 - **YouTube re-compresses everything,** so the master (`build/<ep>.mp4`) looks a little sharper there than the 29 MB upload copy. Use it when you have it.
 - **Pin and link the start on every platform:** pin Episode 1 on Instagram, and put the episodes in a YouTube playlist, linked from each Short.
 
+## Channel setup
+
+Set up all three accounts before the first post. NOBODY MOVES's `channel/CHANNEL.md` has finished copy for every field, and `channel/make_channel_art.py` builds the art from the show's stills and fonts. For a new show, copy both and change the constants.
+
+| | TikTok | Instagram | YouTube |
+|---|---|---|---|
+| Profile picture | circle; shown at about 48 px in the feed | 320×320 stored, 110 px shown | 800×800, circle |
+| Banner | none: the video grid is the cover | none: the grid (3:4 crops) and highlights | 2560×1440, 6 MB max. Every device shows the middle 423 px band. A phone shows only the middle 1546 px of it |
+| Bio | 80 characters (some accounts get 160) | 150 characters; the name field is searchable | 1,000-character description, plus keywords |
+| Link | from 1,000 followers (personal account) | up to 5 | several; the first shows on the channel page |
+| Pins | 3 videos | 3 posts | a playlist on the channel home |
+
+- **Keep one name and handle on all three apps.** Pick a fallback handle that is valid on all three, with letters, digits and a period.
+- **The profile picture is the title, not a character.** A new season can bring a new cast without losing the account's face. Use a flat, loud color from the show's palette: it is the one thing that reads at 48 px.
+- **The banner is per season.** The case, its witnesses and its address go on the banner and in the YouTube description. The short bios describe the format, so they survive a new season.
+- **The bio credits the human.** Write "written by [creator]". Add "voiced by" only if the creator records the voices; with a TTS cast, it would be false.
+
 ## Labeling and disclosure
 
 - **Turn on the AI label** on every post: TikTok's AI-generated content label, Instagram's "AI info", YouTube's "altered or synthetic content". The format is built to work with the label on.
 - **Write the disclaimer as a joke,** on the end card. NOBODY MOVES: "Reenactments dramatized with AI. The flamingo is real."
-- **Put "written and voiced by [creator]" in the bio.** Human authorship is what separates the show from slop, and it is the evidence of authorship.
+- **Put "written by [creator]" in the bio,** and "voiced by" only when the creator records the voices. Human authorship is what separates the show from slop, and it is the evidence of authorship.
 - **Disclose brand deals** as both paid and synthetic. Never present AI testimonials as real.
 
 ## Licensing
