@@ -29,6 +29,7 @@ CAST = {
     "CHIME": {"voice": "af_nicole", "speed": 1.05, "pitch": 0.72, "altered": True},
     "MR. BASIN": {"voice": "bm_lewis", "speed": 0.95, "pitch": 0.92},  # birdbath, and his own lawyer (from Ep. 2)
     "RAY": {"voice": "am_puck", "speed": 1.1, "pitch": 1.08},        # solar frog, perky once charged (from Ep. 4)
+    "DALE": {"voice": "am_michael", "speed": 0.9, "pitch": 0.97},    # inflatable snowman, slow and deflated (from Ep. 6)
     # New speakers: English presets only (af_/am_/bf_/bm_). build_audio.py phonemizes "a..." voices
     # as US English and every other voice as British.
 }
