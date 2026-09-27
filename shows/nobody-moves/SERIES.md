@@ -102,3 +102,16 @@ Ray's light in `yard_after` is `(0.183, 0.768, 0.02)`. For a later frame that ch
 7. **Finale.** The original pitch was "Deb has two legs. She has been standing on one since 1994." The current Deb stills show her on two legs, so either rework this reveal or make one-leg Deb stills early and plant them.
 
 Between episodes, post 15–25 second **Confessionals**: one ornament airing one grudge, ending with "Episode 1 is pinned."
+
+### Confessionals (written)
+
+Each is a folder under `episodes/`, numbered after the episode it follows, and builds like an episode. None plants a clue.
+
+| Folder | Post after | Grudge | Continuity |
+|---|---|---|---|
+| `ep01c_deb_consent` | Ep. 1 | Deb never speaks, so the narrator asks for her and reads each silence as a yes: "Can we delete Episode 1?" … "Didn't think so." | Deb has still never spoken. Name card: "Consent: implied" |
+| `ep02c_chime_anonymous` | Ep. 2 | The anonymous source was promised nobody would know it was the chime. "They altered my voice. Then they added wind chimes." "I am not a wind—" and the wind stops | The chime's Ep. 2 sentence stays unfinished |
+| `ep04c_ray_hat` | Ep. 4 | Ray reports Garrison's hat for stealing his sun at sunset. He remembers only today's sunset: "Worst one of my life!" | Ray's memory resets at each full charge |
+| `ep04c_basin_frog` | Ep. 4 | Mr. Basin, the frog's self-appointed counsel: "The frog talked. Without his attorney present." "He represented himself. … Amateur." | Mr. Basin's record: 0–0 |
+| `ep05c_garrison_doorbell` | Ep. 5 | Garrison calls the No. 5 doorbell nosy and knows its specs by heart ("a picture every 1.6 seconds"), yet "was facing the other way." | Name card "Facing: the doorbell"; the "Facing:" line so far is "the other way" (Eps. 2, 4), "the street" (Ep. 5), "the doorbell" (5c). Never write it as Garrison turning himself: the open Mower thread says a person handles this yard |
+| `ep05c_lorraine_changed` | Ep. 5 | "Everyone says I've changed, hon." Jump cuts through her outfits: "I haven't changed. I've been changed." "Twelve outfits since March." | Twelve outfits since March (Garrison said eleven in Ep. 3; the fitting makes twelve) |
