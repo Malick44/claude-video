@@ -412,12 +412,12 @@ def draw_corner_label(frame, shot):
     if not label:
         return
     d = ImageDraw.Draw(frame)
-    fnt = font("Oswald", 42, "Bold")
-    x, y = 64, 575 if shot["kind"] == "board" else 352
-    width = int(d.textlength(label, font=fnt)) + 36
-    d.rounded_rectangle((x, y, x + width, y + 62), radius=5, fill=(12, 12, 13, 225))
-    d.rectangle((x, y, x + 7, y + 62), fill=YELLOW + (255,))
-    d.text((x + 20, y + 28), label, font=fnt, fill=(255, 255, 255, 255), anchor="lm")
+    fnt = font("Oswald", 58, "Bold")
+    x = 64
+    y = {"board": 520, "evidence": 344, "doorbell": 326}.get(shot["kind"], 216)
+    width = int(d.textlength(label, font=fnt)) + 44
+    d.rounded_rectangle((x, y, x + width, y + 82), radius=6, fill=YELLOW + (255,))
+    d.text((x + 22, y + 39), label, font=fnt, fill=(12, 12, 13, 255), anchor="lm")
 
 
 def exhibit_tag(label, stamp):
