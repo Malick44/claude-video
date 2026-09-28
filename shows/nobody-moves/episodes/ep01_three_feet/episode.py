@@ -8,6 +8,7 @@ the same timeline into 1080x1920 frames. Change a line here and both follow.
 
 TITLE = "NOBODY MOVES"
 EPISODE = "EPISODE 1: THREE FEET"
+CORNER_LABEL = "EPISODE 1"
 NEXT_UP = "NEXT: EPISODE 2 \u2014 I WAS RIGHT HERE"
 # The hidden clue in the doorbell-cam flicker (kept out of the video; SCRIPT.md only).
 ANSWER = ("In frame 418 Lorraine the porch goose has turned to face the other way. Deb's jump is "

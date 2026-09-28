@@ -406,6 +406,20 @@ def draw_caption(frame, t):
             return
 
 
+def draw_corner_label(frame, shot):
+    """Optional episode badge, inset below the apps' top bars."""
+    label = getattr(ep, "CORNER_LABEL", None)
+    if not label:
+        return
+    d = ImageDraw.Draw(frame)
+    fnt = font("Oswald", 42, "Bold")
+    x, y = 64, 575 if shot["kind"] == "board" else 352
+    width = int(d.textlength(label, font=fnt)) + 36
+    d.rounded_rectangle((x, y, x + width, y + 62), radius=5, fill=(12, 12, 13, 225))
+    d.rectangle((x, y, x + 7, y + 62), fill=YELLOW + (255,))
+    d.text((x + 20, y + 28), label, font=fnt, fill=(255, 255, 255, 255), anchor="lm")
+
+
 def exhibit_tag(label, stamp):
     im = Image.new("RGBA", (520, 150), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
@@ -783,6 +797,7 @@ def render(t, fi):
         draw_lower_third(frame, shot, lt)
     if k not in ("qcard", "end", "title"):
         draw_caption(frame, t)
+    draw_corner_label(frame, shot)
     return frame.convert("RGB")
 
 
