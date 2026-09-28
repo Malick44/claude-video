@@ -1,5 +1,10 @@
 # Channel setup: TikTok, Instagram, YouTube
 
+## Live channel status (September 28, 2026)
+
+- **YouTube:** [NOBODY MOVES](https://www.youtube.com/channel/UCBFRV8Iq9B8yRuoQYPoBpRQ) is live at `@nobodymovescase`. The profile picture, banner, description and channel keywords are published.
+- **TikTok and Instagram:** account creation has not been verified here. Use `@nobodymovescase` if available to keep the handles aligned.
+
 One name, one handle and one profile picture on all three apps. The profile picture is the show's title, not a character, so it outlives a season's cast. The YouTube banner shows the season's witnesses and changes each season. The bios describe the format, and only the YouTube description tells the season's story.
 
 Make the art with `.venv/bin/python channel/make_channel_art.py` and the grid covers with `.venv/bin/python channel/make_covers.py`, both run from `shows/nobody-moves/`. Add `--preview` to either to also write `channel/build/`, which shows the files at the sizes the apps display them.
@@ -14,7 +19,7 @@ Make the art with `.venv/bin/python channel/make_channel_art.py` and the grid co
 ## Name and handle
 
 - **Name:** `NOBODY MOVES` on TikTok and YouTube. On Instagram, use `NOBODY MOVES | true crime`, because Instagram searches the name field.
-- **Handle:** `@nobodymoves` everywhere. If it's taken on any app, use the same fallback on all three: `@nobodymoves.case`, `@nobodymovescase` or `@watchnobodymoves`. All three apps allow these characters.
+- **Handle:** The live YouTube handle is `@nobodymovescase`. Use the same handle on TikTok and Instagram if available.
 - Search each app for "nobody moves" before you claim the handle.
 
 ## Profile picture
