@@ -1,11 +1,11 @@
 ---
 name: nobody-moves-render
-description: Render a NOBODY MOVES episode or Confessional to its final 1080x1920 MP4s with the shows/nobody-moves pipeline, verify the files (format, stream lengths, size, black frames, loudness), and review the result side by side against a reference episode with pipeline/review.py, which compares pacing and grabs the same story beats from both videos at phone size. Use this whenever the user wants an episode rendered or re-rendered, asks to check, QA or review a finished video, wants to compare one episode with another ("compare episode 3 with episode 2"), or says "render episode 4", even without naming the pipeline. The nobody-moves-renderer subagent preloads this skill. Writing the script belongs to nobody-moves-write-episode; placing new images, voices and framing fixes belong to nobody-moves-produce-episode; sound changes belong to nobody-moves-sound-design.
+description: Render a NOBODY MOVES episode or Confessional to its final 1080x1920 MP4s with the shows/nobody-moves pipeline, adjust renderer-owned on-screen graphics, verify the files (format, stream lengths, size, black frames, loudness), and review the result side by side against a reference episode with pipeline/review.py. Use this whenever the user wants an episode rendered or re-rendered, requests a video label or graphic adjustment, asks to check, QA or review a finished video, or wants to compare episodes. The nobody-moves-renderer subagent preloads this skill. Writing the script belongs to nobody-moves-write-episode; placing new images, voices and framing fixes belong to nobody-moves-produce-episode; sound changes belong to nobody-moves-sound-design.
 ---
 
 # Render and review a NOBODY MOVES episode
 
-This skill turns a written, framed episode into its final videos, proves the files are right, and reviews them against an episode the user has already seen. Whoever runs it reports problems and doesn't fix the script, the images or the sound: those belong to the skills named at the end, and a render is the wrong moment to change them silently.
+This skill turns a written, framed episode into its final videos, proves the files are right, and reviews them against an episode the user has already seen. Renderer-owned graphics can be changed here when requested. Script, image and sound problems belong to the skills named at the end; report those rather than changing them silently during a render.
 
 **You can't watch video.** Judge from frame grabs and measurements, and say so in the report.
 
@@ -45,6 +45,8 @@ $PY pipeline/render.py episodes/<ep> --contact          # one frame per shot, se
 ```
 
 Open `build/contact.png`. A missing still shows as a labeled placeholder card, and an unknown shot kind renders as the end card; both are cheaper to catch here than after 10 minutes. Each cell is labeled with its shot id and time, and doorbell shots are grabbed paused on the clue frame, with their call to action. Framing problems go back to `nobody-moves-produce-episode`, section 4.
+
+**Episode corner labels:** An episode can set `CORNER_LABEL = "EPISODE 1"` in its `episode.py`. `draw_corner_label()` in `pipeline/render.py` draws it on every frame; episodes without that setting get no badge. For a requested size, color or placement change, edit that renderer function, then preview the hook, both evidence shots, board and doorbell before the full render. Keep the badge below the apps' top bars and clear of exhibit stamps, the doorbell readout and the board's polaroids; a shot-specific vertical position is appropriate where those elements compete. Run `pipeline/safezones.py episodes/<ep>` after the edit, since it detects badge text along with other text. Do not make a badge universal unless the user asks for the series-wide change.
 
 ## 4. Render
 
