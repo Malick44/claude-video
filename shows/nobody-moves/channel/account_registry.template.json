@@ -1,0 +1,65 @@
+{
+  "show": "NOBODY MOVES",
+  "kit_date": "2026-09-28",
+  "recommended_launch_version": "A_puzzle_first",
+  "shared_handle_candidate": "@nobodymovescase",
+  "shared_handle_verified": false,
+  "pilot_candidate": "/Users/malickdes/Downloads/NOBODY_MOVES_Ep1_Three_Feet.mp4",
+  "pilot_approved_for_upload": false,
+  "owner_authorized_to_publish": false,
+  "accounts": {
+    "tiktok": {
+      "status": "not_created",
+      "handle": null,
+      "profile_url": null,
+      "profile_copy_version": "A",
+      "avatar": "tiktok/art/avatar_title.png",
+      "cross_links_checked": false,
+      "post_001": {
+        "status": "not_published",
+        "url": null,
+        "caption_version": "A",
+        "cover": "tiktok/art/cover_clue.jpg",
+        "pinned_comment_added": false,
+        "video_pinned": false,
+        "ai_disclosure_checked": false
+      }
+    },
+    "facebook": {
+      "status": "not_created",
+      "handle": null,
+      "profile_url": null,
+      "profile_copy_version": "A",
+      "avatar": "facebook/art/avatar_title.png",
+      "page_cover": "facebook/art/cover_clue.jpg",
+      "cross_links_checked": false,
+      "post_001": {
+        "status": "not_published",
+        "url": null,
+        "caption_version": "A",
+        "cover": "facebook/art/reel_cover_clue.jpg",
+        "first_comment_added": false,
+        "welcome_post_url": null,
+        "ai_disclosure_checked": false
+      }
+    },
+    "youtube": {
+      "status": "not_created",
+      "handle": null,
+      "profile_url": null,
+      "profile_copy_version": "A",
+      "avatar": "youtube/art/avatar_title.png",
+      "banner": "youtube/art/banner_clue.jpg",
+      "cross_links_checked": false,
+      "post_001": {
+        "status": "not_published",
+        "url": null,
+        "metadata_version": "A",
+        "thumbnail_frame_or_concept": "youtube/art/cover_clue.jpg",
+        "pinned_comment_added": false,
+        "playlist_url": null,
+        "synthetic_content_selection_checked": false
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # NOBODY MOVES
 
-A true-crime docuseries for TikTok where every witness is a lawn ornament. The episodes are built from AI stills with slow camera moves, captions and scratch voices. The ornaments never move; only the camera does. The series bible (cast, visual style, planted clues, episode roadmap) is in [`SERIES.md`](SERIES.md).
+A fictional true-crime parody for short-form video where every witness is a lawn ornament. The episodes are built from AI stills with slow camera moves, captions and scratch voices. The ornaments never move; only the camera does. The series bible (cast, visual style, planted clues, episode roadmap) is in [`SERIES.md`](SERIES.md).
 
 This folder is independent of the `watch` skill in the rest of the repo.
 
@@ -192,4 +192,4 @@ Turn on TikTok's **AI-generated** label, and pin a comment that points at the hi
 
 The same `_tiktok.mp4` works as an Instagram Reel and a YouTube Short. Turn on Instagram's "AI info" label and YouTube's "altered or synthetic content" setting, and keep the Reels description to one line so it doesn't cover the name cards. `pipeline/review.py` checks the on-screen text against all three apps' buttons, top bars and descriptions. It runs `pipeline/safezones.py`, which also works before the full render (`.venv/bin/python pipeline/safezones.py episodes/<ep>`), and writes `build/review/zones.png`. The full cross-posting notes are in `.agents/skills/ai-tiktok-series/references/posting-playbook.md`, under "Reels and Shorts".
 
-**Channel.** [`channel/CHANNEL.md`](channel/CHANNEL.md) has the name, handle, bios and YouTube description for each app. `.venv/bin/python channel/make_channel_art.py` builds the profile picture every app shares and the YouTube banner into `channel/art/`. Add `--preview` to write `channel/build/`, which shows each file at the sizes the apps display it.
+**Channel.** [`channel/CHANNEL.md`](channel/CHANNEL.md) leads to the TikTok, Facebook Page and YouTube launch kits: profile copy, first-post metadata, alternate art, setup steps and the account-agent handoff. `.venv/bin/python channel/make_channel_art.py` rebuilds the original shared avatar and YouTube banner; `.venv/bin/python channel/make_launch_art.py` rebuilds the platform variants.
