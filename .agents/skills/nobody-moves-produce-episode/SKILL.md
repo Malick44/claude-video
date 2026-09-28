@@ -82,18 +82,20 @@ Follow `nobody-moves-render`, or delegate the whole step to the `nobody-moves-re
 - `<ep>.mp4`, the master at about 9 Mbps, too big to send in chat for a main episode;
 - `<ep>_tiktok.mp4`, under 29 MB. **Send this one.**
 
+**Grid cover:** add the episode to `COVERS` in `channel/make_covers.py` if it isn't there: its own subject, not the hook's Garrison close-up, and nothing that gives the answer away. Then run `.venv/bin/python channel/make_covers.py <ep>`, and check the new cover's own file, `channel/covers/<ep>.jpg`. Commit it with the episode.
+
 **Audio-only change:** if only the audio changed and `timeline.json` keeps the same `total`, `shots` and `captions`, remux the new soundtrack into the existing MP4 in seconds instead of re-rendering. Follow `nobody-moves-sound-design`, "Re-render or remux".
 
 ## 6. Hand-off
 
-- **Commit:** `episode.py`, `SCRIPT.md`, any new stills, any `make_stills.py`, and `stock/` if it changed. Never commit `build/`, `.env` or `assets/`.
+- **Commit:** `episode.py`, `SCRIPT.md`, any new stills, any `make_stills.py`, the grid cover and its `COVERS` entry, and `stock/` if it changed. Never commit `build/`, `.env` or `assets/`.
 - **PR:** open it as a draft. Merge only when the user says so ("merge it"), because they review the video first, and use a merge commit, like the repo's earlier PRs. A `git fetch` right after the merge may be denied; confirm the merge on GitHub instead.
 - **Tell the user:**
   - the runtime;
   - the mixcheck result: PASS n/5, the dialogue median and the worst line;
   - which shots still use fallback crops, and the prompts for their ideal stills (from the episode's `STILLS`);
   - that the voices are scratch TTS, and the recording names if they want to record lines.
-- **Posting reminders:** turn on TikTok's AI-generated label; pin a hint comment about the clue without giving it away; paste any Attribution credits from `SCRIPT.md` into the description.
+- **Posting reminders:** upload `channel/covers/<ep>.jpg` as the cover; turn on TikTok's AI-generated label; pin a hint comment about the clue without giving it away; paste any Attribution credits from `SCRIPT.md` into the description.
 
 ## Changing the pipeline
 
