@@ -25,10 +25,10 @@ STILLS = {
     "holes": "two holes in a bare patch, drag marks (user image 2)",
     "yard_before": "night yard, Deb in her spot (user image 5)",
     "yard_after": "night yard, Deb three feet left, holes (user image 4)",
-    "lorraine": "OPTIONAL goose close-up on the porch step",
-    "chime": "OPTIONAL backlit wind chime silhouette",
-    "aerial": "OPTIONAL drone shot of the cul-de-sac",
-    "cork": "OPTIONAL empty cork board",
+    "lorraine": "goose close-up on the porch step",
+    "chime": "backlit wind chime silhouette",
+    "aerial": "drone shot of the cul-de-sac",
+    "cork": "empty cork board",
 }
 
 L = lambda who, text, say=None: ("line", who, text, say or text)  # noqa: E731
@@ -100,7 +100,7 @@ SHOTS = [
         "items": [], "min": 2.4,
     },
     {
-        "id": "lorraine", "note": 'Lorraine on the porch steps (a long-lens stakeout crop until a close-up is provided).', "kind": "still",
+        "id": "lorraine", "note": 'Lorraine in close-up on the porch step.', "kind": "still",
         "views": [V("lorraine", (0.5, 0.5, 1.05), (0.5, 0.47, 1.22)),
                   V("yard_before", (0.744, 0.245, 3.0), (0.744, 0.25, 3.35), "longlens")],
         "items": [
@@ -161,11 +161,11 @@ SHOTS = [
         "kb": ((0.5, 0.5, 1.0), (0.5, 0.53, 1.18)),   # ends framed low: the index card stays above every app's description
         # polaroids: (still, crop box as fractions x0,y0,x1,y1, label, center fx, fy, size, rotation, look)
         "polaroids": [
-            ("yard_before", (0.478, 0.380, 0.829), "DEB (MOVED)", 0.50, 0.40, 620, -2.5, None),
+            ("yard_after", (0.180, 0.360, 0.830), "DEB (MOVED)", 0.50, 0.40, 620, -2.5, None),
             ("garrison", (0.228, 0.335, 0.717), "GARRISON", 0.24, 0.24, 420, 4, None),
-            ("yard_before", (0.680, 0.200, 0.808), "LORRAINE", 0.77, 0.23, 420, -5, None),
+            ("lorraine", (0.240, 0.310, 0.820), "LORRAINE", 0.77, 0.23, 420, -5, None),
             ("porch", (0.234, 0.466, 0.978), "MR. BASIN", 0.29, 0.58, 420, -3, None),
-            ("porch", (0.696, 0.015, 1.0), "ANON.", 0.72, 0.58, 420, 5, "anon"),
+            ("chime", (0.360, 0.160, 0.960), "ANON.", 0.72, 0.58, 420, 5, "anon"),
         ],
         "items": [
             L("NARRATOR", "Forty-three witnesses. Zero movement."),
