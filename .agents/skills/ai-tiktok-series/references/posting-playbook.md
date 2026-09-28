@@ -32,7 +32,7 @@ The same upload copy works as an Instagram Reel and a YouTube Short: the same fr
 | Length | 60–90 s for main episodes | up to 3 minutes | up to 3 minutes |
 | UI over the video (approximate, 1080×1920) | top 130 px; buttons x 940+ from y 880; description y 1500+ | top 200 px; buttons x 950+ from y 1100; description y 1500+ | top 160 px; buttons x 960+ from y 1000; description y 1540+ |
 | AI label | "AI-generated content" | "AI info" (Meta asks for it on photorealistic AI video and realistic voices) | "Altered or synthetic content" in YouTube Studio |
-| Cover | pick a frame | pick a frame; the profile grid crops it to 3:4, cutting 240 px from the top and the bottom | pick a frame (mobile upload) |
+| Cover | upload an image or pick a frame; the grid crops it to 3:4 or a square | upload an image or pick a frame; the grid crops it to 3:4, cutting 240 px from the top and the bottom | Partner Program channels upload a thumbnail in Studio on a computer (since July 2026); others pick a frame |
 | Money | Creator Rewards (60 s or more) | Reels bonuses are invitation-only and change often | Shorts revenue sharing through the YouTube Partner Program |
 
 - **Check the layout for all three.** `review.py` runs `pipeline/safezones.py`, which flags any text under each app's buttons, top bar or description and draws `build/review/zones.png`. The zone numbers above are estimates that the apps change. Check the first upload on a phone and update `ZONES` in `safezones.py` if an app has moved.
@@ -57,6 +57,7 @@ Set up all three accounts before the first post. NOBODY MOVES's `channel/CHANNEL
 - **Keep one name and handle on all three apps.** Pick a fallback handle that is valid on all three, with letters, digits and a period.
 - **The profile picture is the title, not a character.** A new season can bring a new cast without losing the account's face. Use a flat, loud color from the show's palette: it is the one thing that reads at 48 px.
 - **The banner is per season.** The case, its witnesses and its address go on the banner and in the YouTube description. The short bios describe the format, so they survive a new season.
+- **Give every video its own cover.** The grid is how a new viewer finds Episode 1 and the order. Keep the text inside the middle square (y 420–1500), which every grid shows, and clear of the pinned badge (top left) and the view count (bottom left). Number the episodes in big type, and style spin-offs differently so the numbered episodes stand out. NOBODY MOVES's `channel/make_covers.py` builds them from the stills.
 - **The bio credits the human.** Write "written by [creator]". Add "voiced by" only if the creator records the voices; with a TTS cast, it would be false.
 
 ## Labeling and disclosure
