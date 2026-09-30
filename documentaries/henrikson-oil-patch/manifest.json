@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "project": {
+    "slug": "henrikson-oil-patch",
+    "working_title": "James Henrikson — North Dakota Oil Patch Murders",
+    "format": "faceless narration over archival footage",
+    "tone": "cinematic, dramatic",
+    "platform": "youtube",
+    "aspect_ratio": "16:9",
+    "resolution": {"width": 1920, "height": 1080},
+    "target_runtime_minutes": {"min": 22, "max": 28},
+    "loudness": {"integrated_lufs": -14, "true_peak_dbtp": -1},
+    "voice": {
+      "engine": null,
+      "candidates": ["auk_voiceover", "kokoro"],
+      "selection": "blind A/B on the same 60-90 s passage"
+    }
+  },
+  "chapters": []
+}

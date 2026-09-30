@@ -1,0 +1,18 @@
+# Commit only what we write: JSON and Markdown in the numbered folders,
+# .meta.json provenance sidecars included. Media, court PDFs, license
+# agreements and other downloads stay out of git.
+/*/[0-9][0-9]_*/**
+!/*/[0-9][0-9]_*/**/
+!/*/[0-9][0-9]_*/**/*.json
+!/*/[0-9][0-9]_*/**/*.md
+!/*/[0-9][0-9]_*/**/.gitkeep
+
+# yt-dlp metadata dumps (large, third-party)
+*.info.json
+
+# Rebuildable search index and embeddings
+/*/.cache/
+
+# Restricted material never enters git, sidecars and .gitkeep included
+/*/04_stills/restricted/**
+!/*/04_stills/restricted/README.md
