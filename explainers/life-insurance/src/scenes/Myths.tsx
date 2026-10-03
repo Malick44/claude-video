@@ -27,7 +27,7 @@ export const Myths: React.FC<{frames: number}> = ({frames}) => {
         const col = i % 2;
         const row = Math.floor(i / 2);
         const enter = spring({frame: frame - 30 - i * 8, fps, config: {damping: 14, stiffness: 110}});
-        const flipAt = 90 + i * 70;
+        const flipAt = 70 + i * 95;
         const flip = ease(frame, [flipAt, flipAt + 26], [0, 180], INOUT);
         const lift = Math.sin((flip / 180) * Math.PI) * 24;
         return (

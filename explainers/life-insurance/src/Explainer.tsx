@@ -1,5 +1,5 @@
 import React from "react";
-import {AbsoluteFill, Audio, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
+import {AbsoluteFill, Audio, interpolate, staticFile, useCurrentFrame, useVideoConfig} from "remotion";
 import {TransitionSeries, linearTiming} from "@remotion/transitions";
 import {fade} from "@remotion/transitions/fade";
 import {slide} from "@remotion/transitions/slide";
@@ -7,6 +7,7 @@ import {wipe} from "@remotion/transitions/wipe";
 import {flip} from "@remotion/transitions/flip";
 import {clockWipe} from "@remotion/transitions/clock-wipe";
 import {C, SCENES, TOTAL_FRAMES, TRANSITION} from "./theme";
+import cues from "./vo.json";
 import {Hook} from "./scenes/Hook";
 import {Squeeze} from "./scenes/Squeeze";
 import {Paycheck} from "./scenes/Paycheck";
@@ -16,6 +17,21 @@ import {Match} from "./scenes/Match";
 import {Myths} from "./scenes/Myths";
 import {Steps} from "./scenes/Steps";
 import {Close} from "./scenes/Close";
+
+// Music ducks under the narration: ramp down 8 frames before a line, back up 14 frames after.
+const MUSIC = 0.8;
+const DUCKED = 0.36;
+const musicVolume = (frame: number) => {
+  let duck = 0;
+  for (const c of cues) {
+    const d = Math.min(
+      interpolate(frame, [c.start - 8, c.start], [0, 1], {extrapolateLeft: "clamp", extrapolateRight: "clamp"}),
+      interpolate(frame, [c.end, c.end + 14], [1, 0], {extrapolateLeft: "clamp", extrapolateRight: "clamp"}),
+    );
+    duck = Math.max(duck, d);
+  }
+  return MUSIC + (DUCKED - MUSIC) * duck;
+};
 
 const f = (id: string) => SCENES.find((s) => s.id === id)!.frames;
 
@@ -62,7 +78,8 @@ export const Explainer: React.FC = () => {
           return out;
         })}
       </TransitionSeries>
-      <Audio src={staticFile("score.mp3")} />
+      <Audio src={staticFile("score.mp3")} volume={musicVolume} />
+      <Audio src={staticFile("vo.mp3")} volume={1} />
       <div style={{position: "absolute", left: 0, bottom: 0, height: 6, width: `${(frame / TOTAL_FRAMES) * 100}%`, background: `linear-gradient(90deg, ${C.teal}, ${C.gold})`}} />
     </AbsoluteFill>
   );

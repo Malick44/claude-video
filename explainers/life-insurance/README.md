@@ -20,7 +20,7 @@ homeowners sandwiched between aging parents and young kids.** Independent of the
 Motion toolkit used: spring physics, per-word kinetic type (blur/rise/tilt), SVG path drawing
 (`evolvePath`), path morphing (`interpolatePath`), animated counters and charts, 3D card flips,
 parallax/camera push-ins, `TransitionSeries` with slide/fade/wipe/clock-wipe/flip, animated gradient
-and particle backgrounds, and a synthesized score with scene-locked SFX.
+and particle backgrounds, a synthesized score with scene-locked SFX, and a Kokoro voiceover that ducks the music.
 
 All dollar figures are **illustrative** (and labelled as such on screen). The video is educational,
 not financial or insurance advice.
@@ -31,10 +31,15 @@ not financial or insurance advice.
 cd explainers/life-insurance
 npm install
 python3 scripts/make_score.py   # needs numpy + ffmpeg; writes public/score.mp3
+# Voiceover (Kokoro, same pinned model files as shows/nobody-moves/tools/common.sh):
+KOKORO_MODELS=~/.kokoro/models python3 scripts/make_voiceover.py   # writes public/vo.mp3 + src/vo.json
 npm run studio                  # live preview
 npm run render                  # -> out/explainer.mp4
 ```
 
-Scene lengths live in `src/timeline.json`; both the composition and the score generator read it, so
-retiming a scene keeps the audio hits aligned (re-run `make_score.py` after editing).
+Scene lengths live in `src/timeline.json`; the composition, score and voiceover generators all read it.
+Narration cues in `make_voiceover.py` are scene-relative frames, so after retiming a scene just re-run
+`make_score.py` and `make_voiceover.py`. `src/vo.json` drives the music ducking in `Explainer.tsx`.
+
+The rendered video is published as a GitHub release asset, not committed to the repo.
 Fonts (Fraunces, Inter) are vendored in `public/fonts`, so renders work offline.

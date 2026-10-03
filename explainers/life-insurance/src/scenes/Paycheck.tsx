@@ -30,10 +30,10 @@ export const Paycheck: React.FC<{frames: number}> = ({frames}) => {
     return {x: t, i};
   });
 
-  const unpaid = ease(frame, [STOP, STOP + 160], [0, 14400], (t) => t);
-  const runway = 1 - ease(frame, [STOP + 10, STOP + 190], [0, 1], (t) => t);
-  const out = frame > STOP + 190;
-  const end = ease(frame, [STOP + 200, STOP + 230], [0, 1]);
+  const unpaid = ease(frame, [STOP, STOP + 110], [0, 14400], (t) => t);
+  const runway = 1 - ease(frame, [STOP + 10, STOP + 110], [0, 1], (t) => t);
+  const out = frame > STOP + 110;
+  const end = ease(frame, [STOP + 112, STOP + 135], [0, 1]);
 
   return (
     <Scene variant="deep" frames={frames} chapter="02 · THE RISK" accent={C.coral}>
@@ -156,7 +156,7 @@ export const Paycheck: React.FC<{frames: number}> = ({frames}) => {
             Emergency fund <span style={{color: C.mute, fontWeight: 600}}>(3 months of expenses)</span>
           </span>
           <span style={{color: C.coral}}>
-            Unpaid bills: <Count to={14400} start={STOP} dur={160} prefix="$" />
+            Unpaid bills: <Count to={14400} start={STOP} dur={110} prefix="$" />
           </span>
         </div>
         <div style={{height: 34, borderRadius: 17, background: "rgba(255,255,255,.12)", overflow: "hidden"}}>

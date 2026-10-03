@@ -18,7 +18,7 @@ const MAX_H = 440;
 export const Cost: React.FC<{frames: number}> = ({frames}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
-  const callout = spring({frame: frame - 270, fps, config: {damping: 11, stiffness: 120}});
+  const callout = spring({frame: frame - 335, fps, config: {damping: 11, stiffness: 120}});
 
   return (
     <Scene variant="dark" frames={frames} chapter="04 · THE PRICE">
