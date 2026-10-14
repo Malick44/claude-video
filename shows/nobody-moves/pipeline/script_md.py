@@ -139,6 +139,9 @@ def main():
                 out.append(f"- `{key}` ({s['id']}): " + "; ".join(parts) + f". Prompt: {entry.get('prompt', '')}")
             else:
                 status = "filed without a clips.json entry" if path else "not filed yet; the shot renders its fallback still"
+                if s.get("blender") and not path:
+                    status = (f"rendered by pipeline/blender_reenact.py ({s['blender'].get('template')}), not filed "
+                              "yet; the shot renders its fallback still")
                 prompt = getattr(ep, "CLIPS", {}).get(key)
                 out.append(f"- `{key}` ({s['id']}): {status}." + (f" Prompt (CLIPS): {prompt}" if prompt else ""))
         out.append("")

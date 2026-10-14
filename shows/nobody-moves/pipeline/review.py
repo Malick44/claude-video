@@ -10,7 +10,8 @@ Reads <ep>/build/timeline.json and the rendered MP4 (the TikTok copy by default)
   FAIL  a black stretch (0.4 s or longer) outside question cards and the end card's fade-in
   WARN  a doorbell call to action on screen for less than 1.5 s (too short to read)
   WARN  a reenactment rendered from its fallback still (clip missing), outside 3-6 s, frozen on its last
-        frame for over 1 s, or not followed by a still or evidence shot (the real ornament, denying it)
+        frame for over 1 s, or not followed by a still or evidence shot (the real ornament, denying it);
+        a Blender clip (blender_reenact.py) rendered with a PROXY model or below final quality
   WARN  text under TikTok's, Instagram Reels' or YouTube Shorts' own buttons, top bar or description
         (pipeline/safezones.py; writes build/review/zones.png; about 45 s, skip with --no-zones)
   info  the file's loudness (about -14 LUFS, true peak about -1.0 to -1.2 dBFS after AAC)
@@ -314,6 +315,12 @@ def rx_warnings(tl):
             out.append(f"{s['id']}: reenactment {dur:.2f} s long, outside {RX_LEN[0]:g}-{RX_LEN[1]:g} s")
         if s.get("clip_freeze_at") is not None and dur - s["clip_freeze_at"] > 1.0:
             out.append(f"{s['id']}: frozen on the clip's last frame for {dur - s['clip_freeze_at']:.2f} s (over 1 s)")
+        b = s.get("clip_blender")     # a Blender render (blender_reenact.py): deliver.py refuses these two
+        if b and b.get("proxy"):
+            out.append(f"{s['id']}: Blender clip {s['clip']} was rendered with a PROXY model (a placeholder: file the "
+                       "models with blender_reenact.py model add)")
+        if b and b.get("quality") != "final":
+            out.append(f"{s['id']}: Blender clip {s['clip']} is a {b.get('quality')} render, not final")
         nxt = shots[i + 1] if i + 1 < len(shots) else None
         if not nxt or nxt["kind"] not in ("still", "evidence"):
             out.append(f"{s['id']}: the shot after the reenactment isn't a still or evidence shot (the real ornament, denying it)")

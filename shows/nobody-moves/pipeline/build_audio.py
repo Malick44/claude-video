@@ -20,7 +20,10 @@ A reenactment shot (kind "reenactment") plays a clip from clips/ (pipeline/clips
 length is "dur" when set, else its lines or its clip, whichever is longer. Its lines are voiced and
 captioned as on a still. Its cue is a reversed suck-in into a slowed hit on its first frame and a swell
 that peaks into the hard cut, then "cut_silence" seconds of total silence. A missing clip renders its
-fallback still, so the episode still builds.
+fallback still, so the episode still builds. A reenactment with a "blender" dict is rendered by
+pipeline/blender_reenact.py, timed to this build's words, and filed like any other clip; its fields are
+checked here too (blender_reenact.validate_shot), and timeline.json records a filed Blender clip's
+quality and proxy flag ("clip_blender") for review.py and deliver.py.
 
 The mix is 48 kHz stereo on three buses: dialogue; the score (theme layers whose intensity
 builds toward the last shot marked "climax": True, else the last doorbell shot that flickers; ducked under
@@ -361,6 +364,14 @@ def validate_clip(i, s):
         if cin >= info["seconds"] or (cout is not None and cout > info["seconds"] + 0.5 / CLIP_FPS):
             sys.exit(f"{where}: \"in\" {cin:g} / \"out\" {cout} fall outside the clip ({info['seconds']:.2f} s)")
     CLIPS[s["id"]] = (path, info)
+    if "blender" in s:      # rendered by blender_reenact.py: its own fields' errors and warnings (bpy-free)
+        import blender_reenact
+        errors, warnings = blender_reenact.validate_shot(ep, s)
+        if errors:
+            sys.exit("\n".join(f"shot {e}" for e in errors)
+                     + "\n(the \"blender\" fields: docs/BLENDER_REENACTMENTS.md, section 2)")
+        for w in warnings:
+            warn("shot " + w.removeprefix("WARN "))
     # warnings: each a mistake a draft made
     if stamp and re.search(r"\d:\d\d", stamp):
         warn(f"{where}: the stamp {stamp!r} has a clock time; a theory must not be readable against the doorbell table")
@@ -420,16 +431,26 @@ def clip_timing(shot, start, t):
     play = (cout - cin) / speed if cout is not None else None
     freeze = round(play, 3) if play is not None and length > play + 1e-6 else None
     fallback = next((v["img"] for v in shot.get("fallback", []) if still_file(ep, v["img"])), None)
+    blender = {}
+    rel = os.path.relpath(ep.DIR, SHOW_DIR)
     if path is None:
         warn(f"shot {sid}: clip {shot['clip']} is missing, so it renders "
              + (f"its fallback still {fallback}" if fallback else "a placeholder (no fallback still exists either)")
-             + f" under the label; file the clip with pipeline/clips.py add {os.path.relpath(ep.DIR, SHOW_DIR)} "
-             f"{shot['clip']} <file>" + note)
+             + (f" under the label; render it with pipeline/blender_reenact.py {rel} --build (then build the audio "
+                "again)" if "blender" in shot else
+                f" under the label; file the clip with pipeline/clips.py add {rel} {shot['clip']} <file>") + note)
     else:
-        index = os.path.join(os.path.dirname(path), "clips.json")
-        if shot["clip"] not in (json.load(open(index)) if os.path.exists(index) else {}):
+        entry = cliptools.clip_entry(os.path.dirname(path), shot["clip"])
+        if entry is None:
             warn(f"shot {sid}: clip {shot['clip']} has no clips.json entry (no prompt or generator on record); "
                  "file it with pipeline/clips.py add")
+        elif entry.get("sidecar"):     # a Blender render: what review.py and deliver.py gate on
+            blender = {"clip_blender": {"quality": entry.get("quality"), "proxy": bool(entry.get("proxy")),
+                                        "sidecar": entry["sidecar"]}}
+            if entry.get("proxy") or entry.get("quality") != "final":
+                warn(f"shot {sid}: clip {shot['clip']} is a Blender {entry.get('quality')}"
+                     + (" with a PROXY model" if entry.get("proxy") else "") + ": fine to preview, but deliver.py "
+                     "refuses it; render it with --quality final --require-models")
     fields = {
         "clip_file": os.path.relpath(path, SHOW_DIR) if path else None,
         "clip_sha1": file_sha1(path)[:12] if path else None,
@@ -441,7 +462,7 @@ def clip_timing(shot, start, t):
         "label": shot.get("label", d["label"]), "look": shot.get("look", d["look"]), "cue": shot.get("cue", d["cue"]),
         "interp": shot.get("interp", "nearest"), "cut_silence": shot.get("cut_silence", d["cut_silence"]),
         "kb": shot.get("kb", ((0.5, 0.5, 1.0), (0.5, 0.5, 1.0))),
-    }
+    } | blender
     return start + length, fields
 
 

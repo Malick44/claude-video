@@ -16,12 +16,19 @@ rotation and a non-square pixel aspect are applied, since the renderer reads nei
 existing clip without --force. --retime F retimes once, here, with optical flow (0.5 = half speed), so
 the episode plays the take at speed 1.0 and nothing is slowed twice. The prompt and negative come from
 the episode's CLIPS and CLIP_SOURCES (pass --prompt only for a clip with no CLIPS entry), and every
-filing is recorded in clips/clips.json with both files' sha1, the generator and "ai_generated": true.
+filing is recorded in clips/clips.json with both files' sha1, the generator and "ai_generated" (true for a
+generated clip).
 It warns when a 9:16 cover crop leaves under 720 px of width, when the clip starts or ends black, and
 when its middle frame is too dark for the reenactment look.
 
 lint_prompt() is shared with build_audio.py, which lints an episode's CLIPS and rx_ keyframes on every
 build. Motion prompts must name no person: the person who puts the yard back is never shown.
+
+Every clip is filed through add(), whatever made it: pipeline/blender_reenact.py files a Blender render by
+calling add() on its frames (as a lossless intermediate), with its provenance as extra clips.json fields
+("quality", "proxy", "sidecar": <key>.blender.json, ...), so a rendered clip lands in the same mezzanine, the
+same checks and the same index as a generated one. record_entry() and clip_entry() are the one reader and
+writer of clips.json.
 """
 import datetime
 import json
@@ -150,8 +157,36 @@ def mean_luma(img):
     return float(np.asarray(img.convert("L"), dtype=np.float32).mean())
 
 
-def add(target, key, src, generator, prompt=None, retime=None, credit=None, force=False, episode=None):
-    """File `src` as clip `key` in episodes/<ep>/clips/ or the series library (target "series")."""
+def clip_entry(folder, key):
+    """clips/clips.json's entry for `key` (None if the clip has none)."""
+    index = os.path.join(folder, "clips.json")
+    if not os.path.exists(index):
+        return None
+    with open(index, encoding="utf-8") as f:
+        return json.load(f).get(key)
+
+
+def record_entry(folder, key, entry):
+    """Write `key`'s entry into <folder>/clips.json (the one writer: add() for every clip), through a temp file
+    so an interrupted write never leaves half an index."""
+    index = os.path.join(folder, "clips.json")
+    entries = json.load(open(index, encoding="utf-8")) if os.path.exists(index) else {}
+    entries[key] = entry
+    tmp = index + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(entries, f, indent=1, ensure_ascii=False)
+        f.write("\n")
+    os.replace(tmp, index)
+
+
+def add(target, key, src, generator, prompt=None, retime=None, credit=None, force=False, episode=None, *,
+        extra=None, ai_generated=True, described=False, low_res_fix="generate 9:16"):
+    """File `src` as clip `key` in episodes/<ep>/clips/ or the series library (target "series").
+
+    Keyword options, for a clip made by a tool rather than a generator (blender_reenact.py): `extra` adds fields
+    to the clips.json entry (they override the standard ones); `ai_generated` records whether AI made it;
+    `described` marks `prompt` as a description of a rendered scene, which no generator ever reads, so the
+    prompt lint (for generator prompts) skips it; `low_res_fix` is the advice the low-width warning gives."""
     if target == "series":
         folder = os.path.join(SHOW_DIR, "clips")
         ep = load_episode(episode) if episode else None
@@ -166,7 +201,7 @@ def add(target, key, src, generator, prompt=None, retime=None, credit=None, forc
     if not prompt:
         sys.exit(f"no prompt for {key}: add it to CLIPS in episode.py (or pass --prompt for a clip with no CLIPS entry"
                  + (", or --episode for a series clip)" if target == "series" else ")"))
-    errors, warnings = lint_prompt(prompt, "motion")
+    errors, warnings = ([], []) if described else lint_prompt(prompt, "motion")
     if errors:
         sys.exit(f"{key}: the motion prompt " + "; ".join(errors))
     for w in warnings:
@@ -204,26 +239,25 @@ def add(target, key, src, generator, prompt=None, retime=None, credit=None, forc
     crop_w = min(got["w"], got["h"] * 9 / 16)
     if crop_w < MIN_CROP_W:
         print(f"warning: {key}: a 9:16 cover crop leaves {crop_w:.0f} px of width (under {MIN_CROP_W}); "
-              "generate 9:16", file=sys.stderr)
+              f"{low_res_fix}", file=sys.stderr)
     for end in black_ends(out, got["seconds"]):
         print(f"warning: {key}: the clip {'starts' if end == 'start' else 'ends'} black; trim it before filing, "
               "or set the shot's \"in\"/\"out\" past it (review.py fails black frames inside a reenactment)", file=sys.stderr)
-    mid = frame_at(out, got["seconds"] / 2)
+    try:
+        mid = frame_at(out, got["seconds"] / 2)
+    except ImportError:     # no PIL in this Python (Blender's own): the luma check is skipped, nothing else
+        mid = None
+        print(f"note: {key}: no PIL here, so the middle frame's luma isn't checked", file=sys.stderr)
     if mid is not None and mean_luma(mid) < DARK_LUMA:
         print(f"warning: {key}: the middle frame's mean luma is {mean_luma(mid):.0f}/255, too dark for the "
               f"reenactment look (under {DARK_LUMA}; aim for 100)", file=sys.stderr)
-    index = os.path.join(folder, "clips.json")
-    entries = json.load(open(index)) if os.path.exists(index) else {}
-    entries[key] = {
+    record_entry(folder, key, {
         "file": f"{key}.mp4", "source": os.path.basename(src), "source_sha1": file_sha1(src), "sha1": file_sha1(out),
         "generator": generator, "prompt": prompt, "negative": sources.get("negative"),
         "keyframe": sources.get("keyframe"), "references": sources.get("keyframe_refs"), "retime": retime,
         "date": datetime.date.today().isoformat(), "w": got["w"], "h": got["h"], "seconds": got["seconds"],
-        "credit": credit, "ai_generated": True,
-    }
-    with open(index, "w") as f:
-        json.dump(entries, f, indent=1, ensure_ascii=False)
-        f.write("\n")
+        "credit": credit, "ai_generated": bool(ai_generated), **(extra or {}),
+    })
     print(f"wrote {out} ({got['w']}x{got['h']}, {got['seconds']:.2f} s at {CLIP_FPS} fps) and its clips.json entry")
     return out
 

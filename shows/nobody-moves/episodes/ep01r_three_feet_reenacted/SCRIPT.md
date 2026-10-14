@@ -42,9 +42,9 @@ EVIDENCE BOARD, lifted. Deb's polaroid is the hub, with red string to two suspec
 **NARRATOR** (0:08.41) · record as `lineup_2`: Who did it? Gnome, or goose?
 
 ### 0:10.73–0:14.78 · HEIST
-> REENACTMENT: clip `rx_heist_gnome` · 4.05 s at 1.0x (source 0.25–4.30 s) · "REENACTMENT · AI" · stamp "THEORY #1: THE GNOME" · CLIP MISSING, fallback still `garrison`
+> REENACTMENT: clip `rx_heist_gnome_bl` · 4.05 s at 1.0x (source 0.00–4.05 s) · "REENACTMENT · AI" · stamp "THEORY #1: THE GNOME" · CLIP MISSING, fallback still `garrison`
 
-REENACTMENT · AI, THEORY #1, HEIST MOVIE. A glossy plastic 3D Garrison stands dead still in a grid of red laser beams, staring into the lens. Locked-off camera. On 'Then' he slides sideways like a chess piece, rigid, never turning, and passes under the lowest beam on a lens flare. Deb is a soft pink shape in the foreground, and nothing touches her. Hard cut mid-slide.
+REENACTMENT · AI, THEORY #1, HEIST MOVIE. A glossy plastic 3D Garrison stands dead still in a grid of red laser beams, staring into the lens. Locked-off camera. On 'move' he zips sideways like a chess piece, rigid, never turning, and passes under the lowest beam on a lens flare. The lens is Deb's point of view (she is off screen: a pink kicker light from frame right). Hard cut mid-slide.
 
 **NARRATOR** (0:11.08) · record as `heist_1`: That night, he was facing her. Then he made his move.
 
@@ -63,9 +63,9 @@ SILENT REACTION CUTAWAY: Mr. Basin, the birdbath, six feet from Deb, at sunset w
 > Lower third: **MR. BASIN**, Birdbath · Declined to comment, *Facing: up.*
 
 ### 0:19.41–0:24.06 · ACTION
-> REENACTMENT: clip `rx_action_goose` · 4.65 s at 1.0x (source 0.20–4.85 s) · "REENACTMENT · AI" · stamp "THEORY #2: THE GOOSE (DIRECTOR'S CUT)" · CLIP MISSING, fallback still `lorraine`
+> REENACTMENT: clip `rx_action_goose_bl` · 4.65 s at 1.0x (source 0.00–4.65 s) · "REENACTMENT · AI" · stamp "THEORY #2: THE GOOSE (DIRECTOR'S CUT)" · CLIP MISSING, fallback still `lorraine`
 
-REENACTMENT · AI, THEORY #2 (DIRECTOR'S CUT), ACTION MOVIE. A glossy plastic 3D Lorraine, bare, stands dead still on the top porch step as a stage fireball blooms behind the roofline. Locked-off camera. On 'dared' she tips off the step as one rigid piece and drops onto the step below, toward the lower left, the way her beak points, never turning. Concrete dust. Trailer voice. Hard cut half a second after she lands.
+REENACTMENT · AI, THEORY #2 (DIRECTOR'S CUT), ACTION MOVIE. A glossy plastic 3D Lorraine, bare, stands dead still on the top porch step as a stage fireball blooms behind the roofline. Locked-off camera. She rocks once on 'one' and once on 'goose', and on 'dared' she tips off the step as one rigid piece and drops onto the step below, toward the lower left, the way her beak points, never turning. Concrete dust. Trailer voice. Hard cut a third of a second after she lands.
 
 **NARRATOR (TRAILER)** (0:19.76) · record as `action_1` ★: In a world where nobody moves... one goose... dared. *(like a movie trailer)*
 
@@ -116,8 +116,8 @@ END CARD: NOBODY MOVES · NEXT: EPISODE 2 — I WAS RIGHT HERE · 'Follow the ca
 
 Generated with AI. For the post description's AI disclosure and credits.
 
-- `rx_heist_gnome` (heist): not filed yet; the shot renders its fallback still. Prompt (CLIPS): Locked-off camera at grass height; the camera never moves, and the laser grid, the flower bed and the house behind him stay perfectly still in frame. The red laser beams hum in drifting haze. For the first two and a half seconds the garden gnome stands perfectly still, staring into the lens. Then he slides sideways toward frame left like a chess piece, upright and rigid, still facing the lens, never turning, never stepping, never bending; he passes beneath the lowest beam without dipping, and a lens flare blooms as he clears it. He is still sliding on the last frame, about a quarter of the frame width from where he started. The pink flamingo in the soft foreground stays perfectly still. Glossy plastic toy-like 3D CG in the look of a cheesy true-crime TV reenactment. Rigid figurines that never bend, blink or change expression; whatever moves, moves as one solid piece, like an object on a hidden track. Theatrical rim light, haze, anamorphic lens flares, bright and saturated, never murky. Slow motion, vertical 9:16, the picture filling the whole frame, with no bars and no on-screen graphics.
-- `rx_action_goose` (action): not filed yet; the shot renders its fallback still. Prompt (CLIPS): Slow motion. Locked-off low-angle camera; the camera never moves. The white concrete porch goose stands perfectly still and rigid on the edge of the top porch step, beak pointing to frame left, while an orange stage fireball blooms behind the roofline and rolls upward with drifting sparks; nothing burns or breaks. At about four seconds she tips forward off the step as one solid, rigid piece and drops onto the step below, moving toward the lower left of frame in the direction her beak points, her body angle unchanged from the first frame, and lands with a puff of concrete dust. She stays on the lower step for the rest of the take while the fireball keeps growing. Beside the door the wind chime sways in the wind and the haze drifts. Glossy plastic toy-like 3D CG in the look of a cheesy true-crime TV reenactment. Rigid figurines that never bend, blink or change expression; whatever moves, moves as one solid piece, like an object on a hidden track. Theatrical rim light, haze, anamorphic lens flares, bright and saturated, never murky. Slow motion, vertical 9:16, the picture filling the whole frame, with no bars and no on-screen graphics.
+- `rx_heist_gnome_bl` (heist): rendered by pipeline/blender_reenact.py (heist), not filed yet; the shot renders its fallback still.
+- `rx_action_goose_bl` (action): rendered by pipeline/blender_reenact.py (action), not filed yet; the shot renders its fallback still.
 
 ## Lines to record by a human
 

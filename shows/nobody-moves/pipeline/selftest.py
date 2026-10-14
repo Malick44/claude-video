@@ -13,7 +13,11 @@ error and warning, frame mapping and the cover crop, the REENACTMENT · AI tag, 
 captions and sound, the end card's AI disclosure, review.py, SCRIPT.md and the contact sheet; and
 cast.py's NM_VOICES switch. Then the voice provenance in timeline.json on a third (ep97_voices): built on
 v4 and rendered without NM_VOICES, a locked recordings/<rec>.v4.wav take, NM_VOICES=kokoro skipping it, and
-a human take. Touches nothing in the real stock/ folder or episodes/.
+a human take. Then a Blender reenactment on a fourth (ep96_blender): the "blender" fields checked by
+build_audio.py, a rendered clip filed through clips.add() and recorded as clip_blender, review.py and
+deliver.py on a proxy draft; and blender_reenact.py --selftest --allow-skip, whose rendering half runs only
+where Blender is found ($NM_BLENDER, .venv-bpy/, bpy in this Python, blender on PATH) and prints SKIP
+otherwise. Touches nothing in the real stock/ folder or episodes/.
 
   .venv/bin/python pipeline/selftest.py --full    # also renders ep98_rx to MP4 and runs review.py on it
 """
@@ -746,6 +750,93 @@ SHOTS = [
 '''
 
 
+EP96 = '''
+TITLE = "NOBODY MOVES"
+EPISODE = "EPISODE 96: RENDERED"
+NEXT_UP = "NEXT: NOTHING"
+L = lambda who, text, say=None: ("line", who, text, say or text)
+V = lambda img, a, b, look=None: {"img": img, "kb": (a, b), "look": look}
+CAST = {"NARRATOR": {"provider": "elevenlabs", "voice_id": "voice123", "model": "eleven_multilingual_v2", "seed": 7}}
+G = V("garrison", (0.5, 0.5, 1.0), (0.5, 0.5, 1.0))
+CLIPS = {"rx_ai": "Locked-off camera; the camera never moves. The gnome slides left. No people, no text."}
+SHOTS = [
+    {"id": "hook", "kind": "still", "views": [G], "items": [L("NARRATOR", "Who moved?")], "post": 0.5},
+    {"id": "rx", "kind": "reenactment", "clip": "rx_gnome_bl", "in": 0.0, "speed": 1.0, "dur": 3.0,
+     "label": "REENACTMENT · AI", "stamp": "THEORY #1: THE GNOME", "fallback": [G], "pre": 0.3,
+     "blender": {"template": "heist", "subject": "garrison", "move_on": "move", "move_at": 1.5},
+     "items": [L("NARRATOR", "Then he made his move.")]},
+    {"id": "deny", "kind": "still", "music": "out", "pre": 0.5, "views": [G], "items": [L("NARRATOR", "Nobody moves.")]},
+    {"id": "end", "kind": "end", "items": [], "min": 2.6},
+]
+'''
+
+
+def blender_checks(tmp, env):
+    """A Blender reenactment (pipeline/blender_reenact.py) from the pipeline's side, with no Blender needed:
+    --has-shots, its fields checked by build_audio.py, a rendered clip filed through clips.add() and recorded in
+    the timeline, review.py and deliver.py on a proxy draft. Then the tool's own selftest, rendering half
+    included where Blender is found."""
+    import clips as cliptools
+    import review
+    ep = os.path.join(tmp, "ep96_blender")
+    os.makedirs(os.path.join(ep, "stills"))
+    with open(os.path.join(ep, "stills", "garrison.jpg"), "wb") as f:
+        f.write(jpeg())
+    with open(os.path.join(ep, "episode.py"), "w") as f:
+        f.write(EP96)
+    r = run(["pipeline/blender_reenact.py", ep, "--has-shots"], env)
+    r2 = run(["pipeline/blender_reenact.py", os.path.join(tmp, "ep99_selftest"), "--has-shots"], env)
+    check(r.stdout.strip() == "yes" and r2.stdout.strip() == "no",
+          "blender_reenact.py --has-shots prints yes for an episode with a blender dict, no otherwise (make_episode.sh)")
+    for line, expect, what in [
+        ('SHOTS[1]["blender"]["template"] = "caper"', "unknown template", "an unknown template"),
+        ('SHOTS[1]["clip"] = "rx_ai"', "AI clip's key", "a Blender clip on an AI clip's key"),
+        ('del SHOTS[1]["dur"]', "dur is required", "a Blender reenactment without dur"),
+    ]:
+        with open(os.path.join(ep, "episode.py"), "w") as f:
+            f.write(EP96 + "\n" + line + "\n")
+        r = run(["pipeline/build_audio.py", ep], env, expect_ok=False)
+        check(expect in r.stderr, f"build error on a blender shot: {what} ({line})")
+    with open(os.path.join(ep, "episode.py"), "w") as f:
+        f.write(EP96)
+    r = run(["pipeline/build_audio.py", ep], env)
+    tl = json.load(open(os.path.join(ep, "build", "timeline.json")))
+    rx = next(s for s in tl["shots"] if s["id"] == "rx")
+    check(rx["clip_missing"] and rx["blender"]["template"] == "heist" and "clip_blender" not in rx
+          and f"render it with pipeline/blender_reenact.py {os.path.relpath(ep, SHOW)} --build" in r.stderr,
+          "a missing Blender clip plays its fallback, and the warning names blender_reenact.py --build")
+    # what blender_reenact.py's --build does once the frames exist: clips.add() with the Blender provenance
+    src = os.path.join(tmp, "bl_frames.mp4")
+    blocks_clip(src, 108, 192, 30, 3.0)
+    cliptools.add(ep, "rx_gnome_bl", src, "Blender 5.0.1, blender_reenact heist v2", prompt="heist: garrison glides left",
+                  force=True, ai_generated=False, described=True, low_res_fix="a draft",
+                  extra={"quality": "draft", "proxy": True, "sidecar": "rx_gnome_bl.blender.json"})
+    entry = cliptools.clip_entry(os.path.join(ep, "clips"), "rx_gnome_bl")
+    check(entry["sidecar"] == "rx_gnome_bl.blender.json" and entry["ai_generated"] is False and entry["proxy"] is True
+          and entry["sha1"] and entry["generator"].startswith("Blender"),
+          "clips.add() files a rendered clip with its provenance as extra clips.json fields")
+    r = run(["pipeline/build_audio.py", ep], env)
+    tl = json.load(open(os.path.join(ep, "build", "timeline.json")))
+    rx = next(s for s in tl["shots"] if s["id"] == "rx")
+    check(not rx["clip_missing"] and rx["clip_blender"] == {"quality": "draft", "proxy": True,
+                                                            "sidecar": "rx_gnome_bl.blender.json"}
+          and "deliver.py refuses it" in r.stderr,
+          "the timeline records a filed Blender clip as clip_blender, and the build warns about a proxy draft")
+    warns = review.rx_warnings(tl)
+    check(any("PROXY" in w for w in warns) and any("draft render, not final" in w for w in warns),
+          "review.py warns about a proxy model and a draft quality")
+    r = run(["pipeline/deliver.py", ep], env, expect_ok=False)
+    check("not delivered" in r.stderr and "a PROXY model, quality draft" in r.stderr,
+          "deliver.py refuses a proxy draft (without --allow-draft)")
+    r = run(["pipeline/blender_reenact.py", "--selftest", "--allow-skip"], env)
+    last = r.stdout.strip().splitlines()[-1]
+    check(last.startswith("selftest: ") and "FAILED" not in r.stdout,
+          f"blender_reenact.py --selftest --allow-skip: {last.removeprefix('selftest: ')}")
+    if "SKIPPED" in last:
+        print("SKIP  the Blender rendering checks: no Blender found here (./setup.sh --blender, or set NM_BLENDER to a "
+              "blender binary or a python with bpy, then run pipeline/blender_reenact.py --selftest)")
+
+
 def voices_checks(tmp, env):
     """Voice provenance: build_audio.py records which captions an ElevenLabs voice made, and which are
     locked v4 takes (recordings/<rec>.v4.*), so the end card and SCRIPT.md follow the soundtrack, not the
@@ -1003,7 +1094,9 @@ def main():
         reenactment_checks(tmp, env, render_mp4="--full" in sys.argv)
         print("\nall reenactment checks passed\n")
         voices_checks(tmp, env)
-        print("\nall voice provenance checks passed")
+        print("\nall voice provenance checks passed\n")
+        blender_checks(tmp, env)
+        print("\nall Blender reenactment checks passed")
     finally:
         server.shutdown()
         shutil.rmtree(tmp, ignore_errors=True)

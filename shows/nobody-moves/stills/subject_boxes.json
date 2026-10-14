@@ -1,0 +1,5 @@
+{
+ "_note": "Where each library still's subject sits, as fractions of the still (x0, y0, x1, y1) and its pixel size. blender_reenact.py maps the box through the cut-back view's starting kb, as render.py crops it, and warns when the reenactment's first frame differs by more than 0.06 in x-centre or 12% in height. Measure a new still once, by eye or with a box tool, and add it here; derived stills (DERIVED_STILLS) use their source's box.",
+ "garrison": {"size": [941, 1672], "box": [0.287, 0.286, 0.676, 0.807]},
+ "lorraine": {"size": [941, 1672], "box": [0.305, 0.325, 0.765, 0.77]}
+}
