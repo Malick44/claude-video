@@ -833,8 +833,9 @@ def blender_checks(tmp, env):
     check(last.startswith("selftest: ") and "FAILED" not in r.stdout,
           f"blender_reenact.py --selftest --allow-skip: {last.removeprefix('selftest: ')}")
     if "SKIPPED" in last:
-        print("SKIP  the Blender rendering checks: no Blender found here (./setup.sh --blender, or set NM_BLENDER to a "
-              "blender binary or a python with bpy, then run pipeline/blender_reenact.py --selftest)")
+        print("SKIP  the Blender rendering checks did not run here. They run on your own machine only (remote sessions "
+              "never render Blender); locally, install Blender (./setup.sh --blender, or set NM_BLENDER to a blender "
+              "binary or a python with bpy) and run pipeline/blender_reenact.py --selftest")
 
 
 def voices_checks(tmp, env):

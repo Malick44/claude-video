@@ -1776,10 +1776,32 @@ def parse(argv):
     return args
 
 
+REMOTE_MARKERS = ("CLAUDE_CODE_REMOTE", "CLAUDE_CODE_REMOTE_SESSION_ID")
+LOCAL_ONLY = ("Blender renders run on your own machine only. This is a remote session (CLAUDE_CODE_REMOTE is set), "
+              "so no Blender process starts here: run this on your computer, with Blender or pip bpy installed.")
+
+
+def remote_session():
+    """True in a cloud session. Blender renders are local-only: nothing renders in a remote container."""
+    return any(os.environ.get(k) for k in REMOTE_MARKERS)
+
+
+def refuse_remote(argv):
+    """Every Blender entry point stops here in a remote session, before a Blender process starts. The selftest
+    reports its rendering half as SKIPPED (exit 0 with --allow-skip), so the show's selftest still passes there."""
+    if "--selftest" in argv:
+        print(f"selftest: 0/0 passed; rendering SKIPPED: {LOCAL_ONLY}", flush=True)
+        return 0 if "--allow-skip" in argv else 4
+    print(LOCAL_ONLY, file=sys.stderr, flush=True)
+    return 2
+
+
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--" in argv:                       # blender -b -P blender_reenact.py -- <args>
         argv = argv[argv.index("--") + 1:]
+    if remote_session() and "--has-shots" not in argv:     # --has-shots only reports; --dry-run needs Blender to plan
+        return refuse_remote(argv)
     if argv and argv[0].startswith("--worker"):
         from rx3d import worker
         return worker.main(argv)

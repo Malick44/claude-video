@@ -132,7 +132,9 @@ A reenactment takes no `lower_third`, `"music": "out"` or `climax`, can't be the
 
 ## Blender reenactments
 
-A reenactment can also be **rendered in Blender** instead of generated. `pipeline/blender_reenact.py` builds the scene from the cast's 3D models (or a procedural stand-in), times the move to this build's own words in `build/timeline.json`, renders it, and files it like any other clip, through `clips.py add`: `clips/<key>.mp4`, its `clips.json` entry, and a `<key>.blender.json` sidecar with the full provenance. `render.py` plays it like any clip. The ornament is rigid by construction (only its root moves; it never turns), the camera is locked, and no human can appear. The label is still `REENACTMENT · AI` (decision D4). The full guide is [`docs/BLENDER_REENACTMENTS.md`](docs/BLENDER_REENACTMENTS.md); making and filing the 3D models is in [`models/README.md`](models/README.md).
+A reenactment can also be **rendered in Blender** instead of generated. **Blender renders run on your own machine only.** Never in a cloud or remote session: `pipeline/blender_reenact.py` refuses to start Blender when `CLAUDE_CODE_REMOTE` is set, and its selftest reports the rendering half as skipped there. Render finals and previews on your computer, then file the clip with `blender_reenact.py`.
+
+The `pipeline/blender_reenact.py` tool builds the scene from the cast's 3D models (or a procedural stand-in), times the move to this build's own words in `build/timeline.json`, renders it, and files it like any other clip, through `clips.py add`: `clips/<key>.mp4`, its `clips.json` entry, and a `<key>.blender.json` sidecar with the full provenance. `render.py` plays it like any clip. The ornament is rigid by construction (only its root moves; it never turns), the camera is locked, and no human can appear. The label is still `REENACTMENT · AI` (decision D4). The full guide is [`docs/BLENDER_REENACTMENTS.md`](docs/BLENDER_REENACTMENTS.md); making and filing the 3D models is in [`models/README.md`](models/README.md).
 
 A shot opts in with a `"blender"` dict and a clip key of its own, ending in `_bl` (an AI clip's key, one in `CLIPS`, is an error):
 

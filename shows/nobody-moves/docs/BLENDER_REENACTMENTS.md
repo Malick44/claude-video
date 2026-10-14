@@ -1,5 +1,7 @@
 # Blender reenactments: `pipeline/blender_reenact.py`
 
+**Blender renders run on your own machine only.** Never in a cloud or remote session: `pipeline/blender_reenact.py` refuses to start Blender when `CLAUDE_CODE_REMOTE` is set, and its selftest reports the rendering half as skipped there. Render finals and previews on your computer, then file the clip with `blender_reenact.py`.
+
 **Status:** integrated in `pipeline/` (driver `blender_reenact.py`, Blender side `rx3d/`), tested with Blender 5.0.1 (`pip install bpy==5.0.1` on Python 3.11) and Cycles on the CPU. The Eevee and GPU paths are written and probed but have not run on a GPU yet. A reenactment shot with a `"blender"` dict is rendered here and **filed like any other clip, through `clips.py add`**, so `render.py` plays it with no change.
 
 **What it does.** The tool renders that shot's 3D reenactment in Blender:

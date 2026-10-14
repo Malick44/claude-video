@@ -98,6 +98,9 @@ Each reenactment is a generated 3D clip, one ornament making one rigid move on a
 
 ## 5b. Blender reenactments
 
+**Blender renders run on your own machine only.** Never in a cloud or remote session: `pipeline/blender_reenact.py` refuses to start Blender when `CLAUDE_CODE_REMOTE` is set, and its selftest reports the rendering half as skipped there. Render finals and previews on your computer, then file the clip with `blender_reenact.py`.
+
+
 A reenactment shot with a `"blender"` dict is rendered by `pipeline/blender_reenact.py` instead of generated: the cast's 3D models (or striped `_PROXY` stand-ins until a model is filed), a rigid move landed on a word of the build's own take, a locked camera, no human possible. It is filed like any generated clip, through `clips.py add` (`clips/<key>.mp4`, its `clips.json` entry with `quality`, `proxy` and `sidecar`, and `clips/<key>.blender.json`). The label stays `REENACTMENT · AI`. Guide: `docs/BLENDER_REENACTMENTS.md`; models: `models/README.md`.
 
 - **Blender path or AI clip.** Use Blender when the move must land exactly on a word, must be repeatable after a re-voice, or no generator take keeps the ornament rigid; the AI route (section 5) when the look needs something the templates (`heist`, `action`) can't stage. One shot plays one source: the Blender clip has its own key ending in `_bl` (`rx_heist_gnome_bl`), never the AI clip's key, and the AI route's values stay in a comment on the shot. Switching back means pointing `"clip"` (and `in`, `kb`) at the AI key.
