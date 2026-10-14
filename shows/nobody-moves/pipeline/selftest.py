@@ -181,22 +181,83 @@ def check(cond, msg):
 
 def load_checks():
     """An episode.py rewritten to text of the same length with the same mtime (two edits in one second) must
-    load its new text. importlib's bytecode cache matches on mtime and size alone, so it would run the old one."""
+    load its new text. importlib's bytecode cache matches on mtime and size alone, so it would run the old one.
+    The .pyc is written explicitly with py_compile (not left to PYTHONDONTWRITEBYTECODE), and a control loads
+    the same v2 text through importlib, which must still get v1: if it does not, this check no longer
+    reproduces the bug and fails."""
+    import importlib.util
+    import py_compile
     import common
+    v1, v2 = 'CLIP = "rx_rot_raw"\nSHOTS = []\n', 'CLIP = "rx_sar_raw"\nSHOTS = []\n'
+    check(len(v1) == len(v2), "the stale-bytecode check rewrites the episode to text of the same length")
     folder = tempfile.mkdtemp(prefix="nm-selftest-load-")
     try:
         path = os.path.join(folder, "episode.py")
         with open(path, "w") as f:
-            f.write('CLIP = "rx_rot_raw"\nSHOTS = []\n')
-        first = common.load_episode(folder).CLIP
+            f.write(v1)
         stat = os.stat(path)
+        py_compile.compile(path, cfile=importlib.util.cache_from_source(path), doraise=True)
         with open(path, "w") as f:
-            f.write('CLIP = "rx_sar_raw"\nSHOTS = []\n')
+            f.write(v2)
         os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
-        check(first == "rx_rot_raw" and common.load_episode(folder).CLIP == "rx_sar_raw",
+        spec = importlib.util.spec_from_file_location("episode", path)
+        control = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(control)
+        if control.CLIP != "rx_rot_raw":
+            raise AssertionError(f"load_checks no longer reproduces the stale-bytecode bug: importlib loaded "
+                                 f"{control.CLIP!r} from the v2 text, not the cached v1 value 'rx_rot_raw'")
+        print("ok   control: importlib runs the stale cached v1 compile of the rewritten v2 text (the bug)")
+        check(common.load_episode(folder).CLIP == "rx_sar_raw",
               "an episode.py rewritten within the same second to the same length loads its new text, not a cached compile")
     finally:
         shutil.rmtree(folder, ignore_errors=True)
+
+
+def placeholder_gate_checks():
+    """--require-models (make_episode.sh's NM_FINAL=1 build) refuses a cast model that is not filed, and passes
+    once it is. Pure Python: blender_reenact's remote guard is in main(), so nothing renders or probes here."""
+    import blender_reenact as bl
+    folder = tempfile.mkdtemp(prefix="nm-selftest-models-")
+    old_dir = bl.MODELS_DIR
+    try:
+        bl.MODELS_DIR = folder
+        try:
+            bl.resolve_model("garrison", True, [])
+            refused = None
+        except bl.Fail as e:
+            refused = str(e)
+        check(refused is not None and "--require-models" in refused,
+              "resolve_model(require=True) raises Fail for a cast model with no models/<name>.glb")
+        path = os.path.join(folder, "garrison.glb")
+        with open(path, "wb") as f:
+            f.write(b"glTF")
+        with open(os.path.join(folder, "models.json"), "w") as f:
+            json.dump({"garrison": {"file": "garrison.glb", "sha1": bl.file_sha1(path)}}, f)
+        got = bl.resolve_model("garrison", True, [])
+        check(got["kind"] == "glb" and got["name"] == "garrison",
+              "resolve_model(require=True) passes once models/garrison.glb is filed")
+    finally:
+        bl.MODELS_DIR = old_dir
+        shutil.rmtree(folder, ignore_errors=True)
+    lines = open(os.path.join(SHOW, "make_episode.sh")).read().splitlines()
+    start = next(i for i, line in enumerate(lines) if "--has-shots" in line and line.lstrip().startswith("if "))
+    end = next(i for i in range(start + 1, len(lines)) if lines[i] == "fi")
+    branch = lines[start:end]
+    check(any('"$FINAL" = 1' in line and "--require-models" in line for line in branch)
+          and not any("--require-models" in line for line in lines[:start] + lines[end:]),
+          "make_episode.sh passes --require-models only in the blender branch, under NM_FINAL=1")
+
+
+def triangle_checks():
+    """blender_reenact.check_triangles: a model at the 100,000-triangle limit passes, one more triangle fails."""
+    import blender_reenact as bl
+    bl.check_triangles(100000, "x")
+    try:
+        bl.check_triangles(100001, "x")
+        raised = False
+    except bl.Fail:
+        raised = True
+    check(raised, "check_triangles(100001) raises Fail, and check_triangles(100000) passes")
 
 
 def tag_checks():
@@ -951,17 +1012,14 @@ def rx_share_checks():
 
 def cast_checks():
     """cast.py: Kokoro by default, every character on Eleven v4 with NM_VOICES=v4, a clear stop on a typo."""
-    import importlib.util
+    from common import load_source
 
     def load(value):
         old = os.environ.pop("NM_VOICES", None)
         if value is not None:
             os.environ["NM_VOICES"] = value
         try:
-            spec = importlib.util.spec_from_file_location("_cast", os.path.join(SHOW, "cast.py"))
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            return mod
+            return load_source("_cast", os.path.join(SHOW, "cast.py"))
         finally:
             os.environ.pop("NM_VOICES", None)
             if old is not None:
@@ -987,6 +1045,8 @@ def main():
     cast_checks()
     preroll_checks()
     rx_share_checks()
+    placeholder_gate_checks()
+    triangle_checks()
     unit = tempfile.mkdtemp(prefix="nm-selftest-unit-")
     try:
         check_lines_checks(unit)

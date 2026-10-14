@@ -71,12 +71,12 @@ ANSWER = ("In frame 418 Lorraine the porch goose has turned to face the other wa
 # NM_VOICES=v4 puts every speaker on v4 in cast.py, and build_audio.py stops before voicing anything
 # while a voice_id is still the placeholder, so the A/B's v4 arm is never Kokoro in disguise.
 def _series_cast():
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "cast", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "cast.py"))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+    import sys
+    show = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+    if os.path.join(show, "pipeline") not in sys.path:
+        sys.path.insert(0, os.path.join(show, "pipeline"))
+    from common import load_source
+    return load_source("cast", os.path.join(show, "cast.py"))
 
 
 _cast = _series_cast()

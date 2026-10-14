@@ -9,7 +9,7 @@ here, and from a procedural **PROXY** otherwise. A clip made with a proxy is a p
 The `.glb` files are git-ignored (`.gitignore`: `models/*.glb`). `models.json`, the registry, is
 committed. To commit a model on purpose (15 MB or less, like a still): `git add -f models/<name>.glb`.
 
-## Conventions (the loader enforces them)
+## Conventions (the loader enforces them; the triangle limit only where Blender checks it)
 
 | | |
 |---|---|
