@@ -72,6 +72,7 @@ CAST = ("garrison", "lorraine", "deb", "basin", "ray", "chime", "dale")
 # Dale, the inflatable snowman, 8 ft when he is up.
 HEIGHTS = {"ray": 0.152, "garrison": 0.406, "lorraine": 0.508, "basin": 0.711, "deb": 0.864, "chime": 0.914,
            "dale": 2.438}
+TRIANGLE_LIMIT = 100000   # model add refuses a GLB over this when Blender checks it; unchecked files and renders are not limited (models/README.md)
 PROXIES = ("garrison", "lorraine", "deb", "basin")
 OUTFITS = (None, "bumblebee", "easter", "gingham")
 LABEL_AI = CLIP_KINDS["reenactment"]["label"]   # "REENACTMENT · AI" on every reenactment, Blender or not (D4)
@@ -1635,6 +1636,12 @@ def showcase_main(args):
     return 0
 
 
+def check_triangles(tris, name):
+    if tris is not None and tris > TRIANGLE_LIMIT:
+        raise Fail(f"{name}: {tris} triangles, over the {TRIANGLE_LIMIT} limit: decimate the mesh in Blender "
+                   f"before export, then run model add again; nothing filed")
+
+
 def model_main(argv):
     ap = argparse.ArgumentParser(prog="blender_reenact.py model")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -1712,6 +1719,7 @@ def model_main(argv):
             sub_info["facts"] = res.get("facts", {})
             sub_info["out_dir"] = out_dir
             entry["tris"] = sub_info.get("tris")
+            check_triangles(entry["tris"], args.name)
         dst = os.path.join(MODELS_DIR, f"{args.name}.glb")
         entry["file"] = os.path.basename(dst)
         os.replace(tmp_glb, dst)

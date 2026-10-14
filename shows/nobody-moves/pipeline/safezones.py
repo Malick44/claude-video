@@ -21,7 +21,6 @@ Writes build/review/zones.png: key moments per app, with the covered areas shade
 inside them in magenta.
 """
 import contextlib
-import importlib.util
 import io
 import json
 import os
@@ -60,9 +59,8 @@ def load_renderer(ep_dir, name, text=True):
     """A private copy of render.py, initialized for the episode; text=False draws no text at all."""
     if HERE not in sys.path:
         sys.path.insert(0, HERE)
-    spec = importlib.util.spec_from_file_location(name, os.path.join(HERE, "render.py"))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    from common import load_source
+    mod = load_source(name, os.path.join(HERE, "render.py"))
     if not text:
         class NoText(ImageDraw.ImageDraw):
             def text(self, *args, **kwargs):

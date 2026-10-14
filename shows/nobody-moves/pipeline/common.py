@@ -14,7 +14,7 @@ MODELS = os.path.join(ASSETS, "models")
 FONTS = os.path.join(ASSETS, "fonts")
 
 
-def _import(name, path):
+def load_source(name, path):
     """Run a Python file as a fresh module, always from its source. importlib's bytecode cache is keyed on
     the file's mtime (to the second) and size, so an episode.py rewritten within a second to text of the
     same length (a "clip" renamed, a number changed) would otherwise run its previous version."""
@@ -23,6 +23,10 @@ def _import(name, path):
     with open(path, "rb") as f:
         exec(compile(f.read(), path, "exec"), mod.__dict__)
     return mod
+
+
+def _import(name, path):
+    return load_source(name, path)
 
 
 def load_episode(ep_dir):

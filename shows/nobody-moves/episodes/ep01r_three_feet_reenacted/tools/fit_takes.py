@@ -20,7 +20,6 @@ arm's copy from docs/AUDIO_ELEVENLABS_V4.md's A/B script. Exit 1 when the runtim
 clip's source runs past its generated take, or a line runs past its reenactment's dur.
 """
 import argparse
-import importlib.util
 import json
 import os
 import re
@@ -43,10 +42,11 @@ WORD = re.compile(r"[A-Za-z0-9:']+(?:-[A-Za-z]+)?")
 
 
 def load_episode(ep_dir=EP_DIR):
-    spec = importlib.util.spec_from_file_location("episode", os.path.join(ep_dir, "episode.py"))
-    ep = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(ep)
-    return ep
+    pipeline = os.path.normpath(os.path.join(EP_DIR, "..", "..", "pipeline"))
+    if pipeline not in sys.path:
+        sys.path.insert(0, pipeline)
+    from common import load_source
+    return load_source("episode", os.path.join(ep_dir, "episode.py"))
 
 
 def load_timeline(path=None):
