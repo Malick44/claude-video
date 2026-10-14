@@ -36,6 +36,8 @@ LEVELS = {
     "crickets": -25,     # doorbell-cam night ambience
     "glitch": -22,       # doorbell-cam frame flicker
     "jump": -14,         # doorbell-cam jump cut (glitch + sub hit)
+    "reenact_hit": -7,   # into a reenactment: reversed suck-in, then the slowed impact + braam
+    "reenact_swell": -12,  # under a reenactment: the overblown crescendo, cut dead on the hard cut
 }
 
 # The theme: a sparse A-minor ostinato. The D# (flat five) is the unease.
@@ -339,6 +341,64 @@ def sting(dur=5.0):
     for part, g in ((piano, 0.7), (braam(min(dur, 3.2)), 0.8), (impact(3.5), 1.0)):
         out[: len(part)] += stereo(part) * g
     return normalize(out[: int((dur + 1.5) * SR)])
+
+
+def _slowed(y, rate):
+    """`y` (mono or stereo) played at `rate` (0.6 = slower and lower, like a slowed tape)."""
+    y = stereo(y)
+    x = np.arange(int(len(y) / rate)) * rate
+    return np.stack([np.interp(x, np.arange(len(y)), y[:, ch]) for ch in (0, 1)], axis=1)
+
+
+def reenact_hit(pre=0.35, dur=2.5, hold=0.15, decay=5.0):
+    """Into a reenactment: a reversed noise suck-in for `pre` seconds, then the downbeat at `pre`, an
+    impact and a braam slowed to 0.6x (the "slow-motion boom"). Placed `pre` before the clip's first
+    frame, so the downbeat lands on it. The boom holds for `hold` s, then dies away fast (about -20 dB
+    0.6 s after the downbeat), so the narration that starts after the shot's "pre" reads over it."""
+    rng = _rng("reenact_hit")
+    n = int(pre * SR)
+    tt = t_axis(pre)
+    burst = bandpass(rng.normal(0, 1, n), 300, 9000) * np.exp(-tt * 9)   # a decaying hiss, reversed below
+    suck = reverb(burst, 1.0, 0.5)[:n][::-1] * np.linspace(0.2, 1, n)[:, None] ** 2
+    boom = _slowed(impact(), 0.6)[: int(dur * SR)] + 0.8 * _slowed(braam(), 0.6)[: int(dur * SR)]
+    boom = softclip(normalize(boom), 1.4)
+    tb = t_axis(len(boom) / SR)
+    boom *= np.where(tb < hold, 1.0, np.exp(-(tb - hold) * decay))[:, None]
+    out = np.zeros((n + len(boom), 2))
+    out[:n] += 0.6 * normalize(suck)
+    out[n:] += boom
+    return normalize(out)
+
+
+def reenact_swell(dur=4.0):
+    """Under a reenactment: an overblown string-and-brass crescendo on the theme's i-VI-iv-V chords,
+    with low timpani-like rolls. It ends at full level with no tail, because the hard cut stops it."""
+    t = t_axis(dur)
+    u = t / dur
+    y = np.zeros_like(t)
+    seg = dur / len(PAD_CHORDS)
+    for k, chord in enumerate(PAD_CHORDS):                      # one chord per quarter of the swell
+        on = np.clip((t - k * seg) / 0.08, 0, 1) * (t < (k + 1) * seg + 0.05)
+        strings = _ensemble(tuple(x + 12 for x in chord), t, seed=("rx-strings", k))
+        brass = _ensemble((chord[0] - 12, chord[0] - 5, chord[0]), t, (-14, -6, 0, 7, 13), ("rx-brass", k))
+        y += on * (0.6 * strings + 0.9 * brass)
+    bright = lowpass(y, 4200, 2)
+    dark = lowpass(y, 500, 2)
+    y = softclip((dark * (1 - u) + bright * u) * 2.0, 2.2)      # the filter opens as it builds
+    rng = _rng("reenact_swell", round(dur, 3))
+    roll = np.zeros_like(t)
+    hit = t_axis(0.25)
+    drum = (np.sin(2 * np.pi * 55 * hit) + 0.5 * np.sin(2 * np.pi * 82.4 * hit)) * np.exp(-hit * 16)
+    pos = 0.0
+    while pos < dur:                                            # the roll speeds up and swells
+        s0 = int(pos * SR)
+        piece = drum[: len(roll) - s0] * rng.uniform(0.6, 1.0)
+        roll[s0: s0 + len(piece)] += piece
+        pos += 0.16 - 0.09 * min(1.0, pos / dur)
+    roll += 0.6 * highpass(np.tanh(4 * normalize(roll)), 220, 2)  # its overtones, for phone speakers
+    mix = stereo(normalize(y)) + 0.7 * stereo(normalize(roll))
+    mix *= (0.12 + 0.88 * u ** 2)[:, None]                      # crescendo, ending at full level
+    return normalize(reverb(mix, 2.0, 0.25)[: len(t)])
 
 
 def swell(dur=4.0):

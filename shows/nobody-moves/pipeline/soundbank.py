@@ -1,7 +1,7 @@
 """Resolve the show's named sounds: synthesized by default, or a stock asset per soundtrack.py.
 
 Names: theme, sting, sting_end, sting_soft, riser, impact, braam, whoosh, shutter, typewriter,
-ding, wind, chimes, crickets, glitch, jump. Looped names are looped (with a crossfade) or
+ding, wind, chimes, crickets, glitch, jump, reenact_hit, reenact_swell. Looped names are looped (with a crossfade) or
 trimmed to fit. Sounds come back as mono (n,) or stereo (n, 2) float arrays at sounds.SR.
 """
 import sys
@@ -28,6 +28,8 @@ SYNTH = {
     "crickets": lambda sec, i: snd.crickets(sec),
     "glitch": lambda sec, i: snd.glitch(),
     "jump": lambda sec, i: snd.jump(),
+    "reenact_hit": lambda sec, i: snd.reenact_hit(),
+    "reenact_swell": lambda sec, i: snd.reenact_swell(sec or 4.0),
 }
 LOOPED = {"theme", "wind", "chimes", "crickets"}
 

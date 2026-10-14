@@ -21,6 +21,10 @@ anything older than STEMS_MAX_AGE gets a NOTE.
   HARD  music out: every shot marked "music": "out" has a silent score stem (loudest 100 ms
         under -60 dBFS, ignoring 0.25 s at each edge where the fades live)
   HARD  length: the soundtrack is at least the timeline total (the video is cut there)
+  HARD  reenactment cut: after each reenactment's hard cut, the score stem is silent (loudest 50 ms
+        under -60 dBFS from 0.03 s after the cut to 0.05 s before its cut_silence ends), and so is the
+        effects stem when the next shot has no sfx of its own. WARN when the score's last 200 ms
+        before the cut is under -24 dBFS: the swell didn't land
   info  loudness range; the 6 loudest 0.5 s windows of the effects stem and the shot (and cue)
         each lands on; share of energy above 250 Hz (what a phone speaker plays) in the effects
         stem and the mix; L/R correlation and mono-sum loudness vs stereo; the level of the last
@@ -35,7 +39,7 @@ import sys
 import numpy as np
 import soundfile as sf
 
-from common import CTA_DELAY, doorbell_clock
+from common import CLIP_KINDS, CTA_DELAY, doorbell_clock
 from sounds import LEVELS
 
 LUFS_TARGET, LUFS_TOL = -14.0, 1.0
@@ -51,6 +55,8 @@ TAIL = 0.1             # s
 FLOOR = -120.0         # dBFS reported for digital silence (JSON has no -inf)
 STEMS_MAX_AGE = 30.0   # s; --stems writes the stems ~10 s before the master, a plain rebuild takes 40 s+
 STEMS = ("dialogue", "score", "effects")
+CUT_AFTER, CUT_BEFORE = 0.03, 0.05   # s: the silence after a reenactment's cut is measured inside these margins
+SWELL_MIN = -24.0      # dBFS: the score's last 200 ms before a reenactment's cut should be at least this loud
 
 
 def ffmpeg():
@@ -108,9 +114,12 @@ def cues(shots):
             out.append((s["start"], "shutter", max(LEVELS["shutter"], LEVELS["impact"] - 4)))
         if s["kind"] == "qcard":
             out.append((s["start"] - 0.45, "whoosh", LEVELS["whoosh"]))
+        if s["kind"] in CLIP_KINDS and s.get("cue"):
+            out.append((s["start"], "reenact hit", LEVELS["reenact_hit"]))
+            out.append((s["end"] - 0.05, "reenact swell peak", LEVELS["reenact_swell"]))
+        if s["kind"] == "doorbell" and "clock_start" in s and ("flicker_at" in s or s.get("flicker") is False):
+            out.append((s["start"] + doorbell_clock(s)[1], "doorbell jump", LEVELS["jump"]))
         if s["kind"] == "doorbell" and "flicker_at" in s:
-            if "clock_start" in s:
-                out.append((s["start"] + doorbell_clock(s)[1], "doorbell jump", LEVELS["jump"]))
             out.append((s["flicker_at"], "flicker", LEVELS["glitch"]))
             out.append((s["flicker_at"] + CTA_DELAY, "reveal hit", max(LEVELS["impact"], LEVELS["braam"])))
     return out
@@ -181,6 +190,30 @@ def hits(fx, sr, shots, cue_list):
         rows.append({"start": round(a / sr, 2), "peak_at": round(peak, 2), "rms_dbfs": round(10 * np.log10(cand[i]), 1),
                      "shot": sid, "into_shot": round(into, 2), "cue": cue[1] if cue else "",
                      "peak_after_cue": round(peak - cue[0], 2) if cue else None})
+    return rows
+
+
+def reenact_cuts(stems, sr, shots):
+    """Per reenactment: the loudest 50 ms of the score (and, when the next shot has no sfx, the effects)
+    in the silence after its hard cut, and the score's level in the last 200 ms before the cut."""
+    rows = []
+    blk = int(0.05 * sr)
+    for i, s in enumerate(shots):
+        if s["kind"] not in CLIP_KINDS:
+            continue
+        nxt = shots[i + 1] if i + 1 < len(shots) else None
+        silence = s.get("cut_silence", CLIP_KINDS[s["kind"]]["cut_silence"])
+        if nxt is None or nxt["kind"] in CLIP_KINDS or silence <= CUT_AFTER + CUT_BEFORE:
+            continue
+        a, b = int((s["end"] + CUT_AFTER) * sr), int((s["end"] + silence - CUT_BEFORE) * sr)
+        buses = ["score"] + ([] if nxt.get("sfx") else ["effects"])
+        loud = {k: max((rms_db(stems[k][j: j + blk]) for j in range(a, max(a + 1, b - blk + 1), blk // 2)), default=FLOOR)
+                for k in buses}
+        pre = rms_db(stems["score"][int((s["end"] - 0.2) * sr): int(s["end"] * sr)])
+        rows.append({"shot": s["id"], "cut_at": s["end"], "checked": buses,
+                     "loudest_50ms_dbfs": {k: round(v, 1) for k, v in loud.items()},
+                     "silent": all(v < SILENT for v in loud.values()),
+                     "swell_last_200ms_dbfs": round(pre, 1), "swell_landed": bool(pre >= SWELL_MIN)})
     return rows
 
 
@@ -294,6 +327,16 @@ def measure(ep_dir):
               f"{silent}/{len(rep['music_out'])} shots silent" if rep["music_out"] else "no music-out shots",
               f"score < {SILENT:g} dBFS")
         rep["hits"] = hits(stems["effects"], sr, shots, cues(shots))
+        cuts = reenact_cuts(stems, sr, shots)
+        if cuts:
+            rep["reenact_cuts"] = cuts
+            silent = sum(r["silent"] for r in cuts)
+            check("reenactment cut", True, silent == len(cuts), f"{silent}/{len(cuts)} cuts silent after",
+                  f"score{'/effects' if any('effects' in r['checked'] for r in cuts) else ''} < {SILENT:g} dBFS")
+            for r in cuts:
+                if not r["swell_landed"]:
+                    rep["notes"].append(f"WARN: {r['shot']}: the score's last 200 ms before the cut is "
+                                        f"{r['swell_last_200ms_dbfs']:.1f} dBFS (under {SWELL_MIN:g}): the swell didn't land")
 
     # ---- length and tail
     dur = len(mix) / sr
@@ -349,6 +392,12 @@ def print_report(rep):
         for r in rep["music_out"]:
             print(f"  {r['shot']:10s} {r['start']:6.2f}-{r['end']:6.2f} s  loudest 100 ms {r['loudest_100ms_dbfs']:6.1f} dBFS  "
                   f"{'silent' if r['silent'] else 'NOT SILENT'}")
+    if rep.get("reenact_cuts"):
+        print("\nReenactment cuts (loudest 50 ms in the silence after the cut; the swell's last 200 ms before it)")
+        for r in rep["reenact_cuts"]:
+            after = ", ".join(f"{k} {v:6.1f} dBFS" for k, v in r["loudest_50ms_dbfs"].items())
+            print(f"  {r['shot']:10s} cut {r['cut_at']:6.2f} s  after: {after}  {'silent' if r['silent'] else 'NOT SILENT'}"
+                  f"  | swell {r['swell_last_200ms_dbfs']:6.1f} dBFS{'' if r['swell_landed'] else ' (did not land)'}")
     if "hits" in rep:
         print(f"\nHits: {N_HITS} loudest {HIT_WIN:g} s windows of the effects stem (loudest first)")
         for r in rep["hits"]:

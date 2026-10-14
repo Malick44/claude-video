@@ -64,6 +64,7 @@ Set up all three accounts before the first post. NOBODY MOVES's `channel/CHANNEL
 
 - **Turn on the AI label** on every post: TikTok's AI-generated content label, Instagram's "AI info", YouTube's "altered or synthetic content". The format is built to work with the label on.
 - **Write the disclaimer as a joke,** on the end card. NOBODY MOVES: "Reenactments dramatized with AI. The flamingo is real."
+- **Once some shots carry their own AI label, widen the disclaimer.** NOBODY MOVES labels every reenactment `REENACTMENT · AI` and stamps its doorbell footage "NOT A REENACTMENT"; a line that then named only the reenactments would teach viewers that unlabelled means real, though the photoreal stills are AI too. So an episode with a reenactment says "Footage, reenactments and voices made with AI. The flamingo is real.", in its description as well, and keeps it legible on the end card for at least 1.8 s.
 - **Put "written by [creator]" in the bio,** and "voiced by" only when the creator records the voices. Human authorship is what separates the show from slop, and it is the evidence of authorship.
 - **Disclose brand deals** as both paid and synthetic. Never present AI testimonials as real.
 

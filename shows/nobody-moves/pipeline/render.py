@@ -5,7 +5,11 @@
   python pipeline/render.py episodes/<episode> --contact              # one frame per shot -> build/contact.png
 
 Run build_audio.py first. Stills are read from <episode>/stills/<key>.(png|jpg|webp);
-a shot uses the first of its views whose still exists, else a labelled placeholder.
+a shot uses the first of its views whose still exists, else a labelled placeholder. An episode's
+DERIVED_STILLS (exposure lifts of existing stills) are computed here, in memory.
+A reenactment plays its clip from clips/ (decoded from frame 0, never seeked, so a preview and the
+full render give the same pixels) under a red "REENACTMENT · AI" tag, or its fallback still while the
+clip is missing.
 """
 import json
 import math
@@ -17,7 +21,8 @@ import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from common import CTA_DELAY, FONTS, SHOW_DIR, doorbell_clock, fmt_clock, load_episode
+from common import (CLIP_KINDS, CTA_DELAY, DISCLOSURE_IN, FONTS, RX_TAG_X, RX_TAG_Y, SHOW_DIR, clip_path,
+                    doorbell_clock, file_sha1, fmt_clock, fmt_rate, load_episode, rx_tag_width)
 
 W, H, FPS = 1080, 1920, 30
 YELLOW = (242, 194, 48)
@@ -26,10 +31,12 @@ RED = (208, 52, 44)
 # set by init()
 ep = BUILD = STILLS_DIR = None
 SHOTS, TOTAL, CAPTIONS, CHUNKS = [], 0.0, [], []
+HAS_RX = AI_VOICES = False     # the episode has a reenactment / a voiced line from an ElevenLabs voice
+SHOT_BY_ID = {}
 
 
 def init(ep_dir):
-    global ep, BUILD, STILLS_DIR, SHOTS, TOTAL, CAPTIONS, CHUNKS
+    global ep, BUILD, STILLS_DIR, SHOTS, TOTAL, CAPTIONS, CHUNKS, HAS_RX, AI_VOICES, SHOT_BY_ID
     ep = load_episode(ep_dir)
     BUILD, STILLS_DIR = ep.BUILD, ep.STILLS_DIR
     tl_path = os.path.join(BUILD, "timeline.json")
@@ -39,6 +46,17 @@ def init(ep_dir):
         tl = json.load(f)
     SHOTS, TOTAL, CAPTIONS = tl["shots"], tl["total"], tl["captions"]
     CHUNKS = caption_chunks()
+    SHOT_BY_ID = {s["id"]: s for s in SHOTS}
+    HAS_RX = any(s["kind"] == "reenactment" for s in SHOTS)
+    AI_VOICES = ai_voices()
+
+
+def ai_voices():
+    """True when a line in the soundtrack is an ElevenLabs voice: voiced by one at build time ("provider"),
+    or a locked v4 take from recordings/ ("generated"). build_audio.py writes both into timeline.json, so
+    the end card names the voices the soundtrack holds, not the cast in force now: NM_VOICES at render time,
+    or an unused ElevenLabs entry in the cast, changes nothing. A human take counts as human."""
+    return any(c.get("provider") == "elevenlabs" or c.get("generated") for c in CAPTIONS)
 
 
 # ---------------------------------------------------------------- helpers
@@ -101,13 +119,13 @@ def with_alpha(img, a):
 
 # ---------------------------------------------------------------- sources
 
-def placeholder(key):
+def placeholder(key, sub="still pending"):
     im = Image.new("RGB", (W, H))
     arr = np.linspace(40, 12, H)[:, None, None] * np.array([0.8, 0.9, 1.1])[None, None, :]
     im = Image.fromarray(np.broadcast_to(arr, (H, W, 3)).astype(np.uint8))
     d = ImageDraw.Draw(im)
     d.text((W / 2, H / 2 - 60), key.upper(), font=font("Oswald", 90, "Bold"), fill=(200, 200, 200), anchor="mm")
-    d.text((W / 2, H / 2 + 40), "still pending", font=font("PlexMono", 30), fill=(150, 150, 150), anchor="mm")
+    d.text((W / 2, H / 2 + 40), sub, font=font("PlexMono", 30), fill=(150, 150, 150), anchor="mm")
     return im
 
 
@@ -121,7 +139,38 @@ def still_path(key):
     return None
 
 
+def own_still(key):
+    return any(os.path.exists(os.path.join(STILLS_DIR, f"{key}.{ext}")) for ext in ("png", "jpg", "jpeg", "webp"))
+
+
+def derived_spec(key):
+    """The episode's DERIVED_STILLS entry for `key` (an exposure lift of an existing still, computed in
+    memory), unless the episode folder has a file of its own for that key."""
+    spec = getattr(ep, "DERIVED_STILLS", {}).get(key)
+    if spec and not own_still(key) and still_path(spec["from"]):
+        return spec
+    return None
+
+
+def has_still(key):
+    return bool(still_path(key) or derived_spec(key))
+
+
+def derive(im, spec):
+    """DERIVED_STILLS: an optional Gaussian blur ("blur", a radius), then out = in ** (1 / gamma) on 0-1
+    values, then "tint" (per channel) and "gain" multiply. Same pixels and framing, so coordinates and
+    doorbell frames still match the source."""
+    if spec.get("blur"):
+        im = im.filter(ImageFilter.GaussianBlur(spec["blur"]))
+    a = (np.asarray(im, dtype=np.float32) / 255.0) ** (1.0 / spec.get("gamma", 1.0))
+    a = a * np.array(spec.get("tint", (1.0, 1.0, 1.0)), dtype=np.float32) * spec.get("gain", 1.0)
+    return Image.fromarray(np.clip(a * 255, 0, 255).astype(np.uint8))
+
+
 def load_still(key):
+    spec = derived_spec(key)
+    if spec:      # from the source's own file, so a lift of "cork" keyed "cork" starts from the library one
+        return derive(Image.open(still_path(spec["from"])).convert("RGB"), spec), True
     p = still_path(key)
     if p:
         return Image.open(p).convert("RGB"), True
@@ -131,7 +180,7 @@ def load_still(key):
 def pick_view(shot):
     """First view whose still exists (optional upgrades listed first, user images as fallback)."""
     for v in shot["views"]:
-        if still_path(v["img"]):
+        if has_still(v["img"]):
             return v
     return shot["views"][-1]
 
@@ -166,6 +215,83 @@ def source(key, look=None):
             im = im.filter(ImageFilter.UnsharpMask(radius=2.2, percent=45, threshold=2))
         _src[(key, look)] = apply_look(im, look)
     return _src[(key, look)]
+
+
+class ClipReader:
+    """The frames of one clip, from an ffmpeg pipe opened at frame 0 (no -ss seeking, so the sequential
+    full render and random access, as in previews, the contact sheet and safezones, give identical
+    pixels). It keeps the last two frames; a request behind the read head reopens the pipe, which costs
+    under 0.5 s on a clip of 10 s or less. Past the end it returns the last frame."""
+
+    def __init__(self, path, w, h):
+        self.path, self.w, self.h = path, w, h
+        self.proc, self.pos, self.frames, self.last = None, -1, {}, None
+
+    def _open(self):
+        self.close()
+        import imageio_ffmpeg
+        self.proc = subprocess.Popen([imageio_ffmpeg.get_ffmpeg_exe(), "-v", "error", "-i", self.path, "-an",
+                                      "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], stdout=subprocess.PIPE)
+        self.pos, self.frames = -1, {}
+
+    def frame(self, k):
+        if k in self.frames:
+            return self.frames[k]
+        if self.last is not None and k >= self.last[0]:
+            return self.last[1]
+        if self.proc is None or k < self.pos:
+            self._open()
+        size = self.w * self.h * 3
+        while self.pos < k:
+            buf = self.proc.stdout.read(size)
+            if len(buf) < size:                      # past the end: hold the last frame
+                self.last = (self.pos, self.frames[self.pos]) if self.pos >= 0 else (0, Image.new("RGB", (self.w, self.h)))
+                self.close()
+                return self.last[1]
+            self.pos += 1
+            self.frames = {p: im for p, im in self.frames.items() if p == self.pos - 1}
+            self.frames[self.pos] = Image.frombytes("RGB", (self.w, self.h), buf)
+        return self.frames[k]
+
+    def close(self):
+        if self.proc is not None:
+            self.proc.kill()            # before closing the pipe, so ffmpeg can't complain about it
+            self.proc.wait()
+            self.proc.stdout.close()
+            self.proc = None
+
+
+_clips = {}   # shot id -> ClipReader: one reader per shot, never per kind, so nothing leaks between shots
+
+
+def clip_source(shot, lt):
+    """The clip frame at `lt` seconds into a clip shot, at the clip's own resolution; None while the
+    clip is missing (the shot then renders its fallback still)."""
+    if shot.get("clip_missing") or not shot.get("clip_file"):
+        return None
+    rd = _clips.get(shot["id"])
+    if rd is None:
+        path = clip_path(ep.DIR, shot["clip"])
+        rel = os.path.relpath(path, SHOW_DIR) if path else None
+        if rel != shot["clip_file"] or file_sha1(path)[:12] != shot["clip_sha1"]:
+            sys.exit(f"shot {shot['id']}: clip {shot['clip']} changed since build_audio.py (its length sets the shot's): "
+                     f"rebuild the audio with pipeline/build_audio.py {ep.DIR}")
+        rd = _clips[shot["id"]] = ClipReader(path, shot["clip_w"], shot["clip_h"])
+    freeze = shot.get("clip_freeze_at")
+    src_t = shot["clip_in"] + (min(lt, freeze) if freeze is not None else lt) * shot["clip_speed"]
+    fps = shot["clip_fps"]
+    last = max(0, min(shot["clip_frames"], math.ceil(shot["clip_out"] * fps - 1e-6)) - 1)   # the frame before "out"
+    pos = src_t * fps
+    k = max(0, min(math.floor(pos + 1e-6), last))
+    if shot.get("interp") == "blend" and shot["clip_speed"] < 1 and k < last and pos - k > 1e-6:
+        return Image.blend(rd.frame(k), rd.frame(k + 1), pos - k)
+    return rd.frame(k)
+
+
+def close_clips():
+    for rd in _clips.values():
+        rd.close()
+    _clips.clear()
 
 
 def kb_view(src, kb, u):
@@ -210,6 +336,24 @@ def grade(img, fi, grain=6.0, vignette=True, extra=None):
         a = extra(a)
     a = a + GRAIN[fi % len(GRAIN)] * grain
     return Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+
+
+LUMA = np.array([0.299, 0.587, 0.114], np.float32)
+
+
+def bloom(img, amount=0.25):
+    """A soft glow: a blurred quarter-size copy, screen-blended back over the frame."""
+    small = img.convert("RGB").resize((W // 4, H // 4), Image.BILINEAR).filter(ImageFilter.GaussianBlur(6))
+    g = np.asarray(small.resize((W, H), Image.BILINEAR), dtype=np.float32) / 255.0 * amount
+    a = np.asarray(img.convert("RGB"), dtype=np.float32) / 255.0
+    return Image.fromarray(np.clip((1 - (1 - a) * (1 - g)) * 255, 0, 255).astype(np.uint8))
+
+
+def rx_grade(a):
+    """The "reenact" look: saturation 1.15x around luma and lifted blacks (bright, clean, plasticky),
+    against reality's vignetted, grainy film grade."""
+    lum = (a * LUMA).sum(axis=2, keepdims=True)
+    return 14 + 0.97 * (lum + (a - lum) * 1.15)
 
 
 # ---------------------------------------------------------------- overlays
@@ -386,6 +530,8 @@ def draw_lower_third(frame, shot, lt):
     t0 = shot["lines"][-1]["start"] - shot["start"] if shot.get("lower_third_at") == "last" else 0.35
     dur = shot["end"] - shot["start"]
     a = smooth((lt - t0) / 0.3) * (1 - smooth((lt - (dur - 0.25)) / 0.25))
+    if shot.get("lower_third_at") == "cut":   # a silent cutaway's card is its joke: on from the cut to the cut
+        a = 1.0
     if a <= 0:
         return
     key = tuple(spec)
@@ -396,8 +542,12 @@ def draw_lower_third(frame, shot, lt):
 
 
 def draw_caption(frame, t):
+    here = shot_at(t) if HAS_RX else None
     for c in CHUNKS:
         if c["start"] - 0.02 <= t < c["end"] + 0.12:
+            # a reenactment's hard cut is hard for captions too: no chunk crosses it in either direction
+            if here is not None and here["id"] != c["shot"] and "reenactment" in (here["kind"], SHOT_BY_ID[c["shot"]]["kind"]):
+                continue
             active = None
             for i, (_, w0) in enumerate(c.get("words", [])):   # the last word to have started
                 if w0 - 0.02 <= t:
@@ -407,9 +557,10 @@ def draw_caption(frame, t):
 
 
 def draw_corner_label(frame, shot):
-    """Optional episode badge, inset below the apps' top bars."""
+    """Optional episode badge, inset below the apps' top bars. Never on a reenactment, where the red AI
+    tag holds the corner, nor on the end card when the badge only repeats the title."""
     label = getattr(ep, "CORNER_LABEL", None)
-    if not label:
+    if not label or shot["kind"] == "reenactment" or (shot["kind"] == "end" and label == ep.TITLE):
         return
     d = ImageDraw.Draw(frame)
     fnt = font("Oswald", 58, "Bold")
@@ -429,6 +580,26 @@ def exhibit_tag(label, stamp):
     d.text((22, 36), label, font=f, fill=(15, 15, 15), anchor="lm")
     d.text((4, 92), stamp, font=font("PlexMono", 30), fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
     return im
+
+
+_rx_tags = {}
+
+
+def rx_tag(label, stamp):
+    """The reenactment tag: the label in white on the show's red (yellow means evidence), the stamp in
+    mono under it. The canvas is sized to the text (common.rx_tag_width), never clipped."""
+    key = (label, stamp)
+    if key not in _rx_tags:
+        im = Image.new("RGBA", (rx_tag_width(label, stamp), 150), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        f = font("Oswald", 46, "Bold")
+        tw = d.textlength(label, font=f)
+        d.rounded_rectangle((0, 0, tw + 44, 72), radius=6, fill=RED)
+        d.text((22, 36), label, font=f, fill=(255, 255, 255), anchor="lm")
+        if stamp:
+            d.text((4, 92), stamp, font=font("PlexMono", 30), fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+        _rx_tags[key] = im
+    return _rx_tags[key]
 
 
 def dashed_arrow(d, p0, p1, progress, color, width=9, dash=34, gap=20):
@@ -650,6 +821,32 @@ def board_sources(shot):
     return _board[shot["id"]]
 
 
+def rx_fallback(shot):
+    """The first fallback view whose still exists, else None (a "clip pending" placeholder)."""
+    return next((v for v in shot.get("fallback", []) if has_still(v["img"])), None)
+
+
+def render_reenactment(shot, lt, fi, dur):
+    src = clip_source(shot, lt)
+    if src is not None:
+        frame, _, _ = kb_view(src, shot["kb"], lt / dur)
+    else:
+        v = rx_fallback(shot)
+        if v:
+            frame, _, _ = kb_view(source(v["img"], v.get("look")), v["kb"], lt / dur)
+        else:
+            frame = placeholder(shot["clip"], "clip pending")
+    if shot.get("look") == "reenact":
+        frame = grade(bloom(frame), fi, grain=3.0, vignette=False, extra=rx_grade)
+    else:
+        frame = grade(frame, fi)
+    frame = frame.convert("RGBA")
+    frame.alpha_composite(bottom_gradient())
+    # full opacity on every frame, with no fade: the cut is hard both ways, and a paused frame must show it
+    frame.alpha_composite(rx_tag(shot["label"], shot.get("stamp")), (RX_TAG_X, RX_TAG_Y))
+    return frame
+
+
 def render_board(shot, lt, fi, dur):
     b = board_sources(shot)
     card_t = shot["lines"][-1]["start"] - shot["start"]
@@ -706,7 +903,7 @@ def door_sources(shot):
 
 def render_doorbell(shot, lt, fi, dur):
     ds = door_sources(shot)
-    fl = shot["flicker_at"] - shot["start"]
+    fl = shot.get("flicker_at", float("inf")) - shot["start"]   # "flicker": False: never (no flicker or CTA)
     phase = int((lt - fl) / 0.3) if lt >= fl else -1
     paused = phase >= 6
     base, jump = doorbell_clock(shot)
@@ -758,6 +955,15 @@ def render_end(shot, lt, fi, dur):
     a1 = int(255 * smooth((lt - 0.25) / 0.5))
     a2 = int(255 * smooth((lt - 0.9) / 0.4))
     a3 = int(255 * smooth((lt - 1.4) / 0.4))
+    # The AI disclosure. With a reenactment it fades in with the title (fully visible from DISCLOSURE_IN)
+    # and names everything made with AI: once reenactment frames say "AI", unlabelled must never read as
+    # real. Without one, it names the voices when the soundtrack holds an ElevenLabs voice (ai_voices()).
+    disclose, a4 = "Reenactments dramatized with AI.", a3
+    if HAS_RX:
+        disclose = "Footage, reenactments and voices made with AI."
+        a4 = int(255 * smooth((lt - (DISCLOSURE_IN - 0.4)) / 0.4))
+    elif AI_VOICES:
+        disclose = "Reenactments and voices made with AI."
     spaced_text(d, (W / 2, 690), ep.TITLE, font("Oswald", 116, "Bold"), (255, 255, 255, a1), 9)
     d.rectangle((W / 2 - 150, 870, W / 2 + 150, 874), fill=YELLOW + (a1,))
     size = 38                                  # shrink a long "NEXT" line to end before x 930 (the apps' buttons)
@@ -765,8 +971,8 @@ def render_end(shot, lt, fi, dur):
         size -= 1
     d.text((W / 2, 930), ep.NEXT_UP, font=font("Inter", size, "Bold"), fill=YELLOW + (a2,), anchor="mm")
     d.text((W / 2, 1020), "Follow the case.", font=font("Inter", 54, "ExtraBold"), fill=(255, 255, 255, a3), anchor="mm")
-    d.text((W / 2, 1330), "Reenactments dramatized with AI.", font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a3), anchor="mm")
-    d.text((W / 2, 1374), "The flamingo is real.", font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a3), anchor="mm")
+    d.text((W / 2, 1330), disclose, font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a4), anchor="mm")
+    d.text((W / 2, 1374), "The flamingo is real.", font=font("Inter", 30, "Regular"), fill=(150, 150, 150, a4), anchor="mm")
     frame.alpha_composite(ov)
     fade_in = smooth(lt / 0.2)
     if fade_in < 1:
@@ -791,8 +997,12 @@ def render(t, fi):
         frame = render_board(shot, lt, fi, dur)
     elif k == "doorbell":
         frame = render_doorbell(shot, lt, fi, dur)
-    else:
+    elif k == "reenactment":
+        frame = render_reenactment(shot, lt, fi, dur)
+    elif k == "end":
         frame = render_end(shot, lt, fi, dur)
+    else:
+        raise ValueError(f"unknown shot kind {k!r} (shot {shot['id']})")
     if k in ("still", "evidence", "board"):
         draw_lower_third(frame, shot, lt)
     if k not in ("qcard", "end", "title"):
@@ -805,15 +1015,24 @@ def report_fallbacks():
     """Every shot that isn't using its first-choice still, and every still that will draw as a placeholder."""
     fb, ph = [], []
     for s in SHOTS:
+        if s["kind"] in CLIP_KINDS:
+            if s.get("clip_missing"):
+                v = rx_fallback(s)
+                print(f"REENACTMENT FALLBACK (clip missing): {s['id']} ({s['clip']}) -> {v['img'] if v else 'placeholder'}")
+                if not v:
+                    ph.append(f'{s["id"]} ({s["clip"]})')
+                if clip_path(ep.DIR, s["clip"]):
+                    print(f"  {s['clip']} has been filed since build_audio.py: rebuild the audio to use it")
+            continue
         if s.get("views"):
             v = pick_view(s)
-            if not still_path(v["img"]):
+            if not has_still(v["img"]):
                 ph.append(f'{s["id"]} ({s["views"][0]["img"]})')
             elif v is not s["views"][0]:
                 skipped = [w["img"] for w in s["views"][: s["views"].index(v)]]
                 fb.append(f'{s["id"]}: {", ".join(skipped)} -> {v["img"]}')
         keys = [s.get("frame_a"), s.get("frame_b")] + [p[0] for p in s.get("polaroids", [])]
-        ph += [f'{s["id"]} ({k})' for k in keys if k and not still_path(k)]
+        ph += [f'{s["id"]} ({k})' for k in keys if k and not has_still(k)]
     if fb:
         print("fallback views (shot: missing stills -> used):", "; ".join(fb))
     if ph:
@@ -827,14 +1046,18 @@ def main(argv):
     argv = argv[1:]
     import imageio_ffmpeg
     ff = imageio_ffmpeg.get_ffmpeg_exe()
-    missing = [k for k in getattr(ep, "STILLS", {}) if not still_path(k)]
+    missing = [k for k in getattr(ep, "STILLS", {}) if not has_still(k)]
     if missing:
         print("not provided (using fallbacks):", ", ".join(missing))
+    missing = [k for k in getattr(ep, "CLIPS", {}) if not clip_path(ep.DIR, k)]
+    if missing:
+        print("clips not provided (rendering fallbacks):", ", ".join(missing))
     report_fallbacks()
     if "--preview" in argv:
         ts = [float(x) for x in argv[argv.index("--preview") + 1].split(",")]
         for t in ts:
             render(t, int(t * FPS)).save(os.path.join(BUILD, f"preview_{t:05.2f}.png"))
+        close_clips()
         return
     if "--contact" in argv:
         thumbs = []
@@ -843,17 +1066,28 @@ def main(argv):
             t = s["start"] + (s["end"] - s["start"]) * 0.75
             if s["kind"] == "doorbell" and s.get("flicker_at"):   # the paused clue frame, not mid-flicker
                 t = min(s["end"] - 1.0 / FPS, s["flicker_at"] + CTA_DELAY + 0.6)
-            im = render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS)
-            d = ImageDraw.Draw(im)
-            d.rectangle((0, 0, 270, 30), fill=(0, 0, 0))
-            d.text((6, 4), f'{s["id"]}  {t:.2f}s', font=label, fill=(242, 194, 48))
-            thumbs.append(im)
+            cells = [t]
+            if s["kind"] in CLIP_KINDS:         # 40% in, and the last frame before the hard cut
+                cells = [s["start"] + (s["end"] - s["start"]) * 0.4, s["end"] - 1.0 / FPS]
+            for t in cells:
+                im = render(t, int(t * FPS)).resize((270, 480), Image.LANCZOS)
+                d = ImageDraw.Draw(im)
+                d.rectangle((0, 0, 270, 30), fill=(0, 0, 0))
+                d.text((6, 4), f'{s["id"]}  {t:.2f}s', font=label, fill=(242, 194, 48))
+                if s["kind"] in CLIP_KINDS:     # a footer row: the clip, or the still standing in for it. At the
+                    v = rx_fallback(s) if s.get("clip_missing") else None   # bottom, so the red tag stays visible
+                    head = (f'FALLBACK {v["img"] if v else "placeholder"}' if s.get("clip_missing")
+                            else f'RX {s["clip"]} {fmt_rate(s["clip_speed"])}x')
+                    d.rectangle((0, 452, 270, 480), fill=(0, 0, 0))
+                    d.text((6, 454), head, font=label, fill=RED if s.get("clip_missing") else (255, 255, 255))
+                thumbs.append(im)
         cols = 7
         sheet = Image.new("RGB", (cols * 270, math.ceil(len(thumbs) / cols) * 480), (0, 0, 0))
         for i, im in enumerate(thumbs):
             sheet.paste(im, ((i % cols) * 270, (i // cols) * 480))
         sheet.save(os.path.join(BUILD, "contact.png"))
         print("wrote", os.path.join(BUILD, "contact.png"))
+        close_clips()
         return
     out = os.path.join(BUILD, f"{ep.SLUG}.mp4")
     n = int(math.ceil(TOTAL * FPS))
@@ -870,6 +1104,7 @@ def main(argv):
             print(f"frame {fi}/{n}", flush=True)
     proc.stdin.close()
     proc.wait()
+    close_clips()
     print("wrote", out)
 
 

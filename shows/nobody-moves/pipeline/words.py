@@ -6,9 +6,15 @@ The TTS model reports no timings, so they come from the audio of the finished li
   2. inside a phrase, its voiced time is shared among its words by their length in phonemes;
   3. the spoken words ("three twelve AM") are mapped back onto the caption's words ("3:12 AM").
 Good to a fraction of a word, and it works on any audio: Kokoro, ElevenLabs or the user's own take.
+Audio tags in the spoken text ("[deadpan] I didn't see nothing.") steer an ElevenLabs voice and
+are never words. A direction ([deadpan]) takes no time, a pause tag ([beat]) ends a phrase like a
+full stop, and a sound ([sighs], [laughs], [light rain]) is timed as a phrase of its own, so the
+words around it don't light up during it (tag_kind). strip_tags gives the text without them, which
+build_audio.py also sends to Kokoro.
 
   .venv/bin/python pipeline/words.py        # offline self-check on synthetic speech
 """
+import collections
 import difflib
 import functools
 import re
@@ -21,10 +27,109 @@ MIN_PAUSE = 0.07      # shortest silence that counts as a pause
 SKIP_BREAK = 0.35     # DP cost of a punctuation mark with no pause (voices sometimes run on)
 SKIP_PAUSE = 0.12     # DP cost of a pause with no punctuation (a breath, a dramatic beat)
 ENDS_PHRASE = re.compile(r"[,.;:!?—–…]+[\"')\]]*$")
+# An inline audio tag in the spoken text, read by ElevenLabs v4 as a delivery direction: "[deadpan]",
+# "[said angrily in French accent]", "[light rain]". Square brackets on one line, not nested, starting
+# with a letter. Parentheses, "3:12" and every other character are ordinary text.
+TAG = re.compile(r"\[[A-Za-z][^\[\]\n]*\]")
+TAGS = re.compile(rf"(?:[ \t]*{TAG.pattern})+[ \t]*")   # a run of tags and the spaces around it
+# What a tag does to the clip, for word timing (tag_kind). A direction changes how the words sound
+# and takes no time of its own: an adverb ([quietly], [too quickly]), a manner word below, or a
+# phrase that opens with one of DIRECTION_LEADS ([with contempt], [said angrily in French accent]).
+# A pause tag leaves a silence. Anything else ([sighs], [laughs], [clears throat], [light rain],
+# [phone buzzing]) is taken to be a sound, about SOUND_WEIGHT phonemes long, with a pause after it.
+PAUSE_TAGS = {"pause", "beat", "short pause", "long pause", "dramatic pause", "silence"}
+DIRECTION_WORDS = {
+    "deadpan", "whisper", "whispers", "whispering", "whispered", "hushed", "breathy", "breathless",
+    "unbothered", "deflated", "sarcastic", "sincere", "serious", "solemn", "grave", "ominous", "dramatic",
+    "calm", "flat", "dry", "monotone", "rehearsed", "robotic", "nervous", "anxious", "excited", "curious",
+    "tired", "bored", "sleepy", "sad", "angry", "annoyed", "impatient", "defensive", "resigned", "defeated",
+    "smug", "pompous", "formal", "happy", "cheerful", "warm", "cold", "sweet", "rushed", "slow", "fast",
+    "loud", "soft", "quiet", "shouting", "shouts", "yelling", "singing", "sings", "mischievous",
+    "surprised", "confused", "matter-of-fact",
+}
+DIRECTION_LEADS = {"said", "says", "saying", "in", "with", "under", "like", "as", "too", "very", "more",
+                   "less", "slightly", "a", "an", "almost", "sounding", "speaking", "voice"}
+SOUND_WEIGHT = 8.0    # a sound tag's share of the line's time, in phonemes (about half a second)
 
 
 def norm(word):
     return re.sub(r"[^\w']", "", word.lower())
+
+
+def tag_kind(tag):
+    """"direction", "pause" or "sound": what an audio tag ("[sighs]") does to the clip."""
+    words = re.findall(r"[a-z'-]+", tag.lower())
+    if " ".join(words) in PAUSE_TAGS:
+        return "pause"
+    if words and (words[0] in DIRECTION_LEADS or all(w.endswith("ly") or w in DIRECTION_WORDS for w in words)):
+        return "direction"
+    return "sound"
+
+
+def _gap(say, m):
+    """What replaces a run of tags, judged by what is actually around it: one space when each side is
+    a space or a letter ("AM, [beat] someone", "Hello[laughs]world"); otherwise nothing, so no space
+    is left by punctuation the tag touches ('"[whispers] Hello', "here [sighs].", "Wait [beat]—")
+    or at either end of the line."""
+    a, b = m.start(), m.end()
+    if a == 0 or b == len(say):
+        return ""
+    run = m.group()
+    left, right = run[0] in " \t", run[-1] in " \t"
+    if left and right:
+        return " "
+    word = lambda ch: ch.isalnum() or ch == "_"
+    if (left or word(say[a - 1])) and (right or word(say[b])):
+        return " "
+    return ""
+
+
+def split_tags(say):
+    """(`say` without its audio tags, [(offset in that text, tag), ...] in order)."""
+    parts, tags, pos, size = [], [], 0, 0
+    for m in TAGS.finditer(say):
+        parts.append(say[pos:m.start()])
+        size += m.start() - pos
+        tags += [(size, t) for t in TAG.findall(m.group())]
+        gap = _gap(say, m)
+        parts.append(gap)
+        size += len(gap)
+        pos = m.end()
+    parts.append(say[pos:])
+    return "".join(parts), tags
+
+
+def strip_tags(say):
+    """`say` without its audio tags, for Kokoro: "[deadpan] I didn't see nothing." -> "I didn't see
+    nothing.". Text with no tag is returned as is."""
+    return split_tags(say)[0]
+
+
+def spoken_units(say, phonemize=None):
+    """The timed units of `say`, in order: [[word, weight, ends a phrase], ...]. Its words come from
+    the text without tags; each sound tag is a unit of its own with word None; a pause tag ends the
+    phrase before it; a direction adds nothing. Text with no tag gives say.split()."""
+    text, tags = split_tags(say)
+    spans = [(m.end(), m.group()) for m in re.finditer(r"\S+", text)]
+    units = [[w, weight(w, phonemize), bool(ENDS_PHRASE.search(w))] for _, w in spans]
+    before = collections.defaultdict(list)    # word index -> the tags said just before it
+    for at, tag in tags:
+        kind = tag_kind(tag)
+        if kind == "direction":
+            continue
+        m = re.search(r"\w", text[at:])       # the tag comes before the next word with a letter in it
+        i = len(spans) if not m else next(k for k, (end, _) in enumerate(spans) if end > at + m.start())
+        before[i].append(kind)
+    out = []
+    for i in range(len(units) + 1):
+        for kind in before.get(i, []):
+            if out:
+                out[-1][2] = True              # the words before a pause or a sound end a phrase
+            if kind == "sound":
+                out.append([None, SOUND_WEIGHT, True])
+        if i < len(units):
+            out.append(units[i])
+    return out
 
 
 @functools.lru_cache(maxsize=None)
@@ -131,18 +236,20 @@ def spread(words_w, t0, t1, gaps):
 
 
 def spoken_times(y, sr, say, phonemize=None):
-    """[(word, start, end), ...] for the words of `say`, relative to the clip start."""
-    words = say.split()
-    if not words:
+    """[(word, start, end), ...] for the words of `say`, relative to the clip start. Audio tags
+    are never in it, but a sound tag ([sighs]) keeps its own stretch of the clip (spoken_units)."""
+    units = spoken_units(say, phonemize)
+    if all(w is None for w, _, _ in units):
         return []
+    words = [w for w, _, _ in units]
     s0, s1, pauses = speech_map(y, sr)
-    ws = [weight(w, phonemize) for w in words]
+    ws = [w for _, w, _ in units]
     total = sum(ws)
     # predicted time of each phrase break, from the words' share of the whole line
     breaks, acc = [], 0.0
-    for i, w in enumerate(words[:-1]):
+    for i, (_, _, ends) in enumerate(units[:-1]):
         acc += ws[i]
-        if ENDS_PHRASE.search(w):
+        if ends:
             breaks.append((i, s0 + (s1 - s0) * acc / total))
     pairs = match_breaks([t for _, t in breaks], pauses)
     used = set(pairs.values())
@@ -172,7 +279,8 @@ def spoken_times(y, sr, say, phonemize=None):
     out = []
     for a, b, t0, t1 in bounds:
         for w, (ta, tb) in zip(words[a:b], spread(ws[a:b], t0, t1, loose)):
-            out.append((w, ta, tb))
+            if w is not None:                  # a sound tag's stretch belongs to no word
+                out.append((w, ta, tb))
     return out
 
 
@@ -235,6 +343,44 @@ def selfcheck():
     someone = got[3][1]
     assert abs(someone - starts[4]) < 0.03, (someone, starts[4])    # right after the comma's pause
     assert got[0][1] < 0.1 and got[-1][2] > t - 0.05, got
+    # a direction ([deadpan]) and a pause tag after a comma ([beat]) take no time of their own
+    tagged = caption_times(y, sr, "[deadpan] At three twelve AM, [beat] someone moved Deb.", "At 3:12 AM, someone moved Deb.")
+    assert tagged == got, tagged
+
+    # a sound tag ([sighs], [yawns]) takes the time it makes: noise stands in for the sound, and no
+    # word may light up during it
+    def noise(sec):
+        return 0.1 * np.random.default_rng(7).standard_normal(int(sec * sr))
+
+    def clip(plan):  # [("w", sec) burst | ("n", sec) noise | ("g", sec) gap] -> (audio, burst starts, noise spans)
+        parts, starts, sounds, t = [], [], [], 0.0
+        for kind, sec in plan:
+            if kind == "w":
+                starts.append(t)
+            if kind == "n":
+                sounds.append((t, t + sec))
+            parts.append({"w": burst, "n": noise, "g": gap}[kind](sec))
+            t += sec
+        return np.concatenate(parts), starts, sounds
+
+    for say, text, plan in [
+        ("[sighs] I didn't see nothing.", "I didn't see nothing.",                 # sigh 0.05-0.85
+         [("g", 0.05), ("n", 0.8), ("g", 0.12), ("w", 0.15), ("w", 0.35), ("w", 0.3), ("w", 0.4), ("g", 0.2)]),
+        ("Fine. [sighs] Whatever.", "Fine. Whatever.",                             # sigh 0.5-1.1
+         [("g", 0.05), ("w", 0.3), ("g", 0.15), ("n", 0.6), ("g", 0.15), ("w", 0.5), ("g", 0.2)]),
+        ("I was asleep. [yawns]", "I was asleep.",                                 # yawn 1.05-1.65
+         [("g", 0.05), ("w", 0.15), ("w", 0.25), ("w", 0.45), ("g", 0.15), ("n", 0.6), ("g", 0.1)]),
+    ]:
+        y2, starts2, [(s0, s1)] = clip(plan)
+        timed = caption_times(y2, sr, say, text)
+        assert [w for w, _, _ in timed] == text.split(), timed
+        assert all(abs(a - s) < 0.15 for (_, a, _), s in zip(timed, starts2)), (say, timed)
+        after = [k for k, s in enumerate(starts2) if s > s1][:1]                 # the word right after it
+        assert all(abs(timed[k][1] - starts2[k]) < 0.05 for k in after), (say, timed)
+        assert all(b <= s0 + 0.03 or a >= s1 - 0.03 for _, a, b in timed), (say, timed)  # nothing lit during it
+    # the same sigh timed as if it took no time (the tag just deleted) lights "I" up during it
+    y2, _, _ = clip([("g", 0.05), ("n", 0.8), ("g", 0.12), ("w", 0.15), ("w", 0.35), ("w", 0.3), ("w", 0.4), ("g", 0.2)])
+    assert caption_times(y2, sr, "I didn't see nothing.", "I didn't see nothing.")[0][1] < 0.85
     print("words.py self-check: ok (" + ", ".join(f"{w}@{a:.2f}" for w, a, _ in got) + ")")
 
 
