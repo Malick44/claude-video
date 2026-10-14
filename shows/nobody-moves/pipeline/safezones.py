@@ -128,8 +128,8 @@ def check(ep_dir, out_dir=None):
 
 
 def key_moments(samples, platforms):
-    """Columns for the sheet: a name card, the lowest text, the last call to action, the end card,
-    then moments with text under an app's UI."""
+    """Columns for the sheet: a name card, the first reenactment (its AI tag), the lowest text, the last
+    call to action, the end card, then moments with text under an app's UI."""
     picks = []
 
     def add(s, label):
@@ -141,6 +141,8 @@ def key_moments(samples, platforms):
         ends[s["shot"]] = s
     named = [s for s in ends.values() if s["kind"] in ("still", "evidence") and s["mask"][1262:1480].any()]
     add(named[0] if named else None, "name card")
+    rx = [s for s in ends.values() if s["kind"] == "reenactment"]   # its tag and stamp vs the apps' top bars
+    add(rx[0] if rx else None, "reenactment")
     add(max(samples, key=lambda s: s["bottom"]), "lowest text")
     doors = [s for s in ends.values() if s["kind"] == "doorbell"]
     add(doors[-1] if doors else None, "call to action")

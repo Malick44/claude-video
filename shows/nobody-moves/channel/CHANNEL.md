@@ -43,7 +43,7 @@ A new viewer lands on the profile and has to find Episode 1 and the order. Every
 - **Upload:**
   - **TikTok:** on the post screen, tap the cover and upload the image. You can also change the cover after posting, from the video's edit menu.
   - **Instagram:** Edit cover → Add from camera roll. Keep "Show in profile grid" on.
-  - **YouTube:** channels in the YouTube Partner Program can upload a Shorts thumbnail in Studio on a computer (Content → the Short → Thumbnail), since July 2026. Other channels pick a frame in the app: pick the title card.
+  - **YouTube:** channels in the YouTube Partner Program can upload a Shorts thumbnail in Studio on a computer (Content → the Short → Thumbnail), since July 2026. Other channels pick a frame in the app: pick the title card, or, in an episode without one, a reality frame with the corner label (a reenactment frame keeps its `REENACTMENT · AI` label).
 - **A new episode:** add its entry to `COVERS`, then run `.venv/bin/python channel/make_covers.py <episode>`.
 
 ## TikTok
@@ -57,9 +57,9 @@ True crime. Every witness is a lawn ornament.
 Written by [NAME] · Ep 1 📌
 ```
 
-This fits 80 characters with a name up to about 13 characters. For a longer name, write `By [NAME]`. Write "written by", not "voiced by": the voices are Kokoro.
+This fits 80 characters with a name up to about 13 characters. For a longer name, write `By [NAME]`. Write "written by", not "voiced by": the voices are AI (the Kokoro scratch voices, then the designed Eleven v4 voices).
 
-- **Pinned videos (up to 3):** Episode 1, the latest episode, and the best Confessional.
+- **Pinned videos (up to 3):** Episode 1, the latest episode, and the best Confessional. "Episode 1" is the published Episode 1 until the remake's test decides otherwise ("Every post", below).
 - **Link:** personal accounts get the website field at 1,000 followers. Then link the YouTube Season 1 playlist.
 - **Playlists,** if your account has them: "Season 1" in order, and "Confessionals".
 - **AI label:** turn on "AI-generated content" on every post.
@@ -96,18 +96,18 @@ Change line 2 each season; the other lines stay.
   - The file limit is 6 MB.
 - **Profile picture:** `art/avatar.png`.
 - **Shorts thumbnails:** the covers in `covers/`, if the channel can upload them (see "Grid covers").
-- **Description** (1,000 max, this is about 800). The second paragraph is the season; rewrite it when the case changes:
+- **Description** (1,000 max, this is about 900). The second paragraph is the season; rewrite it when the case changes:
 
 ```
 NOBODY MOVES is a true-crime docuseries about one suburban yard, where every witness is a lawn ornament. They saw everything. None of them can move.
 
 On June 14th, at 3:12 AM, somebody moved the flamingo three feet to the left. The garden gnome was facing the other way. The porch goose can't go anywhere, she's concrete. The birdbath is representing himself. The wind chime only talks when it's windy, and the solar frog only remembers back to his last full charge.
 
-Every episode ends on a doorbell-cam frame where something has changed. Find it, then comment the object and the timestamp.
+Every episode asks who did it, and hides one more change in a doorbell-cam frame. Rewatch, find it, and comment what changed. The reenactments are theories: nothing in this yard moves while anyone is watching.
 
 New case files every week, plus Confessionals: one ornament, one grudge, under 30 seconds. Start with Episode 1 in the Season 1 playlist.
 
-Written by [NAME]. Reenactments dramatized with AI. The flamingo is real.
+Written by [NAME]. Footage, reenactments and voices made with AI. The flamingo is real.
 ```
 
 - **Keywords** (Studio → Settings → Channel): `true crime parody, mockumentary, lawn ornaments, garden gnome, pink flamingo, comedy series, doorbell camera, mystery`.
@@ -117,6 +117,17 @@ Written by [NAME]. Reenactments dramatized with AI. The flamingo is real.
   - "Confessionals".
   - Show Season 1 first on the channel home.
 - **AI label:** on every Short, answer yes to "altered or synthetic content" in Studio.
+
+## Every post
+
+- **The disclosure line** in each description follows that video's end card:
+  - with a reenactment: "Written by [NAME]. Footage, reenactments and voices made with AI. The flamingo is real.", plus the line "Reenactments are theories. Nothing in this yard moves while anyone is watching.";
+  - without one, re-voiced with ElevenLabs: "Written by [NAME]. Reenactments and voices made with AI. The flamingo is real.";
+  - otherwise (the published Season 1): "Written by [NAME]. Reenactments dramatized with AI. The flamingo is real."
+- **AI labels on every post:** TikTok's "AI-generated content", Instagram's "AI info", and "altered or synthetic content" answered yes in YouTube Studio.
+- **The bonus ask** asks for a description, not a name: "Something else in frame 418 moved. Comment what changed before Episode 2." A bare "goose" is a vote on the episode's question, not a find.
+- **The pinned comment** points at the bonus without naming it ("Something else changed at 0:01. Don't spoil it for the next person."); on an episode with a reenactment it can carry the reenactment line above instead.
+- **The pin and the Episode 1 remake** (`SERIES.md`, "Remakes"): the current Episode 1 pin stays through the remake's 7-day test. After that read, the remake is pinned only if it won its package test; otherwise the published Episode 1 keeps the pin. Don't re-pin, edit, unlist or re-upload the published Episode 1 during the test.
 
 ## A new season
 

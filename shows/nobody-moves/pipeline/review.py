@@ -9,6 +9,8 @@ Reads <ep>/build/timeline.json and the rendered MP4 (the TikTok copy by default)
   FAIL  the TikTok copy is under 29 MB (decimal MB, as deliver.py prints it)
   FAIL  a black stretch (0.4 s or longer) outside question cards and the end card's fade-in
   WARN  a doorbell call to action on screen for less than 1.5 s (too short to read)
+  WARN  a reenactment rendered from its fallback still (clip missing), outside 3-6 s, frozen on its last
+        frame for over 1 s, or not followed by a still or evidence shot (the real ornament, denying it)
   WARN  text under TikTok's, Instagram Reels' or YouTube Shorts' own buttons, top bar or description
         (pipeline/safezones.py; writes build/review/zones.png; about 45 s, skip with --no-zones)
   info  the file's loudness (about -14 LUFS, true peak about -1.0 to -1.2 dBFS after AAC)
@@ -17,10 +19,15 @@ Reads <ep>/build/timeline.json and the rendered MP4 (the TikTok copy by default)
 With --ref it measures the reference episode the same way, prints the deltas and a one-line
 summary of the reference's own checks, and writes <ep>/build/review/beats_vs_<ref>_1.png and _2.png:
 the same story beats from both episodes, frame-grabbed from the MP4s at phone size, reference on
-top. The beats: hook, title, payoff (the replay's call to action), first question card, first
-exhibit, first interview name card, the first music-out beat, board, the cliffhanger's frame A,
-the cliffhanger paused on frame B with its call to action, end card. Open them and look: those
+top. The beats: hook, title, the first reenactment (60% in) and the cut back after it, payoff (the
+replay's call to action), first question card, first exhibit, first interview name card, the first
+music-out beat, board, the cliffhanger's frame A, the cliffhanger paused on frame B with its call to
+action, end card. Open them and look: those
 sheets are the review. Reports: <ep>/build/review/report_<file>[_vs_<ref>].json.
+An episode with reenactments also gets <ep>/build/review/reenact.png: one row per reenactment, its
+first frame, 25%, 50% and 75% in, the last frame before the cut and the first frame after it. Check
+that no human appears anywhere, the REENACTMENT · AI tag is legible in every cell, nothing contradicts
+SERIES.md, and the frame after the cut is the real, unmoved ornament at about the same size.
 """
 import json
 import os
@@ -39,8 +46,10 @@ MAX_MB = 29.0                      # decimal MB, the unit deliver.py prints
 CTA_MIN_S = 1.5
 CELL_W, CELL_H = 300, 533          # about phone-preview size
 PER_SHEET = 6
-BEATS = ["hook", "title", "payoff", "question", "exhibit", "interview", "silence", "board",
+BEATS = ["hook", "title", "reenact", "cut back", "payoff", "question", "exhibit", "interview", "silence", "board",
          "cliff A", "cliff B + CTA", "end card"]
+RX_LEN = (3.0, 6.0)                # a reenactment's length window (common.CLIP_KINDS)
+RX_CELLS = [("first", 0.0), ("25%", 0.25), ("50%", 0.5), ("75%", 0.75), ("last", None), ("after cut", None)]
 
 
 def ffmpeg():
@@ -129,7 +138,12 @@ def beats(tl):
     add("hook", shots[0], 0.6)
     title = first(lambda s: s["kind"] == "title")
     add("title", title, title and title["start"] + 1.6)
-    if len(doors) > 1:                      # the replay that pays off last episode's clue
+    rx = first(lambda s: s["kind"] == "reenactment")
+    if rx:
+        add("reenact", rx, rx["start"] + 0.6 * (rx["end"] - rx["start"]))
+        nxt = first(lambda s: True, rx["end"])
+        add("cut back", nxt, nxt and nxt["start"] + 0.5)
+    if len(doors) > 1 and doors[0].get("flicker", True):   # the replay that pays off last episode's clue
         add("payoff", doors[0], doors[0].get("flicker_at", doors[0]["end"]) + CTA_DELAY + 0.5)
     q = first(lambda s: s["kind"] == "qcard")
     add("question", q, q and q["start"] + 0.15 + 0.6 * (q["end"] - q["start"]) + 0.35)
@@ -138,6 +152,8 @@ def beats(tl):
     iv = first(lambda s: s.get("lower_third"), q["start"] if q else 0.0)   # the first interview after a question
     if iv:
         at = iv["lines"][-1]["start"] if iv.get("lower_third_at") == "last" and iv["lines"] else iv["start"] + 0.35
+        if iv.get("lower_third_at") == "cut":    # on from the first frame
+            at = iv["start"]
         add("interview", iv, at + 0.8)
     mo = first(lambda s: s.get("music") == "out")
     add("silence", mo, mo and (mo["lines"][-1]["start"] + 0.5 if mo["lines"] else mo["start"] + 0.5))
@@ -176,8 +192,10 @@ def pacing(tl):
     spoken = sum(c["end"] - c["start"] for c in caps)
     marked = [s for s in shots if s.get("climax")]
     doors = [s for s in shots if s["kind"] == "doorbell"]
-    peak = (marked or doors or [None])[-1]
+    peak = (marked or [s for s in doors if s.get("flicker", True)] or [None])[-1]   # build_audio.py's climax rule
     longest = max((s for s in shots if s["kind"] != "end"), key=lambda s: s["end"] - s["start"])
+    rx = [s for s in shots if s["kind"] == "reenactment"]
+    rx_s = sum(s["end"] - s["start"] for s in rx)
     return {
         "runtime_s": round(total, 2),
         "shots": len(shots),
@@ -185,7 +203,10 @@ def pacing(tl):
         "mean_shot_s": round(float(np.mean(lens)), 2),
         "longest_shot": f'{longest["id"]} {longest["end"] - longest["start"]:.1f}s',
         "title_at_s": next((s["start"] for s in shots if s["kind"] == "title"), None),
-        "payoff_at_s": round(doors[0]["flicker_at"] + CTA_DELAY, 2) if len(doors) > 1 and doors[0].get("flicker_at") else None,
+        "payoff_at_s": (round(doors[0]["flicker_at"] + CTA_DELAY, 2)
+                        if len(doors) > 1 and doors[0].get("flicker", True) and doors[0].get("flicker_at") else None),
+        "reenactments": f"{len(rx)}, {rx_s:.1f} s, {rx_s / total:.1%}" if rx else "none",
+        "first_reenact_at_s": rx[0]["start"] if rx else None,
         "first_question_at_s": next((s["start"] for s in shots if s["kind"] == "qcard"), None),
         "lines": len(caps),
         "words_per_min": round(words / (total / 60), 1),
@@ -279,6 +300,55 @@ def grab_sheet(res, times, out_dir):
 
 # ---------- checks
 
+def rx_warnings(tl):
+    """What review.py warns about a reenactment (build_audio.py warned at build time too)."""
+    shots, out = tl["shots"], []
+    for i, s in enumerate(shots):
+        if s["kind"] != "reenactment":
+            continue
+        dur = s["end"] - s["start"]
+        if s.get("clip_missing"):
+            out.append(f"{s['id']}: clip {s['clip']} missing, rendered from its fallback still "
+                       f"{s.get('clip_fallback') or '(none: a placeholder)'}")
+        if not RX_LEN[0] <= dur <= RX_LEN[1]:
+            out.append(f"{s['id']}: reenactment {dur:.2f} s long, outside {RX_LEN[0]:g}-{RX_LEN[1]:g} s")
+        if s.get("clip_freeze_at") is not None and dur - s["clip_freeze_at"] > 1.0:
+            out.append(f"{s['id']}: frozen on the clip's last frame for {dur - s['clip_freeze_at']:.2f} s (over 1 s)")
+        nxt = shots[i + 1] if i + 1 < len(shots) else None
+        if not nxt or nxt["kind"] not in ("still", "evidence"):
+            out.append(f"{s['id']}: the shot after the reenactment isn't a still or evidence shot (the real ornament, denying it)")
+    return out
+
+
+def reenact_sheet(res, out_dir):
+    """build/review/reenact.png: per reenactment, its first frame, 25%, 50%, 75%, the last frame before the
+    cut and the first frame after it, grabbed from the MP4."""
+    shots = res["timeline"]["shots"]
+    rows = []
+    for i, s in enumerate(shots):
+        if s["kind"] != "reenactment":
+            continue
+        at = {}
+        for name, u in RX_CELLS:
+            if name == "last":
+                t, sid = s["end"] - 1.0 / FPS, s["id"]
+            elif name == "after cut":
+                if i + 1 >= len(shots):
+                    continue
+                t, sid = s["end"], shots[i + 1]["id"]
+            else:
+                t, sid = s["start"] + u * (s["end"] - s["start"]), s["id"]
+            at[name] = (round(t, 3), sid)
+        rows.append((s["id"], res["file"], at))
+    if not rows:
+        return None
+    tmp = os.path.join(out_dir, "_grab.png")
+    out = draw_sheet(rows, [c for c, _ in RX_CELLS], os.path.join(out_dir, "reenact.png"), tmp)
+    if os.path.exists(tmp):
+        os.remove(tmp)
+    return out
+
+
 def check_file(info, tl, which):
     checks = []
 
@@ -316,6 +386,7 @@ def review(ep_dir, which, with_black=True, measure=True):
     for sid, hold in cta_holds(tl).items():
         if hold < CTA_MIN_S:
             res["warnings"].append(f"{sid}: call to action on screen {hold} s (under {CTA_MIN_S} s); raise the shot's \"post\"")
+    res["warnings"] += rx_warnings(tl)
     if info["exists"] and measure:
         res["loudness"] = loudness(path)
         if with_black:
@@ -380,6 +451,10 @@ def main(argv):
     ref = review(argv[argv.index("--ref") + 1], which, with_black=False) if "--ref" in argv else None
     if ref and new["probe"]["exists"] and ref["probe"]["exists"]:
         new["sheets"] = beat_sheets(ref, new, out_dir)
+    if new["probe"]["exists"]:
+        sheet = reenact_sheet(new, out_dir)
+        if sheet:
+            new.setdefault("sheets", []).append(sheet)
     if "--no-zones" not in argv:                           # rendered from the timeline, not read from the file
         new["zones"] = safezones.check(argv[0], out_dir)
         new["zone_rows"] = safezones.report_lines(new["zones"])

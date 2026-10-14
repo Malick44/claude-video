@@ -60,6 +60,8 @@ KIT = {
     "night_crickets_20s": lambda: bank.get("crickets", 20.0),
     "doorbell_glitch": lambda: bank.get("glitch"),
     "doorbell_jump": lambda: bank.get("jump"),
+    "reenact_hit": lambda: bank.get("reenact_hit"),
+    "reenact_swell_4s": lambda: bank.get("reenact_swell", 4.0),
 }
 
 

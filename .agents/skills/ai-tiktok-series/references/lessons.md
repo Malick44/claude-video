@@ -6,6 +6,7 @@ Concrete problems hit while making the pilot and Episodes 2–3, and what fixed 
 - Network and environment
 - Images
 - Video and file size
+- Generated clips (reenactments)
 - Audio and voices
 - Determinism and regressions
 - Writing and runtime
@@ -39,6 +40,18 @@ Concrete problems hit while making the pilot and Episodes 2–3, and what fixed 
 - **Film grain is expensive to encode.** The first uncapped render (crf 19) was 245 MB. The master is now crf 21 with `-maxrate 9M -bufsize 18M`. An 80 s master is still about 88 MB.
 - **Chat attachments cap at 30 MB.** `pipeline/deliver.py` makes a two-pass copy with light denoise (`hqdn3d`), targeting `--max-mb 29`. Episode 1 came out at 28.9 MB. TikTok re-compresses to about that bitrate anyway.
 
+## Generated clips (reenactments)
+
+- **Mark every generated frame as AI, not only the end card.** The first draft labelled a reenactment "REENACTMENT (DIRECTOR'S CUT)" and left "AI" to the end card, where it was legible for 0.8 s. The label is now fixed to `REENACTMENT · AI` on every frame (the build fails any other), the theory and any escalation go in the stamp under it, and on an episode with a reenactment the end card's disclosure fades in with the title and names everything made with AI.
+- **Size a tag to its text.** A fixed 520 px tag canvas (the EXHIBIT tag's) clipped a 674 px stamp. `common.rx_tag_width()` measures with the same fonts the renderer draws with, and the build fails a tag ending past x 930 (the apps' buttons).
+- **Decode clips from frame 0; never seek with `-ss`.** A seek lands on a keyframe or decodes differently from a sequential read, so a preview, the contact sheet and the full render could disagree. `render.ClipReader` pipes frames from frame 0 and reopens the pipe for a frame behind the read head; at 10 s or less a reopen costs under 0.5 s. The self-test compares frames decoded in order with the same frames decoded out of order.
+- **Rebuild the timeline when a clip lands.** A reenactment's length can come from its clip, so `timeline.json` records the clip's sha1 and `render.py` stops on a changed clip ("rebuild the audio"). Set `dur` so the timing doesn't change when the clip arrives.
+- **Never slow a generated take twice.** A slow-motion take played at 0.5x again left the action off screen and ghosted the frames. Slow motion goes in the generator's prompt; a real retime happens once, at intake (`clips.py add --retime`, optical flow), and the shot plays at 1.0x. Tune timing with the take's start (`in`), not `speed`.
+- **Lock the narration take before generating the clip.** The clip's move is timed to a word of the take, and once a clip exists `in` can only absorb a fraction of a second. Voice the line, lock the take, then set the motion prompt's hold time from it.
+- **Keep the key action out of the top-left tag area.** The tag and stamp hold about x 64-750, y 190-320; a keyframe with the cap and a laser beam up there put the action behind the AI label. Give the subject's size and where its top sits in the keyframe prompt.
+- **A name card on a short or silent shot has to be on from the cut.** The default card (in at 0.35 s, 0.3 s fade in, 0.25 s fade out) was fully legible for 0.7 s of a 1.6 s cutaway. `"lower_third_at": "cut"` keeps it fully on from the first frame to the last, and the build warns about any card legible under 1.2 s.
+- **An aspect ratio looks like a clock time.** The prompt lint's clock-time check (`\d:\d\d`) flagged "Vertical 9:16" in every keyframe prompt; it now strips aspect ratios first.
+
 ## Audio and voices
 
 - **You can't listen, so measure.** Every mix decision was checked by numbers, and two problems showed up only in them:
@@ -58,6 +71,8 @@ Concrete problems hit while making the pilot and Episodes 2–3, and what fixed 
 - **Global per-kind caches leak between shots.** Episode 2's second doorbell shot reused the first one's frames. Key caches by shot id.
 - **A missing optional field crashed the renderer** (`render.py` with no `STILLS` dict). Use `getattr(ep, "STILLS", {})` for optional episode fields. The self-test caught it.
 - **Regression check before any pipeline change:** render `--preview` at a dozen fixed times and build the audio, before (via `git stash`) and after. Then `cmp` the PNGs and `soundtrack.wav`, and confirm the voice cache made no new clips. Episode 1 stayed byte-identical through the renderer rewrite. When a change is meant to alter old episodes (like the cinematic redesign), tell the user.
+- **`git archive` leaves `shows/` out** (`.gitattributes` export-ignores it), so it can't make the "before" copy. Copy the tracked files instead (`git ls-files -z shows/<slug> | xargs -0 cp --parents -t <dir>`), plus `assets/`, which is gitignored. Compare the stems by their samples, not with `cmp`: libsndfile writes a timestamped PEAK chunk into float WAVs, so two identical builds' stems differ in the header. Gate every new code path on a new kind or field, so the published episodes stay byte-identical: the reenactment work left all 13 published episodes' `timeline.json`, `soundtrack.wav`, stems, `SCRIPT.md`, contact sheets and previews unchanged.
+- **`SCRIPT.md` is rewritten on every build.** A hand-written half of a draft's `SCRIPT.md` was lost to one build. Notes go in the episode's `NOTES.md`, which `script_md.py` links to.
 
 ## Writing and runtime
 

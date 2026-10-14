@@ -1,6 +1,6 @@
 ---
 name: nobody-moves-sound-design
-description: Change, diagnose and measure the sound of NOBODY MOVES (shows/nobody-moves), covering the synthesized piano-and-strings score, trailer hits, stings, foley and ambiences in pipeline/sounds.py, how build_audio.py places and masters them, stock or user files swapped in through soundtrack.py or an episode's SOUNDS, and measuring a mix with mixcheck.py and soundprobe.py. Use this whenever the user wants the show's music or effects more or less dramatic, tense, cinematic or quiet; a different theme, tempo or chords; a new sound or sting; a sound swapped for their own or a stock file; says a line is buried, the music is too loud or a silent beat isn't silent; wants the audio checked before posting or a mixcheck failure explained; or wants the sound kit WAVs, even if they don't name the show or the files. For episodes the pipeline builds, use this, not cinematic-sound-designer, because build_audio.py regenerates all their audio. Rendering afterwards belongs to nobody-moves-produce-episode.
+description: Change, diagnose and measure the sound of NOBODY MOVES (shows/nobody-moves), covering the piano-and-strings score, trailer hits, stings, the reenactment hit and swell, foley and ambiences in pipeline/sounds.py, how build_audio.py places and masters them, stock or user files swapped in through soundtrack.py or an episode's SOUNDS, and measuring a mix with mixcheck.py and soundprobe.py. Use this whenever the user wants the show's music or effects more or less dramatic, tense, cinematic or quiet; a different theme, tempo or chords; a new sound or sting; a sound swapped for their own or a stock file; says a line is buried, the music is too loud, a silent beat isn't silent or a reenactment's cut has a tail; wants the audio checked before posting or a mixcheck failure explained; or wants the sound kit WAVs, even if they don't name the show. For episodes the pipeline builds, use this, not cinematic-sound-designer, because build_audio.py regenerates all their audio. Rendering belongs to nobody-moves-render.
 ---
 
 # NOBODY MOVES sound design
@@ -26,7 +26,8 @@ Use it to:
 - change the theme's notes, chords or tempo;
 - add a new named sound, or swap one for the user's file, a stock file or an API sound;
 - fix a line that's buried under music or an effect;
-- check that a `"music": "out"` beat is really silent;
+- check that a `"music": "out"` beat is really silent, and that a reenactment's cue stops dead on its cut (recipe g);
+- re-measure an episode re-voiced on Eleven v4 (recipe h);
 - measure a mix before delivery or after any audio change, and explain a mixcheck failure;
 - export the sound kit (`sound_kit/*.wav`) for CapCut, Confessionals or trailers.
 
@@ -41,11 +42,11 @@ Come here when the sound itself changes, or to measure or diagnose a mix.
 
 | File | Owns |
 |---|---|
-| `pipeline/sounds.py` | The library. `SR` (48000); `LEVELS` (mix gain per sound, in dB); the theme (`THEME_NOTES`, `THEME_TURN`, `THEME_STEP`, `PAD_CHORDS`); `_rng`; the filters; the hall (`_hall`, `reverb`); the instruments (`piano_note`, `string_pad`, `heartbeat`, `shimmer`, `theme_layers`, `motif_bed`); the hits (`impact`, `braam`, `riser`, `whoosh`, `sting`, `swell`); the foley and ambiences (`shutter`, `typewriter_click`, `carriage_ding`, `wind`, `chimes`, `crickets`, `glitch`, `jump`) |
+| `pipeline/sounds.py` | The library. `SR` (48000); `LEVELS` (mix gain per sound, in dB); the theme (`THEME_NOTES`, `THEME_TURN`, `THEME_STEP`, `PAD_CHORDS`); `_rng`; the filters; the hall (`_hall`, `reverb`); the instruments (`piano_note`, `string_pad`, `heartbeat`, `shimmer`, `theme_layers`, `motif_bed`); the hits (`impact`, `braam`, `riser`, `whoosh`, `sting`, `swell`); the reenactment cue (`reenact_hit`, `reenact_swell`); the foley and ambiences (`shutter`, `typewriter_click`, `carriage_ding`, `wind`, `chimes`, `crickets`, `glitch`, `jump`) |
 | `pipeline/soundbank.py` | `SYNTH` (sound name to generator), `LOOPED`, `fit()`. `Bank.get(name, seconds, i)` returns the stock file if one is set, otherwise the synthesized sound. Unknown names exit |
 | `soundtrack.py` | `SOUNDS`: show-wide name to stock source. An episode's own `SOUNDS` overrides names; `common.load_episode` merges them |
 | `pipeline/stock.py` | `fetch()` (file, url, freesound, freesound_search, elevenlabs_sfx; pinned in `stock/sources.lock.json`) and `decode_audio(path, sr, channels)` |
-| `pipeline/build_audio.py` | The timeline, the three buses, `put()`, the intensity curve, `dip()` gating, automatic placement, ducking, `--stems`, `master()` |
+| `pipeline/build_audio.py` | The timeline, the three buses, `put()` (with `until=` to cut a sound dead), the intensity curve, `dip()` gating, automatic placement (the reenactment cue included), ducking, `--stems`, `master()` |
 | `pipeline/common.py` | `CTA_DELAY` (1.9 s from flicker to call to action, shared by the renderer and the mix) and `doorbell_clock()` |
 | `pipeline/sound_kit.py` | `KIT` (kit file name to sound); writes `sound_kit/*.wav`, which is gitignored |
 | `pipeline/mixcheck.py` | Measures a built episode; exits 1 on a HARD failure |
@@ -55,7 +56,7 @@ Come here when the sound itself changes, or to measure or diagnose a mix.
 - **dialogue** (`vox`): every line is RMS-matched to -17 dBFS in `voice_line()`.
 - **score:** `score` plus `under`, both ducked under dialogue by up to 8 dB.
   - `score` is the theme bed: shaped by the intensity curve, the gate and the end fade, highpassed at 45 Hz, and set at `LEVELS["bed"]`. Only the bed is gated by `dip()`.
-  - `under` holds the risers and the `sting_soft` swell.
+  - `under` holds the risers, the `sting_soft` swell and the reenactment swell.
 - **effects** (`fxbus`): stings, impacts, braams, whooshes, shutter, typewriter, bell, glitches, jump and ambiences. Never ducked, never gated.
 
 The buses are summed and peak-normalized to -1 dBFS. `master()` then applies a 30 Hz highpass, a gentle compressor and a limiter, and normalizes loudness in two passes to -14 LUFS and -1.5 dBTP. So `LEVELS` are relative to each other and to the dialogue, which is fixed at -17 dBFS RMS. The master only sets overall loudness: raising every entry by x dB lowers dialogue over bed by x dB. `put(buf, at, y, gain_db)` places a sound at `at` seconds.
@@ -69,12 +70,22 @@ The buses are summed and peak-normalized to -1 dBFS. `master()` then applies a 3
   - a riser across the flicker into an impact and braam at `flicker_at + CTA_DELAY`;
   - the score hushed to 0.3 under the flicker.
 
+  A doorbell with `"flicker": False` (a cold open that only jumps) gets the jump and none of the rest.
+- **Every `reenactment`** (with `"cue"` on, the default), a trailer cue that ends in a hard cut, in sound as in picture:
+  - `reenact_hit` on `fxbus`, placed 0.35 s before the shot so its reversed suck-in rises through the previous shot's last 0.35 s and its downbeat (a slowed impact and braam) lands on the reenactment's first frame;
+  - `reenact_swell` on `under`, ducked under the narration: held at 0.35 until the shot's last line ends, then ramped to full at the cut;
+  - at the cut both stop dead (`put(..., until=s.end)`, an 8 ms declick, no tail), and so do the shot's own `sfx`;
+  - the theme bed is gated out (`dip()`) from the reenactment's first frame until `cut_silence` (0.6 s by default) after the cut, then fades back in over 0.6 s; skipped when another reenactment follows. The effects bus isn't gated, so the cut-back's own `crickets`, which start at its first frame, are the room tone its denial lands in;
+  - the clip's own audio is always thrown away.
+
 **Chosen per shot** in `episode.py`: `"music": "out"` (recipe e), `"climax": True` (recipe a, "One moment only"), plus these `sfx` names. Any other `sfx` name exits.
 - `sting`: a riser runs into it;
 - `sting_end`;
 - `sting_soft`: under the shot's last line;
 - `shutter`: over an impact;
 - `wind`, `chimes`, `crickets`: the whole shot, stopping dead at the cut.
+
+On a reenactment shot, `"music": "out"` and `"climax"` don't build (the swell plays on the score bus), and its `sfx` stop dead at the cut.
 
 Per-sound detail is in `references/sound-catalog.md`; every tunable number is in `references/mix-knobs.md`.
 
@@ -119,8 +130,10 @@ $PY pipeline/mixcheck.py episodes/<ep>                # table; --json for one JS
 | HARD true peak | ≤ -1.0 dBTP (the master aims at -1.5) |
 | HARD dialogue over bed | median ≥ 12 dB, aim for 15+; a line under 8 dB is a warning |
 | HARD music-out silence | the score's loudest 100 ms < -60 dBFS (0.25 s at each edge ignored) |
+| HARD reenactment cut | after each reenactment's cut, from 0.03 s to `cut_silence` − 0.05 s, the score stem's loudest 50 ms < -60 dBFS (and the effects stem's, when the next shot has no `sfx`) |
+| WARN reenactment swell | the score stem's last 200 ms before the cut is louder than -24 dBFS; quieter means the swell didn't land |
 | HARD length | soundtrack ≥ timeline total |
-| info hits | the reveal hits and stings on top, within about 1 dB of each other; shutters, then jumps, well below |
+| info hits | the reveal hits and stings on top, within about 1 dB of each other; shutters, then jumps, well below; "reenact hit" and "reenact swell peak" listed for each reenactment |
 | info phone presence, mono, tail, LRA | see above; the tail well under the mix average |
 
 The current values for ep01–ep03 are in `references/baselines.md`; compare every result with them.
@@ -201,15 +214,35 @@ Add `"music": "out"` to the shot in `episode.py`. The bed fades out over the 0.2
 - **It cuts only the score bed.** The shot's own `sfx` and the effects bus still play. Ep03's `exhibit` cuts the music as its shutter fires, so the flash lands in silence.
 - **`under` sounds aren't cut either.** `sting_soft` and the risers play on, but mixcheck counts them as score, so a music-out shot that contains one fails the check. Don't combine them.
 - **For true silence,** give the shot no `sfx`, and check that the previous shot's sting tail has died away.
-- **Use it once or twice an episode,** right before a punchline or a reveal. A drop used everywhere stops landing.
+- **Use it once or twice an episode,** right before a punchline or a reveal, besides each reenactment's cut-back (which always has it). A drop used everywhere stops landing.
+- **Never on a reenactment shot:** its swell is on the score bus, so the build refuses it. The cut-back after it is where the silence goes.
 - **Verify** with mixcheck's music-out row: it should read silent, under -60 dBFS.
 
 ### (f) Export the sound kit
 
-Run `$PY pipeline/sound_kit.py`. It writes every `KIT` entry to `sound_kit/*.wav` as 16-bit, 48 kHz, mono or stereo as generated (5 of the 17 are mono: `camera_shutter`, `typewriter_key`, `typewriter_bell`, `doorbell_glitch`, `doorbell_jump`), using the same sources as the episodes (including any stock overrides in `soundtrack.py`).
+Run `$PY pipeline/sound_kit.py`. It writes every `KIT` entry to `sound_kit/*.wav` as 16-bit, 48 kHz, mono or stereo as generated (5 of the 19 are mono: `camera_shutter`, `typewriter_key`, `typewriter_bell`, `doorbell_glitch`, `doorbell_jump`; `reenact_hit` and `reenact_swell_4s` are stereo), using the same sources as the episodes (including any stock overrides in `soundtrack.py`).
 - **Levels:** each file is peak-normalized to -1 dBFS, so the mix balance isn't in the files. Tell the user to set levels in their editor; `LEVELS` gives the show's relative gains.
 - **The theme** (`theme_60s`) comes from `motif_bed`, a fixed-intensity mixdown, not the building bed of an episode.
 - **To send it,** zip the folder somewhere outside the repo, so a large binary can't end up committed, e.g. `$PY -c "import shutil; shutil.make_archive('/tmp/nobody_moves_sound_kit', 'zip', 'sound_kit')"`.
+
+### (g) A reenactment's hit, swell and hard cut
+
+The cue is automatic (see "Automatic"); what needs care is the shots around it.
+- **The pre-roll.** The shot before a reenactment ends its last line at least 0.35 s before the cut (`"post": 0.35` or more), or `reenact_hit`'s suck-in plays over that line, usually the comment question. `build_audio.py` warns.
+- **No other swell into it.** No `sting_soft` on the shot before: its swell peaks on the reenactment's first frame, on top of the hit. `build_audio.py` warns.
+- **The silence after the cut is the joke.** The cut-back shot has `"music": "out"` and only room tone (`crickets`) under the denial. Check mixcheck's "reenactment cut" row (HARD) and the cut-back's music-out row; on a FAIL, `$PY $PROBE --lines episodes/<ep>` shows what is still sounding. A ringing tail there usually means a sound placed without `until=` or an ambience on the reenactment shot that the next shot repeats.
+- **The swell must land.** mixcheck warns when the score stem's last 200 ms before the cut is quiet: the line runs too close to the cut (the swell ramps only after the last line ends), so give the shot at least 0.5 s of action after its line (`dur`).
+- **The narration over a reenactment must stay clear.** It starts 0.35 s into the shot, on top of the hit's slowed boom and the swell, so check its row in mixcheck's worst lines like any other: 8 dB over the bed at the least. `$PY $PROBE --lines episodes/<ep>` shows whether the effects stem (the hit) or the score stem (the swell) is over it; fix it in the cue (recipe d's order: move the line, then the level, show-wide), never by turning the voice up. The boom is already shaped for this: `sounds.reenact_hit()` holds it 0.15 s after the downbeat, then lets it die to about -20 dB by 0.6 s (`hold`, `decay`). Measured on the Episode 1 remake's Kokoro build: with the boom's natural slowed tail the two reenactment lines sat 1.7 and 2.4 dB over the bed; shaped, none is under 8 dB and the median is 18.8 dB.
+- **Levels:** `LEVELS["reenact_hit"]` (-7) and `LEVELS["reenact_swell"]` (-12). They change every reenactment in the show; measure with `$PY $PROBE reenact_hit braam impact` against the reveal hits, and keep the dialogue median at 15 dB or more.
+- **Per-reenactment flavours** (pizzicato heist strings, a guitar sting, a concrete thud on a landing) aren't supported yet: the cue is the same for every reenactment. Adding one means a per-shot cue name resolved through `SOUNDS` (recipe b for the sound itself); until then, an `sfx` on the reenactment shot plays and stops dead at the cut.
+
+### (h) After a re-voice on Eleven v4
+
+Moving lines from Kokoro to the Eleven v4 voices (`docs/AUDIO_ELEVENLABS_V4.md`) changes the dialogue stem, so re-measure every re-voiced episode with `--stems` and mixcheck, and compare with its Kokoro build.
+- **Quiet tags come back at normal loudness.** Every clip is RMS-matched to -17 dBFS, so `[quietly]`, `[hushed]` and `[under his breath]` keep only their timbre, with their breath and noise turned up. Check those lines' dialogue over bed and say which ones to listen to on a phone speaker. If the level difference matters, the fix is an optional per-line gain in `build_audio.py`, not the tag.
+- **The CHIME** (a hushed designed voice, pitched to 0.72 and bit-crushed, under wind and chimes) is the likeliest line under 8 dB. Try the pitch A/B at 0.80 first (it only re-runs the FX on the cached clip, so it costs nothing), then recipe (d).
+- **Non-verbal tags** (`[exhales]`, `[clears throat]`) put a sound inside the dialogue clip, before the first word. Check that it isn't clipped by the trim and doesn't sit on a cut.
+- **No sound-effect or ambience tags** (`[wind]`, `[phone buzzing]`): baked into a dialogue clip, they would be RMS-matched with the voice, duck the score and count as dialogue in mixcheck. Sound belongs on the effects bus (`sfx`, `sounds.py`, `soundtrack.py`).
 
 ## Re-render or remux
 
@@ -233,8 +266,8 @@ $PY pipeline/deliver.py episodes/<ep>                 # the TikTok copy, under 2
 
 ```bash
 $PY -m py_compile pipeline/*.py soundtrack.py        # silent when every file parses
-$PY pipeline/selftest.py                             # "all stock-source checks passed" (15 checks)
-$PY pipeline/sound_kit.py                            # every KIT entry exports (17 today)
+$PY pipeline/selftest.py                             # exits 0 when every offline check passes
+$PY pipeline/sound_kit.py                            # every KIT entry exports (19 with the reenactment cue)
 $PY $PROBE --determinism                             # determinism: PASS
 for ep in episodes/*/; do [ -f $ep/episode.py ] || continue
   $PY pipeline/build_audio.py $ep --stems >/dev/null && $PY pipeline/mixcheck.py $ep || echo "FAIL $ep"; done

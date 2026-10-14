@@ -39,6 +39,10 @@ API = {
 }
 # Freesound licenses allowed by default: no NonCommercial, since a monetized TikTok is commercial.
 FREESOUND_LICENSES = '("Creative Commons 0" OR "Attribution")'
+# ElevenLabs voices: the model when a cast entry names none, and the models that take inline audio
+# tags ("[deadpan]") as delivery directions. Other models may read a tag out loud.
+TTS_MODEL = "eleven_multilingual_v2"
+TAG_MODELS = ("eleven_v3", "eleven_v4")
 
 
 # ---------------------------------------------------------------- keys + http
@@ -167,8 +171,9 @@ def _url(spec, default_ext):
 
 
 def elevenlabs_tts(text, cast):
-    """One line of dialogue from an ElevenLabs voice (cast entry with provider "elevenlabs")."""
-    body = {"text": text, "model_id": cast.get("model", "eleven_multilingual_v2")}
+    """One line of dialogue from an ElevenLabs voice (cast entry with provider "elevenlabs").
+    `text` is sent as written, audio tags included."""
+    body = {"text": text, "model_id": cast.get("model", TTS_MODEL)}
     for k in ("voice_settings", "seed"):
         if k in cast:
             body[k] = cast[k]
