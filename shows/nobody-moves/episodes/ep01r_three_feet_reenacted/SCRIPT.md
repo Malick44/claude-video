@@ -2,7 +2,7 @@
 
 Runtime: **46.9s**, 9:16 vertical, 1080×1920 at 30 fps.
 
-**Cliffhanger answer (don't post this):** In frame 418 Lorraine the porch goose has turned to face the other way. Deb's jump is the obvious change; the goose is the hidden one: the same goose who said "Where would I go, hon? I'm concrete.", and the one the Director's Cut swore never looks back. Paid off in Episode 2.
+**Cliffhanger answer (don't post this):** In frame 418 Lorraine the porch goose has turned to face the other way. Deb's jump is the obvious change; the goose is the hidden one: the same goose who said "Where would I go, hon? I'm concrete.", and the goose the Director's Cut showed dropping a step without ever turning. Paid off in Episode 2.
 
 Build notes, timing and laughs, canon checks, recording direction and the review log: [NOTES.md](NOTES.md).
 

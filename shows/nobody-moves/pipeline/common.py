@@ -1,12 +1,12 @@
 """Shared paths, episode loading and shot-kind constants for the NOBODY MOVES pipeline."""
 import functools
 import hashlib
-import importlib.util
 import math
 import os
 import re
 import subprocess
 import sys
+import types
 
 SHOW_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSETS = os.path.join(SHOW_DIR, "assets")  # downloaded by setup.sh, not committed
@@ -15,9 +15,13 @@ FONTS = os.path.join(ASSETS, "fonts")
 
 
 def _import(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
+    """Run a Python file as a fresh module, always from its source. importlib's bytecode cache is keyed on
+    the file's mtime (to the second) and size, so an episode.py rewritten within a second to text of the
+    same length (a "clip" renamed, a number changed) would otherwise run its previous version."""
+    mod = types.ModuleType(name)
+    mod.__file__ = path
+    with open(path, "rb") as f:
+        exec(compile(f.read(), path, "exec"), mod.__dict__)
     return mod
 
 

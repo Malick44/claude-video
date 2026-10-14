@@ -175,6 +175,26 @@ def check(cond, msg):
     print("ok  ", msg)
 
 
+def load_checks():
+    """An episode.py rewritten to text of the same length with the same mtime (two edits in one second) must
+    load its new text. importlib's bytecode cache matches on mtime and size alone, so it would run the old one."""
+    import common
+    folder = tempfile.mkdtemp(prefix="nm-selftest-load-")
+    try:
+        path = os.path.join(folder, "episode.py")
+        with open(path, "w") as f:
+            f.write('CLIP = "rx_rot_raw"\nSHOTS = []\n')
+        first = common.load_episode(folder).CLIP
+        stat = os.stat(path)
+        with open(path, "w") as f:
+            f.write('CLIP = "rx_sar_raw"\nSHOTS = []\n')
+        os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+        check(first == "rx_rot_raw" and common.load_episode(folder).CLIP == "rx_sar_raw",
+              "an episode.py rewritten within the same second to the same length loads its new text, not a cached compile")
+    finally:
+        shutil.rmtree(folder, ignore_errors=True)
+
+
 def tag_checks():
     """words.strip_tags, the text Kokoro and the caption timing get: tags out, everything else kept."""
     from words import strip_tags, tag_kind
@@ -517,7 +537,8 @@ def reenactment_checks(tmp, env, render_mp4=False):
     check(abs(length("rx_missing") - 3.0) < 1e-6 and S["rx_missing"]["clip_missing"] is True
           and S["rx_missing"]["clip_fallback"] == "garrison" and "rx_nope is missing" in r.stderr,
           "a missing clip: exactly its dur, clip_missing, its fallback still, and a warning")
-    check(f"clips.py add {os.path.relpath(ep, SHOW)} rx_nope <file>" in r.stderr and ep not in r.stderr,
+    line = next(x for x in r.stderr.splitlines() if "rx_nope is missing" in x)
+    check(f"clips.py add {os.path.relpath(ep, SHOW)} rx_nope <file>" in line and f"add {ep} " not in line,
           "the missing-clip warning names the episode by its path from the show folder, as the README's command does")
     check(S["rx"]["clip_sha1"] == entry["sha1"][:12] and S["rx"]["label"] == "REENACTMENT · AI" and S["rx"]["cue"] is True,
           "the timeline records the clip's sha1 and the resolved label and cue")
@@ -869,6 +890,7 @@ def cast_checks():
 
 
 def main():
+    load_checks()
     tag_checks()
     cast_checks()
     preroll_checks()

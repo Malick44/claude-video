@@ -119,7 +119,7 @@ A beat the episode doesn't have is a gray "none" cell; a beat that lands on the 
 
 A failure goes to `nobody-moves-produce-episode` (a new clip or keyframe), or to `nobody-moves-write-episode` when the theory itself breaks canon.
 
-**The end card,** on an episode with a reenactment, reads "Footage, reenactments and voices made with AI." over "The flamingo is real.", fully visible from about 0.65 s into the card; the build already refuses a card that shows it for under 1.8 s. Grab the card's start plus 0.7 s with `--grab` if in doubt.
+**The end card,** on an episode with a reenactment, reads "Footage, reenactments and voices made with AI." over "The flamingo is real.", fully visible from about 0.65 s into the card; the build already refuses a card that shows it for under 1.8 s. Grab the card's start plus 0.7 s with `--grab` if in doubt. Without a reenactment it reads "Reenactments and voices made with AI." when the soundtrack holds an ElevenLabs voice or a locked v4 take (`recordings/<rec>.v4.*`), else "Reenactments dramatized with AI."; the renderer reads that from `timeline.json`, not from `NM_VOICES`, so it follows the build. A v4 take copied to `recordings/` without the `.v4` counts as human and drops "voices": on a re-voiced episode, grab the card's start plus 1.9 s and check the line.
 
 **The zones sheet,** `build/review/zones.png`, has one row per app (TikTok, Reels, Shorts). It shows the first name card, the lowest text, the first reenactment's tag, the last call to action, the end card and every moment that warned, with the app's covered areas shaded red and text inside them in magenta. It's rendered from the timeline, not grabbed from the MP4, so it needs no render and can run before one.
 

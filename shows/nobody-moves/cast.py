@@ -42,6 +42,9 @@ Other voice sources:
                lists the name for every line. A recording replaces that line's TTS. Add
                "fx_on_recordings": True to a character to also run its pitch/altered chain on
                your takes (e.g. to disguise your own voice as the anonymous source).
+  A locked v4 take  <shot>_<n>.v4.wav in recordings/ (a raw clip copied from build/voice/): used after
+               your own take and before the cast, skipped under NM_VOICES=kokoro, and still counted
+               as an AI voice on the end card (docs/AUDIO_ELEVENLABS_V4.md, "How to lock a take").
 """
 
 import os

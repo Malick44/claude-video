@@ -349,7 +349,7 @@ def validate_clip(i, s):
     path = clip_path(ep.DIR, s["clip"])
     info = clip_info(path) if path else None
     if path and not info:
-        sys.exit(f"{where}: {path} has no video stream; file the clip with pipeline/clips.py add")
+        sys.exit(f"{where}: {os.path.relpath(path, SHOW_DIR)} has no video stream; file the clip with pipeline/clips.py add")
     if info:
         add = f"pipeline/clips.py add {os.path.relpath(ep.DIR, SHOW_DIR)} {s['clip']} <file> --generator ..."
         if abs(info["fps"] - CLIP_FPS) > 0.01:

@@ -265,7 +265,7 @@ Also worth measuring: the voice cache runs at `VOICE_SR = 24000` (Kokoro's nativ
 
 ```bash
 cd shows/nobody-moves; PY=.venv/bin/python; AB=$HOME/nobody-moves-ab   # outside the repo
-arm() {   # arm <name> <NM_VOICES> <episode>: full build, stems, mixcheck, then a copy of build/
+arm() {   # arm <name> <NM_VOICES> <episode>: full build, stems, mixcheck, safe zones, then a copy of build/
   NM_VOICES=$2 ./make_episode.sh episodes/$3                       # the timeline changes: full render, not a remux
   NM_VOICES=$2 $PY pipeline/build_audio.py episodes/$3 --stems
   mkdir -p $AB/$1/$3 && $PY pipeline/mixcheck.py episodes/$3 --json > $AB/$1/$3/mix.json
