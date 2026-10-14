@@ -26,6 +26,12 @@ Pipeline features it uses beyond Episode 1's (the show's README.md, "episode.py 
   5. DERIVED_STILLS, the exposure-lifted stills below.
   6. Audio tags in the spoken text (D10): stripped before Kokoro and before caption timing, and a
      build whose caption would show one stops.
+  7. A "blender" dict on both reenactments: pipeline/blender_reenact.py renders them in Blender, timed
+     to this build's words, and files them as rx_heist_gnome_bl and rx_action_goose_bl
+     (../../docs/BLENDER_REENACTMENTS.md). Until a Blender clip is filed (no Blender on the machine),
+     each shot plays its fallback still, exactly as before. The image-to-video route stays below
+     (STILLS' rx_*_key keyframes, CLIPS, CLIP_SOURCES): to play a generated clip instead, file it under
+     its own key and point the shot's "clip" back at it (the AI-route values are in a comment there).
   "jump_after" stays an int: the doorbell clock ticks in whole seconds, and build_audio.py stops on a
   float.
 
@@ -393,19 +399,34 @@ SHOTS = [
         "post": 0.35,
     },
     # --- THEORY 1, the gnome: HEIST MOVIE. The first thing that moves, at about 13.0 s (Kokoro). Stillness is the
-    # setup and the move is the punch: he holds still under "That night, he was facing her." and slides
-    # on "Then" (about 2.26 s into the shot). The cut catches him mid-slide; reality has him back in his spot.
+    # setup and the move is the punch: he holds dead still under "That night, he was facing her. Then he made his"
+    # and zips on "move" (about 3.23 s into the shot; option B). The cut catches him mid-slide, 0.58 s after the
+    # line ends; reality has him back in his spot.
     {
         "id": "heist", "kind": "reenactment",
         "note": ("REENACTMENT · AI, THEORY #1, HEIST MOVIE. A glossy plastic 3D Garrison stands dead still in a grid "
-                 "of red laser beams, staring into the lens. Locked-off camera. On 'Then' he slides sideways like a "
-                 "chess piece, rigid, never turning, and passes under the lowest beam on a lens flare. Deb is a soft "
-                 "pink shape in the foreground, and nothing touches her. Hard cut mid-slide."),
-        "clip": "rx_heist_gnome", "in": 0.25, "speed": 1.0, "dur": 4.05,   # source 0.25-4.30 s; slide from 2.5 s
-        "kb": ((0.5, 0.53, 1.0), (0.5, 0.53, 1.0)),                        # locked: a push-in would read as a zoom
+                 "of red laser beams, staring into the lens. Locked-off camera. On 'move' he zips sideways like a "
+                 "chess piece, rigid, never turning, and passes under the lowest beam on a lens flare. The lens is "
+                 "Deb's point of view (she is off screen: a pink kicker light from frame right). Hard cut mid-slide."),
+        # Rendered by pipeline/blender_reenact.py, timed to the take (no trim, so "in" is 0). A key of its own: a
+        # Blender render never takes the AI clip's slot (rx_heist_gnome stays the image-to-video route; to play a
+        # generated clip instead: "clip": "rx_heist_gnome", "in": 0.25, "kb": ((0.5, 0.53, 1.0), (0.5, 0.53, 1.0))).
+        "clip": "rx_heist_gnome_bl", "in": 0.0, "speed": 1.0, "dur": 4.05,
+        "blender": {
+            "template": "heist", "subject": "garrison", "props": [],   # Deb is the lens, not a prop
+            # Option B: dead still through "...Then he made his", then a rigid zip on "move" (0.12 s ease-in, about
+            # 31% of the frame width a second) with the flare. Option A (slides on "Then", the line's illustration):
+            # "move_on": "Then", "move_at": 2.26, and "accel_s": 0.35 in the options.
+            "move_on": "move", "move_at": 3.23,            # the word first; seconds if there is no timeline
+            "flare_on": "move",                            # the lens flare peaks 2 frames after "move"
+            "camera": "beside_deb",                        # grass height, where Deb stands, locked off
+            "options": {"path": "left", "travel": 0.25, "accel_s": 0.12},   # a quarter of the frame width by the cut
+        },
+        "kb": ((0.5, 0.5, 1.0), (0.5, 0.5, 1.0)),          # locked: a native 9:16 render, the identity crop
         "label": "REENACTMENT · AI", "stamp": "THEORY #1: THE GNOME",   # every reenactment is marked AI (D4)
         "look": "reenact", "cue": True, "cut_silence": 0.6,
-        "fallback": [V("rx_heist_gnome_key", (0.5, 0.55, 1.0), (0.5, 0.52, 1.35)),
+        "fallback": [V("rx_heist_gnome_bl_key", (0.5, 0.5, 1.0), (0.5, 0.5, 1.0)),   # blender_reenact.py --keyframe
+                     V("rx_heist_gnome_key", (0.5, 0.55, 1.0), (0.5, 0.52, 1.35)),
                      V("garrison", (0.47, 0.52, 1.6), (0.47, 0.50, 2.3))],
         "pre": 0.35,
         "items": [L("NARRATOR", "That night, he was facing her. Then he made his move.")],
@@ -444,21 +465,37 @@ SHOTS = [
         "lower_third_at": "cut",   # fully on from the first frame to the cut, no fade either way
     },
     # --- THEORY 2, the goose: ACTION MOVIE, the Director's Cut. The peak, at about 19.4 s (Kokoro). "In a world
-    # where nobody moves..." plays over a motionless goose in front of an explosion; the big dare is one
-    # step, landing just after "dared" (about 4.13 s in). Cut 0.5 s after the landing.
+    # where nobody moves..." plays over a motionless goose in front of an explosion; she rocks on "one" and on
+    # "goose...", tips on "dared" (the punch word triggers the drop) and lands in the silence after it (about
+    # 4.34 s in). Cut 0.31 s after the landing.
     {
         "id": "action", "kind": "reenactment",
         "note": ("REENACTMENT · AI, THEORY #2 (DIRECTOR'S CUT), ACTION MOVIE. A glossy plastic 3D Lorraine, bare, "
                  "stands dead still on the top porch step as a stage fireball blooms behind the roofline. Locked-off "
-                 "camera. On 'dared' she tips off the step as one rigid piece and drops onto the step below, toward "
-                 "the lower left, the way her beak points, never turning. Concrete dust. Trailer voice. Hard cut "
-                 "half a second after she lands."),
-        "clip": "rx_action_goose", "in": 0.2, "speed": 1.0, "dur": 4.65,   # source 0.2-4.85 s; landing at ~4.33 s
+                 "camera. She rocks once on 'one' and once on 'goose', and on 'dared' she tips off the step as one "
+                 "rigid piece and drops onto the step below, toward the lower left, the way her beak points, never "
+                 "turning. Concrete dust. Trailer voice. Hard cut a third of a second after she lands."),
+        # Rendered by pipeline/blender_reenact.py under its own key (the AI route: "clip": "rx_action_goose",
+        # "in": 0.2). "dur" stays 4.65, so the episode builds exactly as before while no clip is filed; that leaves
+        # the landing 0.26 s after "dared" ends (the rule is 0.25 s or more) and the cut 0.31 s after it (0.3-1.0).
+        # The prototype's 0.37 s of silence before the thud needs "dur": 5.0 and "offset": 0.37 (a 0.35 s longer
+        # episode, inside the 3.1 s headroom).
+        "clip": "rx_action_goose_bl", "in": 0.0, "speed": 1.0, "dur": 4.65,
+        "blender": {
+            "template": "action", "subject": "lorraine",
+            "move_on": ["one", "goose"],                                   # one rock-waddle on each word
+            "tip_on": "dared",                                             # the tip starts on "dared"
+            "land_on": {"word": "dared", "edge": "end", "offset": 0.26},   # the thud: in the silence after it
+            "move_at": [2.80, 3.04], "tip_at": 3.56, "land_at": 4.34,     # the Kokoro take's times, as a fallback
+            "camera": "hero_low",                                          # low on the front walk, locked off
+            "options": {"outfit": None, "steps_down": 1},                  # BARE: the night of 13-14 June
+        },
         "kb": ((0.5, 0.5, 1.0), (0.5, 0.5, 1.0)),
         # The escalation lives in the stamp now: the label is "REENACTMENT · AI" on every reenactment (D4).
         "label": "REENACTMENT · AI", "stamp": "THEORY #2: THE GOOSE (DIRECTOR'S CUT)",
         "look": "reenact", "cue": True, "cut_silence": 0.6,
-        "fallback": [V("rx_action_goose_key", (0.5, 0.5, 1.0), (0.5, 0.46, 1.35)),
+        "fallback": [V("rx_action_goose_bl_key", (0.5, 0.5, 1.0), (0.5, 0.5, 1.0)),   # blender_reenact.py --keyframe
+                     V("rx_action_goose_key", (0.5, 0.5, 1.0), (0.5, 0.46, 1.35)),
                      V("lorraine", (0.5, 0.5, 1.2), (0.5, 0.47, 1.6))],
         "pre": 0.35,
         # One take: measured, Kokoro already leaves 0.25 s and 0.3 s beats at the periods, and three
@@ -467,7 +504,10 @@ SHOTS = [
         "items": [L("NARRATOR (TRAILER)", "In a world where nobody moves... one goose... dared.",
                     "[like a movie trailer] In a world where nobody moves. One goose. Dared.")],
     },
-    {   # the cut-back
+    {   # the cut-back. Its kb matches the AI keyframe's framing (Lorraine about 60% of the frame height). The
+        # Blender clip's first frame shows her about 41% tall at x 0.59 (hero_low), so once rx_action_goose_bl plays,
+        # set both views to (0.50, 0.50, 1.0), the uncropped still, or the cut reads as a punch-in instead of "she
+        # never moved": blender_reenact.py's cut-back check warns until then and prints that kb.
         "id": "l_deny", "kind": "still", "music": "out", "pre": 0.45,
         "note": ("HARD CUT: the real Lorraine back on her step in the porch light, locked off, her beak to frame left, "
                  "the size the reenactment showed her. No fireball and no score, only crickets and the porch-light "

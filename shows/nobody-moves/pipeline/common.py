@@ -118,7 +118,16 @@ def clip_path(ep_dir, key):
 
 
 def ffmpeg_exe():
-    import imageio_ffmpeg
+    """imageio-ffmpeg's ffmpeg (the show's .venv). Only a Python without it (Blender's own, running
+    blender_reenact.py) falls back to $NM_FFMPEG, then ffmpeg on PATH."""
+    try:
+        import imageio_ffmpeg
+    except ImportError:
+        import shutil
+        exe = os.environ.get("NM_FFMPEG") or shutil.which("ffmpeg")
+        if exe:
+            return exe
+        raise
     return imageio_ffmpeg.get_ffmpeg_exe()
 
 

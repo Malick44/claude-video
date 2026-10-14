@@ -67,6 +67,11 @@ Read SERIES.md "Reenactments" first; this is the writer's checklist.
   - new 3D reference sheets (`ref3d_<name>`) in `STILLS` only for a character whose sheet isn't in the library yet.
 - **The line comes before the clip.** The clip's motion is timed to the narration take, so the line is voiced and locked before its clip is generated, and the motion prompt's hold time comes from that take: a move on a key word, "For the first X seconds" with X = `pre` + the key word's time in the take + `in`; a landing after the line, "At about Y seconds" with Y = `pre` + the take's length + `in`. Write the scratch-take numbers now; the produce skill refits them to the locked take. A clip made earlier absorbs only what `in` can give up, a fraction of a second.
 - **Write a `REENACTMENT_PROMPTS.md`** beside the episode for whoever generates the clips (the remake's is the model; its `tools/make_prompts_md.py` writes it from `episode.py`): per clip, the keyframe prompt, motion prompt, negative, references, per-tool settings and a review checklist.
+- **A Blender reenactment** (rendered by `pipeline/blender_reenact.py` from the cast's 3D models, timed to the take's own words; `docs/BLENDER_REENACTMENTS.md`, section 2) fits a theory one of its templates stages: `heist` (a subject dead still, then one rigid glide across a laser grid, cut mid-glide) or `action` (Lorraine rocks on one to three words, tips on the punch word and drops a step in front of a fireball). Write the shot with its own key and a `"blender"` dict; the AI route's prompts can stay beside it:
+  - the shot: `"clip": "rx_<name>_bl"` (never an AI clip's key in `CLIPS`), `"in": 0.0`, `"speed": 1.0`, a `"dur"` (required), `"kb": ((0.5, 0.5, 1.0), (0.5, 0.5, 1.0))`, the same label, stamp, cue and `pre`, and `"fallback"` views starting with `V("rx_<name>_bl_key", (0.5, 0.5, 1.0), (0.5, 0.5, 1.0))` (frame 0, written by `--keyframe`);
+  - `"blender": {"template", "subject", "props", "move_on", "camera", "options"}`, plus `tip_on`/`land_on` for `action` and `flare_on` for `heist`. The beats name words of this shot's own line: `"move"`, `"goose#2"` (the second one), `["one", "goose"]` (one rock each), or `{"word": "dared", "edge": "end", "offset": 0.26}` for a landing in the silence after a word. Add `move_at`/`tip_at`/`land_at` seconds from the scratch take as the fallback. The remake's two shots are the model;
+  - the same rules hold, and the tool checks them: stillness first (the move 1.0 s or more in), the punch word triggers the drop (within 0.1 s), the landing 0.25 s or more after its word and the cut 0.3-1.0 s after the landing, nothing in the AI tag's zone, the cut-back still framed like the clip's first frame. The subject is one ornament from the cast (never Deb: canon never shows how she was moved), across the frame, never along the lens axis; Lorraine stays three-quarter, beak to frame left. Options are per template (the guide's section 5); an unknown key is an error;
+  - the label stays `REENACTMENT · AI` (D4), and the subject needs a 3D model in `models/` before the clip can ship (a proxy stand-in renders until then; list the models the episode needs in the hand-off).
 
 ## Voices and audio tags
 
@@ -167,7 +172,7 @@ A future episode's writer only knows what this file says.
 Tell the user, briefly:
 - the episode's beats in plain language, with when the comment question and the first reenactment land;
 - the new clue and where it pays off, labeled as a spoiler;
-- the list of new stills and clips, with their prompts (or the `REENACTMENT_PROMPTS.md` file), marked optional where a fallback exists;
+- the list of new stills and clips, with their prompts (or the `REENACTMENT_PROMPTS.md` file), marked optional where a fallback exists; for a Blender reenactment, its template and beats instead, and the 3D models it needs (`models/README.md`);
 - the tagged lines and the `HUMAN_TAKES` lines.
 
 Then offer to build it, or go ahead if they asked for the video.

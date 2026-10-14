@@ -4,3 +4,14 @@ episodes/*/build/
 sound_kit/
 .env
 channel/build/
+# Blender reenactments (pipeline/blender_reenact.py, docs/BLENDER_REENACTMENTS.md)
+.venv-bpy/
+/build/
+*.blend
+*.blend1
+models/*.glb
+models/.model_add_*/
+# A Blender clip filed by --build is a build product (usually a draft). Commit a final on purpose:
+#   git add -f episodes/<ep>/clips/<key>_bl.mp4 episodes/<ep>/clips/<key>_bl.blender.json
+episodes/*/clips/*_bl.mp4
+episodes/*/clips/*_bl.blender.json

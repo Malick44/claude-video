@@ -9,6 +9,7 @@ This folder is independent of the `watch` skill in the rest of the repo.
 ```bash
 ./setup.sh                                   # once: venv, Kokoro TTS model, fonts (PyPI + GitHub only)
 ./make_episode.sh episodes/ep01_three_feet   # ~10 min on a laptop CPU
+./setup.sh --blender                         # optional: Blender (bpy, Python 3.11) for "Blender reenactments"
 ```
 
 You need Python 3.10–3.13, which Kokoro requires. `setup.sh` finds one automatically. On a Mac the built-in `python3` is too old, so run `brew install python@3.12` first if setup says none was found.
@@ -128,6 +129,51 @@ A reenactment takes no `lower_third`, `"music": "out"` or `climax`, can't be the
 `add` files a mezzanine (H.264 at a constant 30 fps, no audio, longest side 1920 or less, never cropped, turned upright with square pixels: a phone clip's display rotation and a non-square pixel aspect are applied, since the renderer reads neither) in the episode's `clips/` (or the show's `clips/` for `series`), and records it in that folder's `clips.json`: the source and mezzanine sha1, generator, prompt and negative (read from `CLIPS` and `CLIP_SOURCES`; `--prompt` only for a clip with no `CLIPS` entry), keyframe, references, retime, date, size, length, credit and `"ai_generated": true`. It refuses a file with no video, under 1 s or over 10 s, a prompt that fails the lint, and an existing clip without `--force`, and warns when a 9:16 crop leaves under 720 px of width, when the clip starts or ends black, or when its middle frame is too dark. `--retime F` retimes once, with optical flow (0.5 = half speed). Commit clips like stills (about 6 MB per 5 s).
 
 **After a clip lands, rebuild the audio:** the shot's length can depend on the clip, so `render.py` stops when a clip changed since `build_audio.py` ran. A reenactment's timeline entry records the clip it used (`clip_file`, `clip_sha1`, `clip_in`, `clip_out`, `clip_speed`, `clip_freeze_at`, `clip_missing`, `clip_fallback` and the resolved `label`, `look`, `cue` and `cut_silence`). The renderer decodes each clip from frame 0 through a pipe, never seeking, so a preview, the contact sheet (two cells per reenactment: 40% in and the last frame before the cut) and the full render give the same pixels. `review.py` adds a "reenact" and a "cut back" beat, the reenactments' share of the runtime, warnings for a missing clip, a length outside 3–6 s, a long freeze or a next shot that isn't the real ornament, and `build/review/reenact.png`: each reenactment's first frame, 25%, 50% and 75% in, the last frame before the cut and the first after it, to check for humans, the tag and the cut back. `mixcheck.py` fails a reenactment whose cut isn't followed by silence.
+
+## Blender reenactments
+
+A reenactment can also be **rendered in Blender** instead of generated. **Blender renders run on your own machine only.** Never in a cloud or remote session: `pipeline/blender_reenact.py` refuses to start Blender when `CLAUDE_CODE_REMOTE` is set, and its selftest reports the rendering half as skipped there. Render finals and previews on your computer, then file the clip with `blender_reenact.py`.
+
+The `pipeline/blender_reenact.py` tool builds the scene from the cast's 3D models (or a procedural stand-in), times the move to this build's own words in `build/timeline.json`, renders it, and files it like any other clip, through `clips.py add`: `clips/<key>.mp4`, its `clips.json` entry, and a `<key>.blender.json` sidecar with the full provenance. `render.py` plays it like any clip. The ornament is rigid by construction (only its root moves; it never turns), the camera is locked, and no human can appear. The label is still `REENACTMENT · AI` (decision D4). The full guide is [`docs/BLENDER_REENACTMENTS.md`](docs/BLENDER_REENACTMENTS.md); making and filing the 3D models is in [`models/README.md`](models/README.md).
+
+A shot opts in with a `"blender"` dict and a clip key of its own, ending in `_bl` (an AI clip's key, one in `CLIPS`, is an error):
+
+```python
+{"id": "heist", "kind": "reenactment",
+ "clip": "rx_heist_gnome_bl", "in": 0.0, "speed": 1.0, "dur": 4.05,     # dur required, in 0, speed 1.0
+ "blender": {"template": "heist", "subject": "garrison", "props": [],
+             "move_on": "move", "move_at": 3.23, "flare_on": "move",   # the word, then seconds as a fallback
+             "camera": "beside_deb", "options": {"path": "left", "travel": 0.25, "accel_s": 0.12}},
+ "kb": ((0.5, 0.5, 1.0), (0.5, 0.5, 1.0)), "label": "REENACTMENT · AI", "stamp": "THEORY #1: THE GNOME",
+ "fallback": [V("rx_heist_gnome_bl_key", (0.5, 0.5, 1.0), (0.5, 0.5, 1.0)), V("garrison", ...)], ...}
+```
+
+The templates are `heist` (a subject dead still in a laser grid until its word, then a rigid glide, cut mid-glide) and `action` (Lorraine rocks on one to three words, tips on `tip_on` and drops a step in front of a fireball, landing on `land_on`). The beats name words in the shot's own lines (`"goose#2"` for the second one, or `{"word", "nth", "edge", "offset"}`), with `move_at`/`tip_at`/`land_at`/`flare_at` seconds as the fallback. `build_audio.py` checks the dict on every build, so a typo stops the build before anything is voiced. The Episode 1 remake's two reenactments carry one each.
+
+**Install** (once; either works):
+- `./setup.sh --blender`: `.venv-bpy/`, Blender as a Python module (`pip install bpy==5.0.1`, which exists for **Python 3.11 only**). It is found automatically.
+- The **Blender 5.0 app** from blender.org, then `export NM_BLENDER=/path/to/blender` (macOS: `/Applications/Blender.app/Contents/MacOS/Blender`). Recommended on a GPU machine.
+
+Then check the machine: `.venv/bin/python pipeline/blender_reenact.py --selftest` (pure-Python checks, then a tiny render, about a minute on a CPU). `pipeline/selftest.py` runs it with `--allow-skip`, and prints SKIP for the rendering half where no Blender is found.
+
+```bash
+B=pipeline/blender_reenact.py
+.venv/bin/python $B episodes/<ep> --dry-run                  # the plan: each beat (word -> seconds -> frame), engine, cost
+.venv/bin/python $B episodes/<ep> --preview [--shot heist]   # look and timing, never filed: build/blender/<clip>/sheet.png
+.venv/bin/python $B episodes/<ep> --build                    # files a draft, or "up to date" (make_episode.sh runs this)
+.venv/bin/python $B episodes/<ep> --quality final --require-models   # the deliverable, on a GPU machine
+.venv/bin/python $B episodes/<ep> --keyframe                 # frame 0 -> stills/<clip>_key.png, a fallback view
+.venv/bin/python $B model add garrison garrison.glb --source "..." --ai    # models/README.md; also: model list
+.venv/bin/python $B --showcase garrison --mode sheet --preview          # a model's (or proxy's) four views
+```
+
+**Preview, draft, final.** `--preview` renders every 6th frame plus the beat frames at 270×480 (Cycles 12 spp) into `build/blender/<clip>/`: `sheet.png` (frame 0, each beat, the move + 0.5 s, the cut, with the AI tag's zone and the button column drawn), `contact.png` and `preview.mp4` (the held frames, with the shot's slice of the soundtrack). It never touches `clips/`. A **draft** (540×960, 24 spp) is filed so the whole episode can be built and watched, but it is flagged: `review.py` warns and `deliver.py` refuses it. A **final** (1080×1920, 128 spp, volumetric haze) is the deliverable. Until `models/<name>.glb` is filed, the subject renders as a striped `_PROXY` stand-in, recorded as `proxy: true`, which `deliver.py` refuses too (`--allow-draft` for a test upload).
+
+**GPU.** `--engine auto` picks Eevee on a real GPU, else Cycles; `--device auto` uses OptiX, CUDA, HIP, Metal or oneAPI when Cycles finds one, else the CPU. A final on 4 CPU cores is about 2 hours a clip, and a draft's estimate is over the 30-minute budget, so the CPU route is for previews: render drafts and finals on a GPU machine (the guide's "Rendering finals on a GPU machine"). The plan line (`--dry-run --reprobe`) must say `eevee gpu` or `cycles gpu OPTIX` (or CUDA, HIP, METAL).
+
+**In `make_episode.sh`.** An episode with a `"blender"` dict builds in this order: `build_audio.py` (word times) → `blender_reenact.py --build` (at `NM_RX_QUALITY`, default draft) → `build_audio.py` again (records the filed clip) → `script_md.py` → `render.py` → `deliver.py --allow-draft`. Without Blender, or over the time budget, the pass prints a WARN and the reenactment plays its fallback still. `NM_FINAL=1` is the release build: final quality, a missing model is an error, no Blender is an error, and `deliver.py` refuses a draft or proxy. Episodes without a `"blender"` dict build exactly as before.
+
+**Reviewing a Blender clip.** Look at `build/blender/<clip>/sheet.png` first, and read the run's WARN lines: the tag zone (no subject, beam or fireball under the AI tag), the cut-back match (the real ornament on the hard cut sits where, and as big as, the reenactment's first frame showed it; the warning prints the `kb` that would match), the effect's size, the feet at the cut, and the timing (the drop on its word, the landing 0.25 s or more after it). After filing, the clip goes through the usual `clips.py sheet`, `render.py --contact` and `review.py` checks. The `.blender.json` sidecar records the Blender version, device, quality, models, beats, checks and both cache keys.
 
 ## Captions
 

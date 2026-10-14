@@ -1,6 +1,6 @@
 ---
 name: nobody-moves-produce-episode
-description: Build, check and deliver a NOBODY MOVES episode or Confessional video with the shows/nobody-moves pipeline. Covers setup, placing user images as stills, generating and filing the 3D reenactment clips (REENACTMENT_PROMPTS.md, pipeline/clips.py), voices (Kokoro scratch, Eleven v4 designed voices, NM_VOICES, locking takes, the user's own recordings), framing previews, the mixcheck gate, handing the render to nobody-moves-render, and the draft PR. Use this whenever the user wants to build, export or preview a NOBODY MOVES episode, has sent new images, clips or voice recordings for it, wants a reenactment generated or a shot reframed or a voice swapped, asks to "install Kokoro on my computer", or just says "make the video", even without naming the pipeline. Rendering, verifying and reviewing the finished video belong to nobody-moves-render. Sound and music changes, and measuring or fixing the mix, belong to nobody-moves-sound-design. Writing or rewriting the script belongs to nobody-moves-write-episode.
+description: Build, check and deliver a NOBODY MOVES episode or Confessional with the shows/nobody-moves pipeline. Covers setup, user images as stills, generating and filing the 3D reenactment clips (REENACTMENT_PROMPTS.md, pipeline/clips.py) or rendering them in Blender (pipeline/blender_reenact.py), voices (Kokoro scratch, Eleven v4 designed voices, NM_VOICES, locked takes, the user's recordings), framing previews, the mixcheck gate, handing the render to nobody-moves-render, and the draft PR. Use this whenever the user wants to build, export or preview a NOBODY MOVES episode, has sent new images, clips or voice recordings for it, wants a reenactment generated or rendered in Blender, a shot reframed or a voice swapped, asks to "install Kokoro on my computer", or just says "make the video", even without naming the pipeline. Rendering, verifying and reviewing the finished video belong to nobody-moves-render; sound, music and the mix to nobody-moves-sound-design; writing the script to nobody-moves-write-episode.
 ---
 
 # Produce a NOBODY MOVES episode
@@ -9,7 +9,7 @@ Pipeline: `shows/nobody-moves/`. Other skills own the rest:
 - **`nobody-moves-write-episode`** writes the episode. If `episodes/<ep>/` doesn't exist yet (e.g. "render episode 4" before it's written), write it with that skill first.
 - **`nobody-moves-render`** (or the `nobody-moves-renderer` subagent, which preloads it) renders the final videos, verifies them and reviews them against a reference episode.
 - **`nobody-moves-sound-design`** owns sound and music changes and diagnosing the mix. Hand off to it for any mixcheck FAIL, a line under 8 dB, or a request to change a sound.
-- **`higgsfield-generate`** makes the reenactments' keyframes and clips, when Higgsfield is reachable (section 5).
+- **`higgsfield-generate`** makes the reenactments' keyframes and clips, and the cast's 3D models (GLB), when Higgsfield is reachable (sections 5 and 5b).
 
 Run everything from the show folder:
 
@@ -23,13 +23,14 @@ Every build output lands in `episodes/<ep>/build/`, not in the show folder.
 **Order for an episode with reenactments** (the Episode 1 remake's `TEST_PLAN.md` and `NOTES.md` are the worked example):
 1. Build the audio on the Kokoro scratch voices (with `NM_VOICES=kokoro` once the voice IDs are in `cast.py`, or every plain build of an episode that ships v4 voices, and bills, its changed lines), with no clips: the reenactments render their fallback stills under the label. Check the timing, captions, safe zones, mixcheck and the `validate()` warnings.
 2. Voice the lines on the final voices and lock the takes, the reenactment lines first (section 4).
-3. Generate the reference sheets and keyframes, then the clips against the locked takes, and file them (section 5).
+3. Generate the reference sheets and keyframes, then the clips against the locked takes, and file them (section 5); or, for a shot with a `"blender"` dict, render it in Blender (section 5b).
 4. Rebuild, look (section 6), then render and review (section 7).
 
 ## 1. Environment
 
 - **Setup:** if `.venv/` or `assets/models/` is missing, run `./setup.sh`. It needs Python 3.10–3.13 and fetches the TTS model and fonts from PyPI and GitHub.
-- **Self-test:** `.venv/bin/python pipeline/selftest.py` checks the stock-asset code, the audio-tag handling and the reenactment kind offline, with no keys needed.
+- **Self-test:** `.venv/bin/python pipeline/selftest.py` checks the stock-asset code, the audio-tag handling, the reenactment kind and the Blender path offline, with no keys needed. It runs `pipeline/blender_reenact.py --selftest --allow-skip`, whose rendering half prints SKIP where no Blender is found.
+- **Blender (optional, for Blender reenactments):** `./setup.sh --blender` (`.venv-bpy`, `bpy==5.0.1`, Python 3.11 only), or the Blender 5.0 app with `export NM_BLENDER=/path/to/blender`. Check with `.venv/bin/python pipeline/blender_reenact.py --selftest`.
 - **Cloud sessions:** many hosts are blocked, including Canva downloads, Higgsfield, Freesound, ElevenLabs and Pexels. Don't try to route around a block. Ask the user to send the images, clips or takes, or to allow the host, and carry on with everything that doesn't depend on it. The paid steps (Eleven v4 takes, Higgsfield clips) run wherever those hosts are reachable, usually the user's own machine.
 - **Kokoro on the user's own computer:** a cloud session can't install anything on their machine, so give them the command to run there, from the root of their checkout: `shows/nobody-moves/tools/install-kokoro.sh`. It puts a `kokoro` command in `~/.local/bin` (and prints the PATH line if that folder isn't on it), with the show's pinned versions and model files. Then `kokoro --voices` lists the presets and `kokoro "I didn't see nothing." garrison.wav am_fenrir && afplay garrison.wav` plays one on a Mac. It speaks the plain preset, without `cast.py`'s pitch shift or "voice altered" filter.
 
@@ -95,6 +96,20 @@ Each reenactment is a generated 3D clip, one ornament making one rigid move on a
 9. **Check it:** `.venv/bin/python pipeline/clips.py sheet episodes/<ep>` writes the first, middle and last frame of every clip to `build/review/clips.png`; go through the clip's checklist in `REENACTMENT_PROMPTS.md`. `.venv/bin/python pipeline/clips.py lint episodes/<ep>` re-runs the prompt lint.
 10. **Rebuild the audio** after filing or replacing a clip: the shot length can depend on the clip, and `render.py` refuses a clip that changed since the timeline was built ("rebuild the audio").
 
+## 5b. Blender reenactments
+
+**Blender renders run on your own machine only.** Never in a cloud or remote session: `pipeline/blender_reenact.py` refuses to start Blender when `CLAUDE_CODE_REMOTE` is set, and its selftest reports the rendering half as skipped there. Render finals and previews on your computer, then file the clip with `blender_reenact.py`.
+
+
+A reenactment shot with a `"blender"` dict is rendered by `pipeline/blender_reenact.py` instead of generated: the cast's 3D models (or striped `_PROXY` stand-ins until a model is filed), a rigid move landed on a word of the build's own take, a locked camera, no human possible. It is filed like any generated clip, through `clips.py add` (`clips/<key>.mp4`, its `clips.json` entry with `quality`, `proxy` and `sidecar`, and `clips/<key>.blender.json`). The label stays `REENACTMENT · AI`. Guide: `docs/BLENDER_REENACTMENTS.md`; models: `models/README.md`.
+
+- **Blender path or AI clip.** Use Blender when the move must land exactly on a word, must be repeatable after a re-voice, or no generator take keeps the ornament rigid; the AI route (section 5) when the look needs something the templates (`heist`, `action`) can't stage. One shot plays one source: the Blender clip has its own key ending in `_bl` (`rx_heist_gnome_bl`), never the AI clip's key, and the AI route's values stay in a comment on the shot. Switching back means pointing `"clip"` (and `in`, `kb`) at the AI key.
+- **The order.** `./make_episode.sh episodes/<ep>` does it: `build_audio.py` → `blender_reenact.py --build` (a draft; `NM_RX_QUALITY=final` for finals) → `build_audio.py` → render. Without Blender, or with a CPU estimate over 30 min, it warns and the fallback still plays. By hand: `--dry-run` (beats and cost), `--preview` (look and timing: `build/blender/<clip>/sheet.png`, never filed), `--build`. Re-voicing a line moves its beats; the next `--build` re-renders only when a beat lands on a different frame.
+- **Read the run's WARN lines** before anything else: the tag zone, the cut-back match (with the `kb` the next still needs; on the remake, `l_deny` goes to `(0.50, 0.50, 1.0)` once the Blender action ships), effect coverage, feet at the cut, and the timing (the drop within 0.1 s of its word, the landing 0.25 s or more after it). Hand the sheet review to `nobody-moves-render`.
+- **Models.** Each subject wants `models/<name>.glb`: a Higgsfield 3D GLB (`higgsfield-generate`, `multi_image_to_3d`, textured) from one clean view of the series still (the front view cropped from `ref3d_<name>`; Lorraine's beak-left three-quarter view, never her back), or any modelling tool with the same conventions (+Y up, front on +Z, one figurine; scale and origin are ignored). File it with `.venv/bin/python pipeline/blender_reenact.py model add <name> <file.glb> --source "..." --ai` (or `--no-ai`), which checks it in Blender before filing, then compare its sheet with the library still: the library wins on identity. Never edit `models.json` by hand.
+- **Proxies and drafts are placeholders.** A clip rendered with a proxy, or at draft quality, is flagged in `clips.json` and the timeline: `review.py` warns, `deliver.py` refuses it without `--allow-draft`, and `NM_FINAL=1 ./make_episode.sh` makes a missing model or no Blender an error. Finals (`--quality final --require-models`) belong on a GPU machine (the plan line must say `eevee gpu` or `cycles gpu OPTIX`/CUDA/HIP/METAL); a CPU final takes about 2 hours a clip.
+- **Commit:** `models/models.json` after a `model add` (the GLB itself only on purpose: `git add -f models/<name>.glb`), the episode's `clips/clips.json`, and a final Blender clip with its sidecar on purpose (`git add -f episodes/<ep>/clips/<key>_bl.mp4 episodes/<ep>/clips/<key>_bl.blender.json`; drafts are git-ignored). Never commit `build/blender/` or the show's `build/`.
+
 ## 6. Look before rendering
 
 A full render takes about 10 minutes for a main episode, and previews take seconds. Check framing first:
@@ -130,7 +145,7 @@ Follow `nobody-moves-render`, or delegate the whole step to the `nobody-moves-re
 
 ## 8. Hand-off
 
-- **Commit:** `episode.py`, `SCRIPT.md`, `NOTES.md` and `REENACTMENT_PROMPTS.md` if the episode has them, any new stills (keyframes in the episode, `ref3d_*` sheets in the library), `clips/` with its `clips.json`, `recordings/` (the user's takes and locked v4 takes), any `make_stills.py`, the grid cover and its `COVERS` entry, and `stock/` if it changed. Never commit `build/`, `.env` or `assets/`.
+- **Commit:** `episode.py`, `SCRIPT.md`, `NOTES.md` and `REENACTMENT_PROMPTS.md` if the episode has them, any new stills (keyframes in the episode, `ref3d_*` sheets in the library), `clips/` with its `clips.json` (a final Blender clip with `git add -f`, section 5b), `models/models.json` if a model was filed, `recordings/` (the user's takes and locked v4 takes), any `make_stills.py`, the grid cover and its `COVERS` entry, and `stock/` if it changed. Never commit `build/`, `.env` or `assets/`.
 - **PR:** open it as a draft. Merge only when the user says so ("merge it"), because they review the video first, and use a merge commit, like the repo's earlier PRs. A `git fetch` right after the merge may be denied; confirm the merge on GitHub instead.
 - **Tell the user:**
   - the runtime and the pace (words/min overall and while speaking);
