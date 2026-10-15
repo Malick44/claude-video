@@ -1,0 +1,15 @@
+{
+  "fps": 30,
+  "transition": 15,
+  "scenes": [
+    {"id": "hook", "frames": 240},
+    {"id": "squeeze", "frames": 390},
+    {"id": "paycheck", "frames": 360},
+    {"id": "dime", "frames": 510},
+    {"id": "cost", "frames": 420},
+    {"id": "match", "frames": 390},
+    {"id": "myths", "frames": 420},
+    {"id": "steps", "frames": 360},
+    {"id": "close", "frames": 330}
+  ]
+}
